@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension point="org.eclipse.ui.editors">
+      <editor
+            class="org.rustlang.oxide.editor.RustEditor"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            default="true"
+            extensions="rs,rc"
+            icon="icons/rust-logo-16x16.png"
+            id="org.rustlang.oxide.editor.RustEditor"
+            name="Rust Editor">
+         <contentTypeBinding contentTypeId="org.rustlang.oxide.rustfile">
+         </contentTypeBinding>
+      </editor>
+   </extension>
+
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.rustlang.oxide.preferences.OxidePreferencesInitializer"/>
+   </extension>
+
+   <extension point="org.eclipse.ui.editors.documentProviders">
+      <provider
+            class="org.rustlang.oxide.editor.RustDocumentProvider"
+            id="org.rustlang.oxide.editor.RustDocumentProvider"
+            extensions=".rs,.rc"/>
+   </extension>
+
+   <extension point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            file-extensions="rs,rc"
+            name="Rust File"
+            id="org.rustlang.oxide.rustfile"
+            base-type="org.eclipse.core.runtime.text"/>
+   </extension>
+
+   <extension point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.rustlang.oxide.perspective.RustPerspective"
+            icon="icons/rust-logo-16x16.png"
+            id="org.rustlang.oxide.perspective.RustPerspective"
+            name="Rust">
+      </perspective>
+   </extension>
+
+   <extension point="org.eclipse.ui.newWizards">
+      <category
+            id="org.rustlang.eclipse.RustCategory"
+            name="Rust">
+      </category>
+      <wizard
+            canFinishEarly="false"
+            category="org.rustlang.eclipse.RustCategory"
+            class="org.rustlang.oxide.wizards.RustProjectWizard"
+            descriptionImage="icons/rust-logo-64x64.png"
+            finalPerspective="org.rustlang.oxide.perspective.RustPerspective"
+            hasPages="true"
+            icon="icons/rust-logo-16x16.png"
+            id="org.rustlang.oxide.wizards.RustProjectWizard"
+            name="RustProject"
+            preferredPerspectives="org.rustlang.oxide.perspective.RustPerspective"
+            project="true">
+      </wizard>
+   </extension>
+   <extension point="org.eclipse.ui.editors.templates">
+      <template
+            autoinsert="false"
+            name="crate"
+            description="Crate"
+            contextTypeId="org.rustlang.oxide.editor.templates.crate"
+            id="org.rustlang.oxide.editor.templates.crate">
+      <pattern>#[link(name = "${project_name}",
+       vers = "${version}",
+       uuid = "${uuid}",
+       url = "${url}")];
+
+#[author = "${user}"];
+#[license = "${license}"];
+#[crate_type = "{crate_type}"];
+
+#[doc(brief = "${brief}",
+      desc = "${desc}")];</pattern>
+      </template>
+      <template
+            autoinsert="false"
+            name="gitignore"
+            description=".gitignore"
+            contextTypeId="org.rustlang.oxide.editor.templates.gitignore"
+            id="org.rustlang.oxide.editor.templates.gitignore">
+      <pattern>${project_name}
+*.a
+*.dSYM
+*.dll
+*.dylib
+*.exe
+*.o
+*.so
+*.swo
+*.swp
+*.tmp
+*~</pattern>
+      </template>
+      <template
+            autoinsert="false"
+            name="readme"
+            description="README.md"
+            contextTypeId="org.rustlang.oxide.editor.templates.readme"
+            id="org.rustlang.oxide.editor.templates.gitignore">
+      <pattern>TODO: write
+</pattern>
+      </template>
+   </extension>
+
+</plugin>
