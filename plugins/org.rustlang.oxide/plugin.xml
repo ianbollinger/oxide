@@ -58,7 +58,7 @@
             hasPages="true"
             icon="icons/rust-logo-16x16.png"
             id="org.rustlang.oxide.wizards.RustProjectWizard"
-            name="RustProject"
+            name="Rust Project"
             preferredPerspectives="org.rustlang.oxide.perspective.RustPerspective"
             project="true">
       </wizard>
