@@ -3,7 +3,6 @@ package org.rustlang.oxide.text;
 import org.eclipse.jface.text.rules.*;
 import org.eclipse.jface.text.*;
 import org.eclipse.swt.SWT;
-import org.rustlang.oxide.text.util.*;
 
 public class RustCodeScanner extends BufferedRuleBasedScanner {
     private static final String[] KEYWORDS = {
