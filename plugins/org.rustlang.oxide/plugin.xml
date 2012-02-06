@@ -63,13 +63,60 @@
             project="true">
       </wizard>
    </extension>
+
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.rustlang.oxide.preferences.RustPreferencePage"
+            id="RustPreferencePage"
+            name="Rust">
+      </page>
+      <page
+            category="RustPreferencePage"
+            class="org.rustlang.oxide.preferences.RustEditorPreferencePage"
+            id="RustEditorPreferencePage"
+            name="Editor">
+      </page>
+      <page
+            category="RustEditorPreferencePage"
+            class="org.rustlang.oxide.preferences.RustSyntaxColoringPreferencePage"
+            id="RustSyntaxColoringPreferencePage"
+            name="Syntax Coloring">
+      </page>
+   </extension>
+
+   <extension
+         id="RustBuilder"
+         name="Rust Builder"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            hasNature="true">
+         <run class="org.rustlang.oxide.builder.RustCompilerBuilder">
+         </run>
+      </builder>
+   </extension>
+
+   <extension
+         id="RustNature"
+         name="Rust Nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run class="org.rustlang.oxide.nature.RustNature">
+         </run>
+      </runtime>
+      <builder id="org.rustlang.oxide.RustBuilder"/> 
+   </extension>
+
    <extension point="org.eclipse.ui.editors.templates">
+      <contextType
+            class="org.rustlang.oxide.templates.RustTemplateContextType"
+            id="org.rustlang.oxide.templates.RustTemplateContextType">
+      </contextType>
       <template
+            id="org.rustlang.oxide.templates.crate"
+            contextTypeId="org.rustlang.oxide.templates.RustTemplateContextType"
             autoinsert="false"
-            name="crate"
-            description="Crate"
-            contextTypeId="org.rustlang.oxide.editor.templates.crate"
-            id="org.rustlang.oxide.editor.templates.crate">
+            name="crate">
       <pattern>#[link(name = "${project_name}",
        vers = "${version}",
        uuid = "${uuid}",
@@ -80,14 +127,14 @@
 #[crate_type = "{crate_type}"];
 
 #[doc(brief = "${brief}",
-      desc = "${desc}")];</pattern>
+      desc = "${desc}")];
+</pattern>
       </template>
       <template
             autoinsert="false"
             name="gitignore"
-            description=".gitignore"
-            contextTypeId="org.rustlang.oxide.editor.templates.gitignore"
-            id="org.rustlang.oxide.editor.templates.gitignore">
+            contextTypeId="org.rustlang.oxide.templates.RustTemplateContextType"
+            id="org.rustlang.oxide.templates.gitignore">
       <pattern>${project_name}
 *.a
 *.dSYM
@@ -101,35 +148,33 @@
 *.tmp
 *~</pattern>
       </template>
+
       <template
             autoinsert="false"
             name="readme"
-            description="README.md"
-            contextTypeId="org.rustlang.oxide.editor.templates.readme"
-            id="org.rustlang.oxide.editor.templates.gitignore">
+            contextTypeId="org.rustlang.oxide.templates.RustTemplateContextType"
+            id="org.rustlang.oxide.editor.templates.readme">
       <pattern>TODO: write
 </pattern>
       </template>
-   </extension>
-   <extension
-         point="org.eclipse.ui.preferencePages">
-      <page
-            class="org.rustlang.oxide.preferences.RustPreferencePage"
-            id="org.rustlang.oxide.preferences.RustPreferencePage"
-            name="Rust">
-      </page>
-      <page
-            category="org.rustlang.oxide.preferences.RustPreferencePage"
-            class="org.rustlang.oxide.preferences.RustEditorPreferencePage"
-            id="org.rustlang.oxide.preferences.RustEditorPreferencePage"
-            name="Editor">
-      </page>
-      <page
-            category="org.rustlang.oxide.preferences.RustEditorPreferencePage"
-            class="org.rustlang.oxide.preferences.RustSyntaxColoringPreferencePage"
-            id="org.rustlang.oxide.preferences.RustSyntaxColoringPreferencePage"
-            name="Syntax Coloring">
-      </page>
-   </extension>
 
+      <template
+            autoinsert="false"
+            name="sourcefile"
+            contextTypeId="org.rustlang.oxide.templates.RustTemplateContextType"
+            id="org.rustlang.oxide.editor.templates.sourcefile">
+      <pattern>// TODO: write
+</pattern>
+      </template>
+
+      <template
+            autoinsert="false"
+            name="license"
+            contextTypeId="org.rustlang.oxide.templates.RustTemplateContextType"
+            id="org.rustlang.oxide.editor.templates.license">
+      <pattern>TODO: write
+</pattern>
+      </template>
+
+   </extension>
 </plugin>
