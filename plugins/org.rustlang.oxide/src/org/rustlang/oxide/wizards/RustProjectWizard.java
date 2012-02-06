@@ -1,6 +1,5 @@
 package org.rustlang.oxide.wizards;
 
-import java.io.ByteArrayInputStream;
 import java.lang.reflect.InvocationTargetException;
 import org.eclipse.core.resources.*;
 import org.eclipse.core.runtime.*;
@@ -13,6 +12,7 @@ import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.eclipse.ui.dialogs.WizardNewProjectReferencePage;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 import org.rustlang.oxide.OxidePlugin;
+import org.rustlang.oxide.RustProjects;
 
 public class RustProjectWizard extends Wizard implements INewWizard,
         IExecutableExtension {
@@ -52,8 +52,7 @@ public class RustProjectWizard extends Wizard implements INewWizard,
     }
 
     private RustProjectWizardPage createProjectPage() {
-        return new RustProjectWizardPage(
-                "Setting project properties");
+        return new RustProjectWizardPage("Setting project properties");
     }
 
     @Override
@@ -96,9 +95,8 @@ public class RustProjectWizard extends Wizard implements INewWizard,
         }
         final WorkspaceModifyOperation op = new WorkspaceModifyOperation() {
             @Override
-            protected void execute(IProgressMonitor monitor)
-                    throws CoreException {
-                createAndConfigProject(newProjectHandle, description, monitor);
+            protected void execute(IProgressMonitor monitor) {
+                RustProjects.create(description, newProjectHandle, monitor);
             }
         };
         try {
@@ -113,14 +111,14 @@ public class RustProjectWizard extends Wizard implements INewWizard,
                     MessageDialog.openError(getShell(),
                             "Unable to create project",
                             "Another project with the same name (and different "
-                            + "case) already exists.");
+                                    + "case) already exists.");
                 } else {
                     ErrorDialog.openError(getShell(),
                             "Unable to create project", null,
                             ((CoreException) t).getStatus());
                 }
             } else {
-                // Log.log(IStatus.ERROR, t.toString(), t);
+                OxidePlugin.log(IStatus.ERROR, t.toString(), t);
                 MessageDialog.openError(getShell(), "Unable to create project",
                         t.getMessage());
             }
@@ -129,42 +127,7 @@ public class RustProjectWizard extends Wizard implements INewWizard,
         return newProjectHandle;
     }
 
-    private void createAndConfigProject(final IProject newProjectHandle,
-            final IProjectDescription description,
-            final IProgressMonitor monitor) throws CoreException {
-        createRustProject(description, newProjectHandle, monitor);
-    }
-
     public IProject getCreatedProject() {
         return createdProject;
-    }
-
-    // TODO: move this somewhere appropriate!
-    private void createRustProject(final IProjectDescription description,
-            final IProject projectHandle, final IProgressMonitor monitor)
-            throws CoreException {
-        try {
-            monitor.beginTask("", 2000);
-            projectHandle.create(description, new SubProgressMonitor(monitor,
-                    1000));
-            if (monitor.isCanceled()) {
-                throw new OperationCanceledException();
-            }
-            projectHandle.open(IResource.BACKGROUND_REFRESH,
-                    new SubProgressMonitor(monitor, 1000));
-            // TODO: create makefile
-            projectHandle.getFile("README.md").create(
-                    new ByteArrayInputStream(new byte[] {}), false, null);
-            projectHandle.getFile("LICENSE.txt").create(
-                    new ByteArrayInputStream(new byte[] {}), false, null);
-            projectHandle.getFile(".gitignore").create(
-                    new ByteArrayInputStream(new byte[] {}), false, null);
-            projectHandle.getFile(description.getName() + ".rc").create(
-                    new ByteArrayInputStream(new byte[] {}), false, null);
-            projectHandle.getFile(description.getName() + ".rs").create(
-                    new ByteArrayInputStream(new byte[] {}), false, null);
-        } finally {
-            monitor.done();
-        }
     }
 }
