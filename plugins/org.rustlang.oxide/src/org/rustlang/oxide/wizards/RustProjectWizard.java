@@ -1,58 +1,65 @@
 package org.rustlang.oxide.wizards;
 
 import java.lang.reflect.InvocationTargetException;
-import org.eclipse.core.resources.*;
-import org.eclipse.core.runtime.*;
-import org.eclipse.jface.dialogs.*;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExecutableExtension;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.text.templates.TemplateContext;
+import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.wizard.*;
-import org.eclipse.ui.*;
-import org.eclipse.ui.actions.WorkspaceModifyOperation;
+import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.ui.INewWizard;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.dialogs.WizardNewProjectReferencePage;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 import org.rustlang.oxide.OxidePlugin;
-import org.rustlang.oxide.RustProjects;
+import org.rustlang.oxide.RustCreateProjectOperation;
+import org.rustlang.oxide.templates.BasicTemplateContext;
+import org.rustlang.oxide.templates.RustTemplateContextType;
 
+// TODO: Handle working sets.
 public class RustProjectWizard extends Wizard implements INewWizard,
         IExecutableExtension {
-    public static final String WIZARD_ID =
+    public static final String ID =
             "org.rustlang.oxide.wizards.RustProjectWizard";
+    private IWorkspace workspace;
     private IConfigurationElement config;
-    private RustProjectWizardPage projectPage;
-    private IProject createdProject;
+    private RustNewProjectWizardPage projectPage;
     private WizardNewProjectReferencePage referencePage;
 
-    private void addProjectReferencePage() {
-        if (ResourcesPlugin.getWorkspace().getRoot().getProjects().length > 0) {
-            referencePage = new WizardNewProjectReferencePage("Reference Page");
-            referencePage.setTitle("Reference page");
-            referencePage.setDescription("Select referenced projects");
-            this.addPage(referencePage);
-        }
+    @Override
+    public void init(@SuppressWarnings("unused") final IWorkbench workbench,
+            @SuppressWarnings("unused") final IStructuredSelection selection) {
+        final ImageDescriptor descriptor = OxidePlugin
+                .getImageDescriptor("icons/rust-logo-64x64.png");
+        setDefaultPageImageDescriptor(descriptor);
+        this.workspace = ResourcesPlugin.getWorkspace();
+        this.projectPage = new RustNewProjectWizardPage();
     }
 
     @Override
     public void addPages() {
         addPage(projectPage);
-        addProjectReferencePage();
+        if (projectsInWorkspace()) {
+            addPage(createReferencePage());
+        }
     }
 
-    @Override
-    public void init(@SuppressWarnings("unused") final IWorkbench workbench,
-            @SuppressWarnings("unused") final IStructuredSelection selection) {
-        initializeDefaultPageImageDescriptor();
-        projectPage = createProjectPage();
+    private boolean projectsInWorkspace() {
+        return workspace.getRoot().getProjects().length > 0;
     }
 
-    private void initializeDefaultPageImageDescriptor() {
-        final ImageDescriptor desc = OxidePlugin
-                .getImageDescriptor("icons/rust-logo-64x64.png");
-        setDefaultPageImageDescriptor(desc);
-    }
-
-    private RustProjectWizardPage createProjectPage() {
-        return new RustProjectWizardPage("Setting project properties");
+    private IWizardPage createReferencePage() {
+        final IWizardPage page = new WizardNewProjectReferencePage(
+                "rustReferenceProjectPage");
+        page.setTitle("Rust Project");
+        page.setDescription("Select referenced projects.");
+        return page;
     }
 
     @Override
@@ -64,70 +71,31 @@ public class RustProjectWizard extends Wizard implements INewWizard,
 
     @Override
     public boolean performFinish() {
-        createdProject = createNewProject();
+        final IProject newProjectHandle = projectPage.getProjectHandle();
+        final IProject[] referencedProjects = getReferencedProjects();
+        final TemplateStore templateStore = OxidePlugin.getTemplateStore();
+        final TemplateContext templateContext = new BasicTemplateContext(
+                new RustTemplateContextType());
+        final IRunnableWithProgress operation = new RustCreateProjectOperation(
+                newProjectHandle, referencedProjects, workspace, templateStore,
+                templateContext);
+        final boolean fork = true;
+        final boolean cancelable = true;
+        try {
+            getContainer().run(fork, cancelable, operation);
+        } catch (final InterruptedException e) {
+            return false;
+        } catch (final InvocationTargetException e) {
+            OxidePlugin.log(e);
+            return false;
+        }
         BasicNewProjectResourceWizard.updatePerspective(config);
         return true;
     }
 
-    private IProject createNewProject() {
-        final IProject newProjectHandle = projectPage.getProjectHandle();
-        final IPath defaultPath = Platform.getLocation();
-        IPath newPath = projectPage.getLocationPath();
-        if (defaultPath.equals(newPath)) {
-            newPath = null;
-        } else {
-            final IPath withName = defaultPath.append(newProjectHandle
-                    .getName());
-            if (newPath.toFile().equals(withName.toFile())) {
-                newPath = null;
-            }
-        }
-        final IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        final IProjectDescription description = workspace
-                .newProjectDescription(newProjectHandle.getName());
-        description.setLocation(newPath);
-        if (referencePage != null) {
-            final IProject[] refProjects = referencePage
-                    .getReferencedProjects();
-            if (refProjects.length > 0) {
-                description.setReferencedProjects(refProjects);
-            }
-        }
-        final WorkspaceModifyOperation op = new WorkspaceModifyOperation() {
-            @Override
-            protected void execute(IProgressMonitor monitor) {
-                RustProjects.create(description, newProjectHandle, monitor);
-            }
-        };
-        try {
-            getContainer().run(true, true, op);
-        } catch (final InterruptedException e) {
-            return null;
-        } catch (final InvocationTargetException e) {
-            final Throwable t = e.getTargetException();
-            if (t instanceof CoreException) {
-                final int code = ((CoreException) t).getStatus().getCode();
-                if (code == IResourceStatus.CASE_VARIANT_EXISTS) {
-                    MessageDialog.openError(getShell(),
-                            "Unable to create project",
-                            "Another project with the same name (and different "
-                                    + "case) already exists.");
-                } else {
-                    ErrorDialog.openError(getShell(),
-                            "Unable to create project", null,
-                            ((CoreException) t).getStatus());
-                }
-            } else {
-                OxidePlugin.log(IStatus.ERROR, t.toString(), t);
-                MessageDialog.openError(getShell(), "Unable to create project",
-                        t.getMessage());
-            }
-            return null;
-        }
-        return newProjectHandle;
-    }
-
-    public IProject getCreatedProject() {
-        return createdProject;
+    private IProject[] getReferencedProjects() {
+        return (referencePage != null)
+                ? referencePage.getReferencedProjects()
+                : new IProject[] {};
     }
 }
