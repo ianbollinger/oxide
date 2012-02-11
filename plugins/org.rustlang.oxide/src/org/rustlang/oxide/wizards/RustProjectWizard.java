@@ -22,7 +22,6 @@ import org.rustlang.oxide.RustCreateProjectOperation;
 import org.rustlang.oxide.templates.BasicTemplateContext;
 import org.rustlang.oxide.templates.RustTemplateContextType;
 
-// TODO: Handle working sets.
 public class RustProjectWizard extends Wizard implements INewWizard,
         IExecutableExtension {
     public static final String ID =
@@ -34,12 +33,12 @@ public class RustProjectWizard extends Wizard implements INewWizard,
 
     @Override
     public void init(@SuppressWarnings("unused") final IWorkbench workbench,
-            @SuppressWarnings("unused") final IStructuredSelection selection) {
+            final IStructuredSelection selection) {
         final ImageDescriptor descriptor = OxidePlugin
                 .getImageDescriptor("icons/rust-logo-64x64.png");
         setDefaultPageImageDescriptor(descriptor);
         this.workspace = ResourcesPlugin.getWorkspace();
-        this.projectPage = new RustNewProjectWizardPage();
+        this.projectPage = new RustNewProjectWizardPage(selection);
     }
 
     @Override
