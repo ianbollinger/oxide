@@ -12,7 +12,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rustlang.oxide.OxidePlugin;
 
-public class RustCompilerBuilder extends IncrementalProjectBuilder {
+public class RustBuilder extends IncrementalProjectBuilder {
+    public static final String ID = "org.rustlang.oxide.RustBuilder";
+
     @Override
     protected IProject[] build(final int kind,
             @SuppressWarnings("unused") final Map<String, String> args,
@@ -30,11 +32,6 @@ public class RustCompilerBuilder extends IncrementalProjectBuilder {
             }
         }
         return null;
-    }
-
-    @Override
-    protected void startupOnInitialize() {
-        super.startupOnInitialize();
     }
 
     @Override
@@ -61,7 +58,7 @@ public class RustCompilerBuilder extends IncrementalProjectBuilder {
         }
     }
 
-    public List<RustBuilderVisitor> getVisitors() {
+    private List<RustBuilderVisitor> getVisitors() {
         return ImmutableList.of((RustBuilderVisitor) new RustCompilerVisitor());
     }
 
