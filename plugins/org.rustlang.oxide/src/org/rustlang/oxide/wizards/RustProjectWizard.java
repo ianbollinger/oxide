@@ -19,6 +19,7 @@ import org.eclipse.ui.dialogs.WizardNewProjectReferencePage;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 import org.rustlang.oxide.OxidePlugin;
 import org.rustlang.oxide.RustCreateProjectOperation;
+import org.rustlang.oxide.language.model.CrateAttributes;
 import org.rustlang.oxide.templates.BasicTemplateContext;
 import org.rustlang.oxide.templates.RustTemplateContextType;
 
@@ -71,10 +72,18 @@ public class RustProjectWizard extends Wizard implements INewWizard,
     @Override
     public boolean performFinish() {
         final IProject newProjectHandle = projectPage.getProjectHandle();
+        final CrateAttributes model = projectPage.createModel();
         final IProject[] referencedProjects = getReferencedProjects();
         final TemplateStore templateStore = OxidePlugin.getTemplateStore();
         final TemplateContext templateContext = new BasicTemplateContext(
                 new RustTemplateContextType());
+        templateContext.setVariable("project_name", model.getName());
+        templateContext.setVariable("version", model.getVersion());
+        templateContext.setVariable("url", model.getUrl());
+        templateContext.setVariable("author", model.getAuthor());
+        templateContext.setVariable("license", model.getLicenseName());
+        templateContext.setVariable("brief", model.getBriefDescription());
+        templateContext.setVariable("desc", model.getLongDescription());
         final IRunnableWithProgress operation = new RustCreateProjectOperation(
                 newProjectHandle, referencedProjects, workspace, templateStore,
                 templateContext);

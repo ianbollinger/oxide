@@ -10,16 +10,17 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.rustlang.oxide.language.model.CrateType;
 
 // TODO: is there a point to allow having the crate name be different
 // than the project name?
-// TODO: separate into different groups
-// TODO: using jface's databinding API might tidy things up.
-// TODO: implement validation in general.
+// // TODO: implement validation in general.
 public class RustProjectPropertiesGroup {
     private final Composite parent;
     private final Font font;
-    private final Group group;
+    private final Group propertiesGroup;
+    private final Group metadataGroup;
+    private final Group documentationGroup;
     private final Composite crateTypeGroup;
     private final Text versionField;
     private final Text urlField;
@@ -31,34 +32,45 @@ public class RustProjectPropertiesGroup {
     RustProjectPropertiesGroup(final Composite parent, final Font font) {
         this.parent = parent;
         this.font = font;
-        this.group = createGroup();
+        this.propertiesGroup = createGroup("Crate properties");
         this.crateTypeGroup = createCrateTypeGroup();
         this.versionField = createVersionField();
         // TODO: do we want a default URL?
         // e.g. https://github.com/<author>/<project>
-        this.urlField = createTextField("URL");
-        // TODO: set author to user.name.
-        this.authorField = createTextField("Author");
+        this.urlField = createTextField(propertiesGroup, "URL");
+        this.metadataGroup = createGroup("Crate metadata");
+        this.authorField = createTextField(metadataGroup, "Author");
+        authorField.setText(System.getProperty("user.name"));
         this.licenseCombo = createLicenseCombo();
-        this.briefDescriptionField = createTextField("Brief");
+        this.documentationGroup = createGroup("Crate documentation");
+        this.briefDescriptionField = createTextField(documentationGroup,
+                "Brief");
         this.longDescriptionField = createLongDescriptionField();
-        GridLayoutFactory.swtDefaults().numColumns(2).generateLayout(group);
+        generateLayouts();
     }
 
-    private Group createGroup() {
+    private void generateLayouts() {
+        final GridLayoutFactory twoColumnLayoutFactory = GridLayoutFactory
+                .swtDefaults().numColumns(2);
+        twoColumnLayoutFactory.generateLayout(propertiesGroup);
+        twoColumnLayoutFactory.generateLayout(metadataGroup);
+        twoColumnLayoutFactory.generateLayout(documentationGroup);
+    }
+
+    private Group createGroup(final String title) {
         final Group result = new Group(parent, SWT.NONE);
         result.setFont(font);
-        result.setText("Properties");
+        result.setText(title);
         GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER)
                 .applyTo(result);
         return result;
     }
 
     private Combo createLicenseCombo() {
-        createLabel("License");
-        final Combo combo = new Combo(group, SWT.NONE);
-        // TODO: is this the right list of licenses? Store somewhere
-        // appropriate.
+        createLabel(metadataGroup, "License");
+        final Combo combo = new Combo(metadataGroup, SWT.NONE);
+        // TODO: is this the right list of licenses?
+        // TODO: Store somewhere appropriate.
         combo.add("Apache-2.0");
         combo.add("BSD-2-clause");
         combo.add("MIT");
@@ -69,11 +81,12 @@ public class RustProjectPropertiesGroup {
     }
 
     private Composite createCrateTypeGroup() {
-        createLabel("Crate type");
-        // TODO: too much space between buttons.
-        final Composite radioButtonGroup = new Composite(group, SWT.NONE);
-        // TODO: select a default.
-        createRadioButton("Library", radioButtonGroup);
+        createLabel(propertiesGroup, "Crate type");
+        // TODO: does this belong with the other crate "properties"?
+        final Composite radioButtonGroup = new Composite(propertiesGroup,
+                SWT.NONE);
+        final Button library = createRadioButton("Library", radioButtonGroup);
+        library.setSelection(true);
         createRadioButton("Binary", radioButtonGroup);
         GridLayoutFactory.swtDefaults().numColumns(2)
                 .generateLayout(radioButtonGroup);
@@ -88,31 +101,36 @@ public class RustProjectPropertiesGroup {
         return button;
     }
 
-    private Text createTextField(final String label) {
-        createLabel(label);
+    private Text createTextField(final Group group, final String label) {
+        createLabel(group, label);
         final Text text = new Text(group, SWT.BORDER);
         text.setFont(font);
         return text;
     }
 
     private Text createLongDescriptionField() {
-        createLabel("Long");
-        final Text text = new Text(group, SWT.BORDER | SWT.MULTI | SWT.WRAP);
+        createLabel(documentationGroup, "Description");
+        final Text text = new Text(documentationGroup, SWT.BORDER | SWT.MULTI
+                | SWT.WRAP);
         text.setFont(font);
         return text;
     }
 
     private Text createVersionField() {
-        final Text text = createTextField("Version");
-        // TODO: decide on versioning scheme.
+        final Text text = createTextField(propertiesGroup, "Version");
         text.setText("0.0.1");
         return text;
     }
 
-    private void createLabel(final String text) {
+    private void createLabel(final Composite group, final String text) {
         final Label label = new Label(group, SWT.NONE);
         label.setText(text + ':');
         label.setFont(font);
+    }
+
+    public CrateType getCrateType() {
+        // TODO: fix
+        return CrateType.LIBRARY;
     }
 
     public String getVersion() {
