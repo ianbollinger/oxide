@@ -12,12 +12,12 @@ public class RustSyntaxColoringPreferencePage extends FieldEditorPreferencePage
     }
 
     @Override
-    public void init(IWorkbench workbench) {
+    public void init(final IWorkbench workbench) {
         setPreferenceStore(OxidePlugin.getDefault().getPreferenceStore());
-        setDescription("Rust editor preferences.");
+        setDescription("Rust syntax coloring preferences.");
     }
 
     @Override
-    protected void createFieldEditors() {      
+    protected void createFieldEditors() {
     }
 }

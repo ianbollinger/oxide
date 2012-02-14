@@ -7,9 +7,10 @@ import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+import org.rustlang.oxide.common.EnumPreferenceStore;
 
 public class OxidePlugin extends AbstractUIPlugin {
-    public static final String PLUGIN_ID = "org.rustlang.oxide";
+    public static final String ID = "org.rustlang.oxide";
     private static OxidePlugin plugin;
     private static TemplateStore templateStore;
 
@@ -40,11 +41,15 @@ public class OxidePlugin extends AbstractUIPlugin {
         return templateStore;
     }
 
-    public static ImageDescriptor getImageDescriptor(final String imageFilePath) {
-        return imageDescriptorFromPlugin(PLUGIN_ID, imageFilePath);
+    public static ImageDescriptor getImageDescriptor(
+            final String imageFilePath) {
+        return imageDescriptorFromPlugin(ID, imageFilePath);
     }
 
-    // TODO: move logging somewhere more appropriate.
+    public static EnumPreferenceStore getEnumPreferenceStore() { 
+        return new EnumPreferenceStore(getDefault().getPreferenceStore());
+    }
+
     public static void log(final Throwable throwable) {
         log(null, throwable);
     }
@@ -59,7 +64,7 @@ public class OxidePlugin extends AbstractUIPlugin {
 
     public static void log(final int severity, final String message,
             final Throwable throwable) {
-        final Status status = new Status(severity, PLUGIN_ID, IStatus.OK,
+        final Status status = new Status(severity, ID, IStatus.OK,
                 message, throwable);
         getDefault().getLog().log(status);
     }

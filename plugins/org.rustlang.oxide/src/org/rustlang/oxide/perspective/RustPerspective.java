@@ -8,7 +8,5 @@ public class RustPerspective implements IPerspectiveFactory {
             @SuppressWarnings("unused") final IPageLayout layout) {
         // TODO RustNavigatorView
         // TODO RustSourceFolderWizard
-        // TODO new .rs file wizard
-        // TODO new .rc file wizard
     }
 }

@@ -44,7 +44,8 @@ public class RustCreateProjectOperation extends WorkspaceModifyOperation {
     }
 
     @Override
-    protected void execute(final IProgressMonitor monitor) throws CoreException {
+    protected void execute(
+            final IProgressMonitor monitor) throws CoreException {
         try {
             monitor.beginTask("Creating Rust project", WORK_SCALE
                     * NUMBER_OF_TASKS);
@@ -100,8 +101,9 @@ public class RustCreateProjectOperation extends WorkspaceModifyOperation {
         }
         // TODO: handle monitor appropriately here.
         createFileFromTemplate("README.md", "readme", monitor);
+        // TODO: create license based on license name.
         createFileFromTemplate("LICENSE.txt", "license", monitor);
-        createFileFromTemplate(".gitignore", "gitignore", monitor);
+        // createFileFromTemplate(".gitignore", "gitignore", monitor);
         createFileFromTemplate(projectName + ".rc", "crate", monitor);
         createFileFromTemplate(projectName + ".rs", "sourcefile", monitor);
     }
@@ -122,7 +124,6 @@ public class RustCreateProjectOperation extends WorkspaceModifyOperation {
         // TODO: replace with findTeplateById
         final Template template = templateStore.findTemplate(name);
         try {
-            // TODO: fill in variables.
             final TemplateBuffer buffer = templateContext.evaluate(template);
             return new ByteArrayInputStream(buffer.getString().getBytes(
                     Charsets.UTF_8));
