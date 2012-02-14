@@ -89,23 +89,11 @@
       </editor>
    </extension>
 
-   <extension point="org.eclipse.core.runtime.preferences">
-      <initializer class="org.rustlang.oxide.preferences.RustPreferencesInitializer"/>
-   </extension>
-
    <extension point="org.eclipse.ui.editors.documentProviders">
       <provider
             class="org.rustlang.oxide.editor.RustDocumentProvider"
             id="org.rustlang.oxide.editor.RustDocumentProvider"
             extensions=".rs,.rc"/>
-   </extension>
-
-   <extension point="org.eclipse.core.contenttype.contentTypes">
-      <content-type
-            file-extensions="rs,rc"
-            name="Rust File"
-            id="org.rustlang.oxide.rustfile"
-            base-type="org.eclipse.core.runtime.text"/>
    </extension>
 
    <extension point="org.eclipse.ui.newWizards">
@@ -149,13 +137,25 @@
       </page>
    </extension>
 
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.rustlang.oxide.preferences.RustPreferencesInitializer"/>
+   </extension>
+
+   <extension point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            file-extensions="rs,rc"
+            name="Rust File"
+            id="org.rustlang.oxide.rustfile"
+            base-type="org.eclipse.core.runtime.text"/>
+   </extension>
+
    <extension
          id="RustBuilder"
          name="Rust Builder"
          point="org.eclipse.core.resources.builders">
       <builder
             hasNature="true">
-         <run class="org.rustlang.oxide.builder.RustCompilerBuilder">
+         <run class="org.rustlang.oxide.builder.RustBuilder">
          </run>
       </builder>
    </extension>
@@ -169,6 +169,83 @@
          </run>
       </runtime>
       <builder id="org.rustlang.oxide.RustBuilder"/> 
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            delegate="org.rustlang.oxide.launch.RustApplicationLauncher"
+            delegateName="Rust Application Launcher"
+            id="org.rustlang.oxide.launch.configuration"
+            modes="run, debug"
+            name="Rust Application">
+      </launchConfigurationType>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+      <launchConfigurationTypeImage
+            configTypeID="org.rustlang.oxide.launch.configuration"
+            icon="icons/rust-logo-16x16.png"
+            id="org.rustlang.oxide.launch.configurationTypeImage">
+      </launchConfigurationTypeImage>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="org.rustlang.oxide.launch.RustLaunchConfigurationTabGroup"
+            id="org.rustlang.oxide.launch.configurationTabGroup"
+            type="org.rustlang.oxide.launch.configuration">
+      </launchConfigurationTabGroup>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.sourceLocators">
+      <sourceLocator
+            class="org.rustlang.oxide.launch.RustSourceLocator"
+            id="org.rustlang.oxide.launch.sourceLocator"
+            name="name">
+      </sourceLocator>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchShortcuts">
+      <shortcut
+            class="org.rustlang.oxide.launch.RustLaunchShortcut"
+            icon="icons/rust-logo-16x16.png"
+            id="org.rustlang.oxide.launch.RustLaunchShortcut"
+            label="Rust Application"
+            modes="run,debug">
+         <description
+               description="Runs a Rust application"
+               mode="run">
+         </description>
+         <configurationType id="org.rustlang.oxide.launch.configuration"/>
+         <contextualLaunch>
+            <enablement>
+               <with variable="selection">
+                  <count value="1"/>
+                  <iterate>
+                     <or>
+                        <test
+                              property="org.eclipse.debug.ui.matchesPattern"
+                              value="*.rs">
+                        </test>
+                        <test
+                              property="org.eclipse.debug.ui.matchesPattern"
+                              value="*.rc">
+                        </test>
+                     </or>
+                  </iterate>
+               </with>
+            </enablement>
+         </contextualLaunch>
+      </shortcut>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.debug.ui.category.run"
+            description="Run Rust Application"
+            id="org.rustlang.oxide.runRustApplication"
+            name="Run Rust Application">
+      </command>
    </extension>
 
    <extension point="org.eclipse.ui.editors.templates">
@@ -186,9 +263,9 @@
        uuid = "${uuid}",
        url = "${url}")];
 
-#[author = "${user}"];
+#[author = "${author}"];
 #[license = "${license}"];
-#[crate_type = "{crate_type}"];
+#[crate_type = "${crate_type}"];
 
 #[doc(brief = "${brief}",
       desc = "${desc}")];
@@ -271,73 +348,10 @@ THE SOFTWARE.
 
    </extension>
    <extension
-         point="org.eclipse.debug.core.launchConfigurationTypes">
-      <launchConfigurationType
-            category="org.rustlang.oxide.rustLaunchConfiguration"
-            delegate="org.eclipse.debug.core.model.LaunchConfigurationDelegate"
-            id="org.rustlang.oxide.rustLaunchConfiguration"
-            modes="run,debug"
-            name="Rust Application">
-      </launchConfigurationType>
-   </extension>
-   <extension
-         point="org.eclipse.debug.ui.launchGroups">
-      <launchGroup
-            bannerImage="org.rustlang.oxide.launchGroup"
-            category="org.rustlang.oxide.rustLaunchConfiguration"
-            id="org.rustlang.oxide.launchGroup.run"
-            image="icons/rust-logo-16x16.png"
-            label="Run"
-            mode="run"
-            title="Select or confgure an application to run">
-      </launchGroup>
-   </extension>
-   <extension
-         point="org.eclipse.debug.ui.launchShortcuts">
-      <shortcut
-            category="org.rustlang.oxide.rustLaunchConfiguration"
-            class="org.rustlang.oxide.launch.LaunchShortcut"
-            icon="icons/rust-logo-16x16.png"
-            id="org.rustlang.oxide.launchShortcut"
-            label="Rust Application"
-            modes="run,debug">
-         <configurationType
-               id="org.rustlang.oxide.rustLaunchConfiguration"></configurationType>
-         <description
-               description="Runs a Rust application"
-               mode="run">
-         </description>
-         <contextualLaunch>
-            <enablement>
-               <instanceof
-                     value="java.lang.Object">
-               </instanceof></enablement>
-         </contextualLaunch>
-      </shortcut>
-   </extension>
-   <extension
-         point="org.eclipse.debug.ui.launchConfigurationTypeImages">
-      <launchConfigurationTypeImage
-            configTypeID="org.rustlang.oxide.rustLaunchConfiguration"
-            icon="icons/rust-logo-16x16.png"
-            id="org.rustlang.oxide.launchConfigurationTypeImage">
-      </launchConfigurationTypeImage>
-   </extension>
-   <extension
-         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
-      <launchConfigurationTabGroup
-            class="org.rustlang.oxide.launch.LaunchConfigurationTabGroup"
-            id="org.rustlang.oxide.launchConfigurationTabGroup"
-            type="org.rustlang.oxide.rustLaunchConfiguration">
-      </launchConfigurationTabGroup>
-   </extension>
-   <extension
-         point="org.eclipse.ui.commands">
-      <command
-            categoryId="org.eclipse.debug.ui.category.run"
-            description="Run Rust Application"
-            id="org.rustlang.oxide.runRustApplication"
-            name="Run Rust Application">
-      </command>
+         point="org.eclipse.debug.core.sourcePathComputers">
+      <sourcePathComputer
+            class="org.rustlang.oxide.launch.RustSourcePathComputer"
+            id="org.rustlang.oxide.launch.sourcePathComputer">
+      </sourcePathComputer>
    </extension>
 </plugin>
