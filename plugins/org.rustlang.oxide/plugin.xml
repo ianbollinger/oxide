@@ -197,14 +197,6 @@
       </launchConfigurationTabGroup>
    </extension>
    <extension
-         point="org.eclipse.debug.core.sourceLocators">
-      <sourceLocator
-            class="org.rustlang.oxide.launch.RustSourceLocator"
-            id="org.rustlang.oxide.launch.sourceLocator"
-            name="name">
-      </sourceLocator>
-   </extension>
-   <extension
          point="org.eclipse.debug.ui.launchShortcuts">
       <shortcut
             class="org.rustlang.oxide.launch.RustLaunchShortcut"
@@ -346,12 +338,5 @@ THE SOFTWARE.
 </pattern>
       </template>
 
-   </extension>
-   <extension
-         point="org.eclipse.debug.core.sourcePathComputers">
-      <sourcePathComputer
-            class="org.rustlang.oxide.launch.RustSourcePathComputer"
-            id="org.rustlang.oxide.launch.sourcePathComputer">
-      </sourcePathComputer>
    </extension>
 </plugin>
