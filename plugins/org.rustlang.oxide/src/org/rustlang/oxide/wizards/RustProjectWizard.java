@@ -78,7 +78,9 @@ public class RustProjectWizard extends Wizard implements INewWizard,
         final TemplateContext templateContext = new BasicTemplateContext(
                 new RustTemplateContextType());
         templateContext.setVariable("project_name", model.getName());
+        templateContext.setVariable("crate_type", model.getType().getValue());
         templateContext.setVariable("version", model.getVersion());
+        templateContext.setVariable("uuid", model.getUUID().toString());
         templateContext.setVariable("url", model.getUrl());
         templateContext.setVariable("author", model.getAuthor());
         templateContext.setVariable("license", model.getLicenseName());

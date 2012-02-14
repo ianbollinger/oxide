@@ -10,18 +10,19 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.rustlang.oxide.common.swt.EnumRadioGroup;
 import org.rustlang.oxide.language.model.CrateType;
 
-// TODO: is there a point to allow having the crate name be different
-// than the project name?
-// // TODO: implement validation in general.
+// TODO: is there a point to allow having the crate name be different than the
+// project name?
+// TODO: implement validation in general.
 public class RustProjectPropertiesGroup {
     private final Composite parent;
     private final Font font;
     private final Group propertiesGroup;
     private final Group metadataGroup;
     private final Group documentationGroup;
-    private final Composite crateTypeGroup;
+    private final EnumRadioGroup<CrateType> crateTypeGroup;
     private final Text versionField;
     private final Text urlField;
     private final Text authorField;
@@ -35,8 +36,6 @@ public class RustProjectPropertiesGroup {
         this.propertiesGroup = createGroup("Crate properties");
         this.crateTypeGroup = createCrateTypeGroup();
         this.versionField = createVersionField();
-        // TODO: do we want a default URL?
-        // e.g. https://github.com/<author>/<project>
         this.urlField = createTextField(propertiesGroup, "URL");
         this.metadataGroup = createGroup("Crate metadata");
         this.authorField = createTextField(metadataGroup, "Author");
@@ -80,25 +79,9 @@ public class RustProjectPropertiesGroup {
         return combo;
     }
 
-    private Composite createCrateTypeGroup() {
+    private EnumRadioGroup<CrateType> createCrateTypeGroup() {
         createLabel(propertiesGroup, "Crate type");
-        // TODO: does this belong with the other crate "properties"?
-        final Composite radioButtonGroup = new Composite(propertiesGroup,
-                SWT.NONE);
-        final Button library = createRadioButton("Library", radioButtonGroup);
-        library.setSelection(true);
-        createRadioButton("Binary", radioButtonGroup);
-        GridLayoutFactory.swtDefaults().numColumns(2)
-                .generateLayout(radioButtonGroup);
-        return radioButtonGroup;
-    }
-
-    private Button createRadioButton(final String text,
-            final Composite radioButtonGroup) {
-        final Button button = new Button(radioButtonGroup, SWT.RADIO);
-        button.setText(text);
-        button.setFont(font);
-        return button;
+        return EnumRadioGroup.of(propertiesGroup, CrateType.class);
     }
 
     private Text createTextField(final Group group, final String label) {
@@ -129,8 +112,7 @@ public class RustProjectPropertiesGroup {
     }
 
     public CrateType getCrateType() {
-        // TODO: fix
-        return CrateType.LIBRARY;
+        return crateTypeGroup.getSelection();
     }
 
     public String getVersion() {
