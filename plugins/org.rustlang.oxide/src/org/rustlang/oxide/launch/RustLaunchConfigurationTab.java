@@ -53,7 +53,7 @@ public class RustLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
             control.setExecutable(executable);
             control.setProgramArguments(programArguments);
         } catch (final CoreException e) {
-            OxidePlugin.log(e);
+            OxidePlugin.getLogger().log(e);
         }
     }
 

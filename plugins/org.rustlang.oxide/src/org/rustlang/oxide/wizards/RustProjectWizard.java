@@ -1,6 +1,7 @@
 package org.rustlang.oxide.wizards;
 
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -31,36 +32,7 @@ public class RustProjectWizard extends Wizard implements INewWizard,
     private IConfigurationElement config;
     private RustNewProjectWizardPage projectPage;
     private WizardNewProjectReferencePage referencePage;
-
-    @Override
-    public void init(@SuppressWarnings("unused") final IWorkbench workbench,
-            final IStructuredSelection selection) {
-        final ImageDescriptor descriptor = OxidePlugin
-                .getImageDescriptor("icons/rust-logo-64x64.png");
-        setDefaultPageImageDescriptor(descriptor);
-        this.workspace = ResourcesPlugin.getWorkspace();
-        this.projectPage = new RustNewProjectWizardPage(selection);
-    }
-
-    @Override
-    public void addPages() {
-        addPage(projectPage);
-        if (projectsInWorkspace()) {
-            addPage(createReferencePage());
-        }
-    }
-
-    private boolean projectsInWorkspace() {
-        return workspace.getRoot().getProjects().length > 0;
-    }
-
-    private IWizardPage createReferencePage() {
-        final IWizardPage page = new WizardNewProjectReferencePage(
-                "rustReferenceProjectPage");
-        page.setTitle("Rust Project");
-        page.setDescription("Select referenced projects.");
-        return page;
-    }
+    private TemplateStore templateStore;
 
     @Override
     public void setInitializationData(final IConfigurationElement config,
@@ -70,24 +42,34 @@ public class RustProjectWizard extends Wizard implements INewWizard,
     }
 
     @Override
+    public void init(@SuppressWarnings("unused") final IWorkbench workbench,
+            final IStructuredSelection selection) {
+        setDefaultPageImageDescriptor(provideImageDescriptor());
+        this.workspace = provideWorkspace();
+        this.projectPage = provideNewProjectPage(selection);
+        this.templateStore = provideTemplateStore();
+    }
+
+    @Override
+    public void addPages() {
+        addPage(projectPage);
+        if (projectsInWorkspace()) {
+            addPage(provideReferencedProjectsPage());
+        }
+    }
+
+    private boolean projectsInWorkspace() {
+        return workspace.getRoot().getProjects().length > 0;
+    }
+
+    // TODO: most of this should be moved elsewhere.
+    @Override
     public boolean performFinish() {
-        final IProject newProjectHandle = projectPage.getProjectHandle();
-        final CrateAttributes model = projectPage.createModel();
-        final IProject[] referencedProjects = getReferencedProjects();
-        final TemplateStore templateStore = OxidePlugin.getTemplateStore();
-        final TemplateContext templateContext = new BasicTemplateContext(
-                new RustTemplateContextType());
-        templateContext.setVariable("project_name", model.getName());
-        templateContext.setVariable("crate_type", model.getType().getValue());
-        templateContext.setVariable("version", model.getVersion());
-        templateContext.setVariable("uuid", model.getUUID().toString());
-        templateContext.setVariable("url", model.getUrl());
-        templateContext.setVariable("author", model.getAuthor());
-        templateContext.setVariable("license", model.getLicenseName());
-        templateContext.setVariable("brief", model.getBriefDescription());
-        templateContext.setVariable("desc", model.getLongDescription());
-        final IRunnableWithProgress operation = new RustCreateProjectOperation(
-                newProjectHandle, referencedProjects, workspace, templateStore,
+        final TemplateContext templateContext = provideTemplateContext(
+                projectPage.createModel());
+        final IRunnableWithProgress operation = provideCreateProjectOperation(
+                projectPage.getProjectHandle(), projectPage.getLocationURI(),
+                getReferencedProjects(), workspace, templateStore,
                 templateContext);
         final boolean fork = true;
         final boolean cancelable = true;
@@ -96,16 +78,78 @@ public class RustProjectWizard extends Wizard implements INewWizard,
         } catch (final InterruptedException e) {
             return false;
         } catch (final InvocationTargetException e) {
-            OxidePlugin.log(e);
+            log(e);
             return false;
         }
-        BasicNewProjectResourceWizard.updatePerspective(config);
+        updatePerspective(config);
         return true;
     }
 
     private IProject[] getReferencedProjects() {
-        return (referencePage != null)
-                ? referencePage.getReferencedProjects()
+        return (referencePage != null) ? referencePage.getReferencedProjects()
                 : new IProject[] {};
+    }
+
+    IWizardPage provideReferencedProjectsPage() {
+        final IWizardPage page = new WizardNewProjectReferencePage(
+                "rustReferenceProjectPage");
+        page.setTitle("Rust Project");
+        page.setDescription("Select referenced projects.");
+        return page;
+    }
+    
+    RustNewProjectWizardPage provideNewProjectPage(
+            final IStructuredSelection selection) {
+        return new RustNewProjectWizardPage(selection);
+    }
+
+    ImageDescriptor provideImageDescriptor() {
+        return OxidePlugin.getImageDescriptor("icons/rust-logo-64x64.png");
+    }
+
+    IWorkspace provideWorkspace() {
+        return ResourcesPlugin.getWorkspace();
+    }
+
+    TemplateStore provideTemplateStore() {
+        return OxidePlugin.getTemplateStore();
+    }
+
+    void log(final Throwable e) {
+        OxidePlugin.getLogger().log(e);
+    }
+
+    void updatePerspective(final IConfigurationElement config2) {
+        BasicNewProjectResourceWizard.updatePerspective(config2);
+    }
+
+    // TODO: move this logic somewhere so it can be tested.
+    TemplateContext provideTemplateContext(final CrateAttributes model) {
+        final TemplateContext templateContext = new BasicTemplateContext(
+                provideTemplateContextType());
+        templateContext.setVariable("project_name", model.getName());
+        templateContext.setVariable("crate_type", model.getType().getValue());
+        templateContext.setVariable("version", model.getVersion());
+        templateContext.setVariable("uuid", model.getUuid().toString());
+        templateContext.setVariable("url", model.getUrl());
+        templateContext.setVariable("author", model.getAuthor());
+        templateContext.setVariable("license", model.getLicenseName());
+        templateContext.setVariable("brief", model.getBriefDescription());
+        templateContext.setVariable("desc", model.getLongDescription());
+        return templateContext;
+    }
+
+    RustTemplateContextType provideTemplateContextType() {
+        return new RustTemplateContextType();
+    }
+
+    RustCreateProjectOperation provideCreateProjectOperation(
+            final IProject project, final URI location,
+            final IProject[] referencedProjects, final IWorkspace workspace2,
+            final TemplateStore templateStore2,
+            final TemplateContext templateContext) {
+        return new RustCreateProjectOperation(project, location,
+                referencedProjects, workspace2, templateStore2,
+                templateContext, OxidePlugin.getLogger());
     }
 }

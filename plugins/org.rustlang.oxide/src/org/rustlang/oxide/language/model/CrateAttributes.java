@@ -40,7 +40,7 @@ public class CrateAttributes {
         return version;
     }
 
-    public UUID getUUID() {
+    public UUID getUuid() {
         return uuid;
     }
 

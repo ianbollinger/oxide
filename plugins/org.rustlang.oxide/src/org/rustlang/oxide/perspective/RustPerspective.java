@@ -6,7 +6,6 @@ public class RustPerspective implements IPerspectiveFactory {
     @Override
     public void createInitialLayout(
             @SuppressWarnings("unused") final IPageLayout layout) {
-        // TODO RustNavigatorView
-        // TODO RustSourceFolderWizard
+        // Everything is created in the plugin.xml.
     }
 }

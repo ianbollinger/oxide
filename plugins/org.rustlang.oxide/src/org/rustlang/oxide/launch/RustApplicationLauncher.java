@@ -82,7 +82,7 @@ public class RustApplicationLauncher implements ILaunchConfigurationDelegate2 {
                 }
             }
         } catch (final CoreException e) {
-            OxidePlugin.log(e);
+            OxidePlugin.getLogger().log(e);
         }
         return null;
     }

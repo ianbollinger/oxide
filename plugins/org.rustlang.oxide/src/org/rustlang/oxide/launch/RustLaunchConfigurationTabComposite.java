@@ -20,7 +20,6 @@ import org.rustlang.oxide.OxidePlugin;
 import org.rustlang.oxide.common.Collections3;
 import org.rustlang.oxide.nature.RustNature;
 
-// TODO: replace with built-in arguments tab, if it's not internal.
 public class RustLaunchConfigurationTabComposite extends Composite {
     private final RustLaunchConfigurationTab tab;
     private final Group projectGroup;
@@ -122,7 +121,6 @@ public class RustLaunchConfigurationTabComposite extends Composite {
                             rustProjects.add(project);
                         }
                     }
-                    // TODO: replace this with something less cumbersome.
                     final ResourceListSelectionDialog dialog = new ResourceListSelectionDialog(
                             getShell(), Collections3.toArray(rustProjects,
                                     IProject.class));
@@ -133,7 +131,7 @@ public class RustLaunchConfigurationTabComposite extends Composite {
                         projectField.setText(((IProject) objects[0]).getName());
                     }
                 } catch (final CoreException e) {
-                    OxidePlugin.log(e);
+                    OxidePlugin.getLogger().log(e);
                 }
             }
         });

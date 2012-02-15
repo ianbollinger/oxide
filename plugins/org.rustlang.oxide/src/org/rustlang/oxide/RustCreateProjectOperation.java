@@ -3,6 +3,7 @@ package org.rustlang.oxide;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ObjectArrays;
 import org.eclipse.core.resources.IProject;
@@ -28,19 +29,24 @@ public class RustCreateProjectOperation extends WorkspaceModifyOperation {
     private static final int WORK_SCALE = 1000;
     private final IProject[] referencedProjects;
     private final IProject project;
+    private final URI location;
     private final IWorkspace workspace;
     private final TemplateStore templateStore;
     private final TemplateContext templateContext;
+    private final OxideLogger logger;
 
     public RustCreateProjectOperation(final IProject project,
-            final IProject[] referencedProjects, final IWorkspace workspace,
-            final TemplateStore templateStore,
-            final TemplateContext templateContext) {
-        this.referencedProjects = referencedProjects;
+            final URI location, final IProject[] referencedProjects,
+            final IWorkspace workspace, final TemplateStore templateStore,
+            final TemplateContext templateContext,
+            final OxideLogger logger) {
+        this.location = location;
         this.project = project;
+        this.referencedProjects = referencedProjects;
         this.workspace = workspace;
         this.templateStore = templateStore;
         this.templateContext = templateContext;
+        this.logger = logger;
     }
 
     @Override
@@ -66,6 +72,9 @@ public class RustCreateProjectOperation extends WorkspaceModifyOperation {
         final String[] newNatureIds = ObjectArrays.concat(
                 description.getNatureIds(), RustNature.ID);
         description.setNatureIds(newNatureIds);
+        if (location != null) {
+            description.setLocationURI(location);
+        }
         return description;
     }
 
@@ -101,7 +110,6 @@ public class RustCreateProjectOperation extends WorkspaceModifyOperation {
         }
         // TODO: handle monitor appropriately here.
         createFileFromTemplate("README.md", "readme", monitor);
-        // TODO: create license based on license name.
         createFileFromTemplate("LICENSE.txt", "license", monitor);
         // createFileFromTemplate(".gitignore", "gitignore", monitor);
         createFileFromTemplate(projectName + ".rc", "crate", monitor);
@@ -128,9 +136,9 @@ public class RustCreateProjectOperation extends WorkspaceModifyOperation {
             return new ByteArrayInputStream(buffer.getString().getBytes(
                     Charsets.UTF_8));
         } catch (final BadLocationException e) {
-            OxidePlugin.log(e);
+            logger.log(e);
         } catch (final TemplateException e) {
-            OxidePlugin.log(e);
+            logger.log(e);
         }
         return new ByteArrayInputStream(new byte[] {});
     }

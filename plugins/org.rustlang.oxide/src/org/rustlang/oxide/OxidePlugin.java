@@ -13,6 +13,11 @@ public class OxidePlugin extends AbstractUIPlugin {
     public static final String ID = "org.rustlang.oxide";
     private static OxidePlugin plugin;
     private static TemplateStore templateStore;
+    private final OxideLogger logger;
+
+    OxidePlugin() {
+        this.logger = new OxideLogger();
+    }
 
     @Override
     public void start(final BundleContext context) throws Exception {
@@ -50,22 +55,7 @@ public class OxidePlugin extends AbstractUIPlugin {
         return new EnumPreferenceStore(getDefault().getPreferenceStore());
     }
 
-    public static void log(final Throwable throwable) {
-        log(null, throwable);
-    }
-
-    public static void log(final String message) {
-        log(message, null);
-    }
-
-    public static void log(final String message, final Throwable throwable) {
-        log(IStatus.INFO, message, throwable);
-    }
-
-    public static void log(final int severity, final String message,
-            final Throwable throwable) {
-        final Status status = new Status(severity, ID, IStatus.OK,
-                message, throwable);
-        getDefault().getLog().log(status);
+    public static OxideLogger getLogger() {
+        return getDefault().logger;
     }
 }

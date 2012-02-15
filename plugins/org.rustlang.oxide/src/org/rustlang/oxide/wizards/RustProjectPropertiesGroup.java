@@ -4,7 +4,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
@@ -13,9 +12,6 @@ import org.eclipse.swt.widgets.Text;
 import org.rustlang.oxide.common.swt.EnumRadioGroup;
 import org.rustlang.oxide.language.model.CrateType;
 
-// TODO: is there a point to allow having the crate name be different than the
-// project name?
-// TODO: implement validation in general.
 public class RustProjectPropertiesGroup {
     private final Composite parent;
     private final Font font;

@@ -33,7 +33,7 @@ public class RustLaunchShortcut implements ILaunchShortcut {
         try {
             launch(projectName, mode);
         } catch (final CoreException e) {
-            OxidePlugin.log(e);
+            OxidePlugin.getLogger().log(e);
         }
     }
 
@@ -49,7 +49,7 @@ public class RustLaunchShortcut implements ILaunchShortcut {
         try {
             launch(projectName, mode);
         } catch (final CoreException e) {
-            OxidePlugin.log(e);
+            OxidePlugin.getLogger().log(e);
         }
     }
 

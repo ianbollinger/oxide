@@ -78,7 +78,7 @@ public class RustBuilder extends IncrementalProjectBuilder {
             final Reader reader = new InputStreamReader(inputStream);
             parseLines(CharStreams.readLines(reader));
         } catch (IOException e) {
-            OxidePlugin.log(e);
+            OxidePlugin.getLogger().log(e);
         }
     }
 
@@ -106,8 +106,6 @@ public class RustBuilder extends IncrementalProjectBuilder {
             throws CoreException {
         final IMarker marker = resource.createMarker(IMarker.PROBLEM);
         marker.setAttribute(IMarker.LINE_NUMBER, line);
-        // TODO: CHAR_START/END are relative to the beginning of the FILE
-        // and not the LINE. Ugh.
         // marker.setAttribute(IMarker.CHAR_START, start);
         // marker.setAttribute(IMarker.CHAR_END, end);
         marker.setAttribute(IMarker.MESSAGE, msg);
@@ -135,7 +133,7 @@ public class RustBuilder extends IncrementalProjectBuilder {
                 project.accept(visitor);
             }
         } catch (final CoreException e) {
-            OxidePlugin.log(e);
+            OxidePlugin.getLogger().log(e);
         }
     }
 
@@ -152,7 +150,7 @@ public class RustBuilder extends IncrementalProjectBuilder {
                 delta.accept(visitor);
             }
         } catch (final CoreException e) {
-            OxidePlugin.log(e);
+            OxidePlugin.getLogger().log(e);
         }
     }
 }
