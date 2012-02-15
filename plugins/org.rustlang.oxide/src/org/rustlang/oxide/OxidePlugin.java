@@ -1,7 +1,5 @@
 package org.rustlang.oxide;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
@@ -15,7 +13,7 @@ public class OxidePlugin extends AbstractUIPlugin {
     private static TemplateStore templateStore;
     private final OxideLogger logger;
 
-    OxidePlugin() {
+    public OxidePlugin() {
         this.logger = new OxideLogger();
     }
 
