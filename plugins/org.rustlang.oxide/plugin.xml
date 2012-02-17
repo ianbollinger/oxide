@@ -99,13 +99,12 @@
    <extension point="org.eclipse.ui.newWizards">
       <category
             id="org.rustlang.eclipse.RustCategory"
-            name="Rust">
+            name="Rust Wizards">
       </category>
       <wizard
             canFinishEarly="false"
             category="org.rustlang.eclipse.RustCategory"
             class="org.rustlang.oxide.wizards.RustProjectWizard"
-            descriptionImage="icons/rust-logo-64x64.png"
             finalPerspective="org.rustlang.oxide.perspective.RustPerspective"
             hasPages="true"
             icon="icons/rust-logo-16x16.png"
@@ -113,6 +112,9 @@
             name="Rust Project"
             preferredPerspectives="org.rustlang.oxide.perspective.RustPerspective"
             project="true">
+         <description>
+            Create a new Rust project
+         </description>
       </wizard>
    </extension>
 
