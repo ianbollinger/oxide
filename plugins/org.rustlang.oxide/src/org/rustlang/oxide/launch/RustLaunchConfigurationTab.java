@@ -5,7 +5,6 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
-import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.rustlang.oxide.OxidePlugin;
@@ -74,8 +73,9 @@ public class RustLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
         return "Main";
     }
 
-    @Override
-    public ILaunchConfigurationDialog getLaunchConfigurationDialog() {
-        return super.getLaunchConfigurationDialog();
+    public void update() {
+        // validate();
+        getLaunchConfigurationDialog().updateButtons();
+        getLaunchConfigurationDialog().updateMessage();
     }
 }

@@ -6,11 +6,12 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 
 public class EnumRadioButton<T extends Enum<T>> {
+    // TODO: eliminate circular dependency if possible.
     private final EnumRadioGroup<T> parent;
     private final T value;
     private final Button button;
 
-    private EnumRadioButton(final EnumRadioGroup<T> parent, final T value) {
+    EnumRadioButton(final EnumRadioGroup<T> parent, final T value) {
         this.parent = parent;
         this.value = value;
         this.button = createButton();
@@ -29,15 +30,15 @@ public class EnumRadioButton<T extends Enum<T>> {
         return new EnumRadioButton<T>(parent, value);
     }
 
+    public void setSelection(final boolean selection) {
+        button.setSelection(selection);
+    }
+
     private class EnumRadioButtonSelectionAdapter extends SelectionAdapter {
         @Override
         public void widgetSelected(
                 @SuppressWarnings("unused") final SelectionEvent event) {
             parent.setSelection(value);
         }
-    }
-
-    public void setSelection(final boolean selection) {
-        button.setSelection(selection);
     }
 }

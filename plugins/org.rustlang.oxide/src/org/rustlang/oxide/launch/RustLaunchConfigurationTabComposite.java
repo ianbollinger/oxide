@@ -21,13 +21,12 @@ import org.rustlang.oxide.common.Collections3;
 import org.rustlang.oxide.nature.RustNature;
 
 public class RustLaunchConfigurationTabComposite extends Composite {
+    // TODO: eliminate circular dependency if possible.
     private final RustLaunchConfigurationTab tab;
     private final Group projectGroup;
     private final Text projectField;
-    private final Button projectBrowseButton;
     private final Group mainGroup;
     private final Text executableField;
-    private final Button executableBrowseButton;
     private final Group programArgumentsGroup;
     private final Text programArgumentsTextArea;
 
@@ -38,11 +37,11 @@ public class RustLaunchConfigurationTabComposite extends Composite {
         this.projectGroup = createProjectGroup();
         this.mainGroup = createExecutableGroup();
         this.executableField = createExcutableField();
-        this.executableBrowseButton = createExecutableBrowseButton();
+        createExecutableBrowseButton();
         this.programArgumentsGroup = createProgramArgumentsGroup();
         this.programArgumentsTextArea = createProgramArgumentsTextArea();
         this.projectField = createProjectField();
-        this.projectBrowseButton = createProjectBrowseButton();
+        createProjectBrowseButton();
         generateLayout();
     }
 
@@ -75,7 +74,8 @@ public class RustLaunchConfigurationTabComposite extends Composite {
         final Text text = new Text(projectGroup, SWT.BORDER);
         text.addModifyListener(new ModifyListener() {
             @Override
-            public void modifyText(final ModifyEvent event) {
+            public void modifyText(
+                    @SuppressWarnings("unused") final ModifyEvent event) {
                 updateState();
             }
         });
@@ -86,7 +86,8 @@ public class RustLaunchConfigurationTabComposite extends Composite {
         final Text text = new Text(mainGroup, SWT.BORDER);
         text.addModifyListener(new ModifyListener() {
             @Override
-            public void modifyText(final ModifyEvent event) {
+            public void modifyText(
+                    @SuppressWarnings("unused") final ModifyEvent event) {
                 updateState();
             }
         });
@@ -98,7 +99,8 @@ public class RustLaunchConfigurationTabComposite extends Composite {
         button.setText("Browse...");
         button.addSelectionListener(new SelectionAdapter() {
             @Override
-            public void widgetSelected(final SelectionEvent event) {
+            public void widgetSelected(
+                    @SuppressWarnings("unused") final SelectionEvent event) {
                 // TODO: browse for the executable.
             }
         });
@@ -110,7 +112,8 @@ public class RustLaunchConfigurationTabComposite extends Composite {
         button.setText("Browse...");
         button.addSelectionListener(new SelectionAdapter() {
             @Override
-            public void widgetSelected(final SelectionEvent event) {
+            public void widgetSelected(
+                    @SuppressWarnings("unused") final SelectionEvent event) {
                 try {
                     final IProject[] projects = ResourcesPlugin.getWorkspace()
                             .getRoot().getProjects();
@@ -121,9 +124,10 @@ public class RustLaunchConfigurationTabComposite extends Composite {
                             rustProjects.add(project);
                         }
                     }
-                    final ResourceListSelectionDialog dialog = new ResourceListSelectionDialog(
-                            getShell(), Collections3.toArray(rustProjects,
-                                    IProject.class));
+                    final IProject[] array = Collections3.toArray(rustProjects,
+                            IProject.class);
+                    final ResourceListSelectionDialog dialog =
+                            new ResourceListSelectionDialog(getShell(), array);
                     dialog.setTitle("Project Selection");
                     dialog.open();
                     final Object[] objects = dialog.getResult();
@@ -149,7 +153,8 @@ public class RustLaunchConfigurationTabComposite extends Composite {
                 | SWT.V_SCROLL | SWT.BORDER);
         text.addModifyListener(new ModifyListener() {
             @Override
-            public void modifyText(final ModifyEvent event) {
+            public void modifyText(
+                    @SuppressWarnings("unused") final ModifyEvent event) {
                 updateState();
             }
         });
@@ -189,8 +194,6 @@ public class RustLaunchConfigurationTabComposite extends Composite {
     }
 
     private void updateState() {
-        // tab.validate();
-        tab.getLaunchConfigurationDialog().updateButtons();
-        tab.getLaunchConfigurationDialog().updateMessage();
+        tab.update();
     }
 }

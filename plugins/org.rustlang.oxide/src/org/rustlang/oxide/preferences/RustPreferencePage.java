@@ -16,7 +16,7 @@ public class RustPreferencePage extends FieldEditorPreferencePage implements
     }
 
     @Override
-    public void init(final IWorkbench workbench) {
+    public void init(@SuppressWarnings("unused") final IWorkbench workbench) {
         setPreferenceStore(OxidePlugin.getDefault().getPreferenceStore());
         setDescription("General settings for Rust development.");
     }
@@ -41,9 +41,6 @@ public class RustPreferencePage extends FieldEditorPreferencePage implements
             super(name, labelText, parent);
         }
 
-        // TODO: this is a temporary hack. It should really check whether
-        // the executable is on the Path environment variable and then call
-        // super.checkState if not.
         @Override
         public boolean checkState() {
             return true;

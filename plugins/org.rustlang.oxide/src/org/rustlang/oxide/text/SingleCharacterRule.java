@@ -1,6 +1,9 @@
 package org.rustlang.oxide.text;
 
-import org.eclipse.jface.text.rules.*;
+import org.eclipse.jface.text.rules.ICharacterScanner;
+import org.eclipse.jface.text.rules.IRule;
+import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.Token;
 
 public abstract class SingleCharacterRule implements IRule {
     private final IToken token;

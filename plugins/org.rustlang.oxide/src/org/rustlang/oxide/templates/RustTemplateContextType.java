@@ -4,6 +4,7 @@ import org.eclipse.jface.text.templates.TemplateContextType;
 
 public class RustTemplateContextType extends TemplateContextType {
     public RustTemplateContextType() {
+        // Superclass has no public constructor.
     }
 
     public RustTemplateContextType(final String id) {

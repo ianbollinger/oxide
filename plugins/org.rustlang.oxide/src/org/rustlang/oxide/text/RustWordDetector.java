@@ -5,11 +5,11 @@ import org.eclipse.jface.text.rules.IWordDetector;
 public class RustWordDetector implements IWordDetector {
     @Override
     public boolean isWordStart(final char c) {
-        return Character.isUnicodeIdentifierStart(c) || c == '_';
+        return LexicalUtil.isRustIdentifierStart(c);
     }
 
     @Override
     public boolean isWordPart(final char c) {
-        return Character.isUnicodeIdentifierPart(c) || c == '_';
+        return LexicalUtil.isRustIdentifierPart(c);
     }
 }

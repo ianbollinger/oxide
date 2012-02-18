@@ -5,11 +5,13 @@ import org.rustlang.oxide.text.RustColorManager;
 import org.rustlang.oxide.text.RustSourceViewerConfiguration;
 
 public class RustEditor extends TextEditor {
-    private RustColorManager colorManager;
+    public static final String ID =
+            "org.rustlang.oxide.editor.RustEditor";
+    private final RustColorManager colorManager;
 
     public RustEditor() {
         super();
-        colorManager = new RustColorManager();
+        this.colorManager = new RustColorManager();
         setSourceViewerConfiguration(new RustSourceViewerConfiguration(
                 colorManager));
         setDocumentProvider(new RustDocumentProvider());

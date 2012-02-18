@@ -1,6 +1,9 @@
 package org.rustlang.oxide.text;
 
-import org.eclipse.jface.text.rules.*;
+import org.eclipse.jface.text.rules.ICharacterScanner;
+import org.eclipse.jface.text.rules.IRule;
+import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.Token;
 
 public class RustNumberRule implements IRule {
     private final IToken token;
@@ -44,14 +47,16 @@ public class RustNumberRule implements IRule {
 
     private int scanPrefix(final ICharacterScanner scanner, final int c) {
         final int n = scanner.read();
+        final int base;
         if (c == '0' && n == 'x') {
-            return 16;
+            base = 16;
+        } else if (c == '0' && n == 'b') {
+            base = 2;
+        } else {
+            scanner.unread();
+            base = 10;
         }
-        if (c == '0' && n == 'b') {
-            return 2;
-        }
-        scanner.unread();
-        return 10;
+        return base;
     }
 
     private void scanFloatSuffix(final ICharacterScanner scanner) {

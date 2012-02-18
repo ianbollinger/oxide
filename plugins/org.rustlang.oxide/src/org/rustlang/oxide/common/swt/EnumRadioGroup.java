@@ -13,7 +13,7 @@ public class EnumRadioGroup<T extends Enum<T>> extends Composite {
     private final Map<T, EnumRadioButton<T>> buttons;
     private T selection;
 
-    private EnumRadioGroup(final Composite parent, final Class<T> enumeration) {
+    EnumRadioGroup(final Composite parent, final Class<T> enumeration) {
         super(parent, SWT.NONE);
         this.items = Enums2.values(enumeration);
         this.buttons = createButtons();

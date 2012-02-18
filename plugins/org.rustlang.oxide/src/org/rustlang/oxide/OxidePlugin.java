@@ -11,11 +11,6 @@ public class OxidePlugin extends AbstractUIPlugin {
     public static final String ID = "org.rustlang.oxide";
     private static OxidePlugin plugin;
     private static TemplateStore templateStore;
-    private final OxideLogger logger;
-
-    public OxidePlugin() {
-        this.logger = new OxideLogger();
-    }
 
     @Override
     public void start(final BundleContext context) throws Exception {
@@ -49,11 +44,11 @@ public class OxidePlugin extends AbstractUIPlugin {
         return imageDescriptorFromPlugin(ID, imageFilePath);
     }
 
-    public static EnumPreferenceStore getEnumPreferenceStore() { 
+    public static EnumPreferenceStore getEnumPreferenceStore() {
         return new EnumPreferenceStore(getDefault().getPreferenceStore());
     }
 
     public static OxideLogger getLogger() {
-        return getDefault().logger;
+        return new OxideLogger();
     }
 }

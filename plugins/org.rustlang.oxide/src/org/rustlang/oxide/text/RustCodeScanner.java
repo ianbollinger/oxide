@@ -1,7 +1,15 @@
 package org.rustlang.oxide.text;
 
-import org.eclipse.jface.text.rules.*;
-import org.eclipse.jface.text.*;
+import org.eclipse.jface.text.TextAttribute;
+import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
+import org.eclipse.jface.text.rules.EndOfLineRule;
+import org.eclipse.jface.text.rules.IRule;
+import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.MultiLineRule;
+import org.eclipse.jface.text.rules.SingleLineRule;
+import org.eclipse.jface.text.rules.Token;
+import org.eclipse.jface.text.rules.WhitespaceRule;
+import org.eclipse.jface.text.rules.WordRule;
 import org.eclipse.swt.SWT;
 
 public class RustCodeScanner extends BufferedRuleBasedScanner {
@@ -11,7 +19,6 @@ public class RustCodeScanner extends BufferedRuleBasedScanner {
         "for", "if", "iface", "impl", "import", "in", "let", "log", "mod",
         "move", "mutable", "native", "of", "pure", "resource", "ret", "self",
         "to", "type", "unchecked", "unsafe", "use", "while", "with",
-
         // TYPES
         "bool", "char", "f32", "f64", "float", "i16", "i32", "i64", "i8",
         "int", "str", "u16", "u32", "u64", "u8", "uint", "vec"

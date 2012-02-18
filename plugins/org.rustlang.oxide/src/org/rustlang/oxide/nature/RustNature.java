@@ -55,7 +55,9 @@ public class RustNature implements IProjectNature {
     }
 
     @Override
-    public synchronized void setProject(final IProject project) {
-        this.project = project;
+    public void setProject(final IProject project) {
+        synchronized (this) {
+            this.project = project;
+        }
     }
 }

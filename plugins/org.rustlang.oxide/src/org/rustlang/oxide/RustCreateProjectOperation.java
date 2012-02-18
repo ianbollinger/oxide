@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.List;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ObjectArrays;
 import org.eclipse.core.resources.IProject;
@@ -21,13 +22,14 @@ import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateException;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
+import org.rustlang.oxide.common.Collections3;
 import org.rustlang.oxide.nature.RustNature;
 
 public class RustCreateProjectOperation extends WorkspaceModifyOperation {
-    // TODO: provide way of keeping this number valid.
+    // TODO: provide way of keeping this number in sync.
     private static final int NUMBER_OF_TASKS = 8;
     private static final int WORK_SCALE = 1000;
-    private final IProject[] referencedProjects;
+    private final List<IProject> referencedProjects;
     private final IProject project;
     private final URI location;
     private final IWorkspace workspace;
@@ -36,7 +38,7 @@ public class RustCreateProjectOperation extends WorkspaceModifyOperation {
     private final OxideLogger logger;
 
     public RustCreateProjectOperation(final IProject project,
-            final URI location, final IProject[] referencedProjects,
+            final URI location, final List<IProject> referencedProjects,
             final IWorkspace workspace, final TemplateStore templateStore,
             final TemplateContext templateContext,
             final OxideLogger logger) {
@@ -66,8 +68,9 @@ public class RustCreateProjectOperation extends WorkspaceModifyOperation {
     private IProjectDescription createProjectDescription() {
         final IProjectDescription description = workspace
                 .newProjectDescription(project.getName());
-        if (referencedProjects.length > 0) {
-            description.setReferencedProjects(referencedProjects);
+        if (!referencedProjects.isEmpty()) {
+            description.setReferencedProjects(
+                    Collections3.toArray(referencedProjects, IProject.class));
         }
         final String[] newNatureIds = ObjectArrays.concat(
                 description.getNatureIds(), RustNature.ID);
@@ -117,8 +120,8 @@ public class RustCreateProjectOperation extends WorkspaceModifyOperation {
     }
 
     private void createFileFromTemplate(final String fileName,
-            final String templateName, final IProgressMonitor monitor)
-            throws CoreException {
+            final String templateName,
+            final IProgressMonitor monitor) throws CoreException {
         final InputStream stream = getTemplateInputStream(templateName);
         final boolean force = false;
         final IProgressMonitor monitor2 = createSubProgressMonitor(monitor);

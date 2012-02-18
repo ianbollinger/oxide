@@ -1,6 +1,7 @@
 package org.rustlang.oxide.text;
 
-import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGB;
 
 public interface IColorManager {
     Color getColor(String key);

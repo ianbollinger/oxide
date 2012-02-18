@@ -20,7 +20,7 @@ import org.rustlang.oxide.OxidePlugin;
 public class RustLaunchShortcut implements ILaunchShortcut {
     @Override
     public void launch(final ISelection selection, final String mode) {
-        if (selection == null || !(selection instanceof TreeSelection)) {
+        if (!(selection instanceof TreeSelection)) {
             return;
         }
         final TreeSelection treeSelection = (TreeSelection) selection;
@@ -40,7 +40,7 @@ public class RustLaunchShortcut implements ILaunchShortcut {
     @Override
     public void launch(final IEditorPart editor, final String mode) {
         final IEditorInput editorInput = editor.getEditorInput();
-        if (editorInput == null || !(editorInput instanceof FileEditorInput)) {
+        if (!(editorInput instanceof FileEditorInput)) {
             return;
         }
         final FileEditorInput fileEditorInput = (FileEditorInput) editorInput;
@@ -53,8 +53,8 @@ public class RustLaunchShortcut implements ILaunchShortcut {
         }
     }
 
-    private void launch(final String projectName, final String mode)
-            throws CoreException {
+    private void launch(final String projectName,
+            final String mode) throws CoreException {
         ILaunchConfiguration found = null;
         final ILaunchManager launchManager = DebugPlugin.getDefault()
                 .getLaunchManager();
@@ -94,6 +94,7 @@ public class RustLaunchShortcut implements ILaunchShortcut {
                     .setAttribute(DebugPlugin.ATTR_CONSOLE_ENCODING, "UTF-8");
             found = workingCopy.doSave();
         }
+        // TODO: use new progress monitor.
         final IProgressMonitor monitor = null;
         final boolean build = true;
         final boolean register = true;

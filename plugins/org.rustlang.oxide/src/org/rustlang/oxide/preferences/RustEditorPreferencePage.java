@@ -12,12 +12,13 @@ public class RustEditorPreferencePage extends FieldEditorPreferencePage
     }
 
     @Override
-    public void init(final IWorkbench workbench) {
+    public void init(@SuppressWarnings("unused") final IWorkbench workbench) {
         setPreferenceStore(OxidePlugin.getDefault().getPreferenceStore());
         setDescription("Rust editor preferences.");
     }
 
     @Override
     protected void createFieldEditors() {
+        // TODO: implement.
     }
 }

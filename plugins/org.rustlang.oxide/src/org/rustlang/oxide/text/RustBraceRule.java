@@ -9,7 +9,7 @@ public class RustBraceRule extends SingleCharacterRule {
 
     @Override
     protected boolean isRuleCharacter(final int c) {
-        return c == '{' || c == '}' || c == '[' || c == ']' || c == '('
-                || c == ')';
+        return c == '(' || c == ')' || c == '<' || c == '>' || c == '['
+                || c == ']' || c == '{' || c == '}';
     }
 }

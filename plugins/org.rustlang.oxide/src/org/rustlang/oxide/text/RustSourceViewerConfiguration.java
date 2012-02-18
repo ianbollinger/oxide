@@ -1,9 +1,12 @@
 package org.rustlang.oxide.text;
 
-import org.eclipse.jface.text.*;
-import org.eclipse.jface.text.presentation.*;
-import org.eclipse.jface.text.rules.*;
-import org.eclipse.jface.text.source.*;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.TextAttribute;
+import org.eclipse.jface.text.presentation.IPresentationReconciler;
+import org.eclipse.jface.text.presentation.PresentationReconciler;
+import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
+import org.eclipse.jface.text.rules.Token;
+import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 
 public class RustSourceViewerConfiguration extends
@@ -22,7 +25,8 @@ public class RustSourceViewerConfiguration extends
             IDocument.DEFAULT_CONTENT_TYPE,
             RustPartitions.RUST_SINGLE_LINE_COMMENT,
             RustPartitions.RUST_MULTI_LINE_COMMENT,
-            RustPartitions.RUST_STRING, RustPartitions.RUST_CHARACTER
+            RustPartitions.RUST_STRING,
+            RustPartitions.RUST_CHARACTER
         };
     }
 
@@ -38,6 +42,21 @@ public class RustSourceViewerConfiguration extends
         reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
         return reconciler;
     }
+
+    /*
+    @Override
+    public IAutoEditStrategy[] getAutoEditStrategies(
+            final ISourceViewer sourceViewer, final String contentType) {
+        return new IAutoEditStrategy[] { getAutoIndentStrategy() };
+    }
+
+    public IAutoEditStrategy getAutoIndentStrategy() {
+        if (autoIndentStrategy == null) {
+            autoIndentStrategy = new RustAutoIndentStrategy();
+        }
+        return autoIndentStrategy;
+    }
+    */
 
     private RustCodeScanner getCodeScanner() {
         if (codeScanner == null) {

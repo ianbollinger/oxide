@@ -13,8 +13,10 @@ public class RustLaunchConfigurationTabGroup extends
             @SuppressWarnings("unused") final ILaunchConfigurationDialog dialog,
             @SuppressWarnings("unused") final String mode) {
         final ILaunchConfigurationTab[] tabs = new ILaunchConfigurationTab[] {
-                new RustLaunchConfigurationTab(), new EnvironmentTab(),
-                new CommonTab() };
+            new RustLaunchConfigurationTab(),
+            new EnvironmentTab(),
+            new CommonTab()
+        };
         setTabs(tabs);
     }
 }

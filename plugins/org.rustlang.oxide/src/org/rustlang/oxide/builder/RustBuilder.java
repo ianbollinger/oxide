@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.CharStreams;
@@ -37,13 +38,13 @@ public class RustBuilder extends IncrementalProjectBuilder {
         if (kind == IncrementalProjectBuilder.CLEAN_BUILD) {
             cleanBuild(monitor);
         } else if (kind == IncrementalProjectBuilder.FULL_BUILD) {
-            fullBuild(monitor);
+            fullBuild();
         } else {
             final IResourceDelta delta = getDelta(getProject());
             if (delta == null) {
-                fullBuild(monitor);
+                fullBuild();
             } else {
-                incrementalBuild(delta, monitor);
+                incrementalBuild(delta);
             }
         }
         final IProject project = getProject();
@@ -65,7 +66,8 @@ public class RustBuilder extends IncrementalProjectBuilder {
         final Iterable<String> libraryPathList = Splitter.on(';')
                 .omitEmptyStrings().split(libraryPaths);
         final ImmutableList.Builder<String> builder = ImmutableList.builder();
-        builder.add(compilerPath); //.add("--no-trans");
+        builder.add(compilerPath);
+        // TODO: .add("--no-trans");
         for (final String libraryPath : libraryPathList) {
             builder.add("-L").add(libraryPath);
         }
@@ -75,15 +77,16 @@ public class RustBuilder extends IncrementalProjectBuilder {
         final Process process = DebugPlugin.exec(commandLine, workingDirectory);
         try {
             final InputStream inputStream = process.getInputStream();
-            final Reader reader = new InputStreamReader(inputStream);
+            // TODO: ensure encoding is correct.
+            final Reader reader = new InputStreamReader(inputStream,
+                    Charsets.UTF_8);
             parseLines(CharStreams.readLines(reader));
-        } catch (IOException e) {
+        } catch (final IOException e) {
             OxidePlugin.getLogger().log(e);
         }
     }
 
-    private void parseLines(final List<String> lines)
-            throws CoreException {
+    private void parseLines(final List<String> lines) throws CoreException {
         final Pattern p = Pattern
                 .compile("^([^:]+):(\\d+):(\\d+): (\\d+):(\\d+) error: (.+)$");
         for (final String line : lines) {
@@ -93,17 +96,16 @@ public class RustBuilder extends IncrementalProjectBuilder {
             }
             final IResource resource = getProject().getFile(m.group(1));
             final int lineStart = Integer.parseInt(m.group(2));
-            final int columnStart = Integer.parseInt(m.group(3));
-            final int lineEnd = Integer.parseInt(m.group(4));
-            final int columnEnd = Integer.parseInt(m.group(5));
+            // final int columnStart = Integer.parseInt(m.group(3));
+            // final int lineEnd = Integer.parseInt(m.group(4));
+            // final int columnEnd = Integer.parseInt(m.group(5));
             final String message = m.group(6);
-            reportError(resource, lineStart, columnStart, columnEnd, message);
+            reportError(resource, lineStart, message);
         }
     }
 
     private void reportError(final IResource resource, final int line,
-            final int start, final int end, final String msg)
-            throws CoreException {
+            final String msg) throws CoreException {
         final IMarker marker = resource.createMarker(IMarker.PROBLEM);
         marker.setAttribute(IMarker.LINE_NUMBER, line);
         // marker.setAttribute(IMarker.CHAR_START, start);
@@ -112,21 +114,14 @@ public class RustBuilder extends IncrementalProjectBuilder {
         marker.setAttribute(IMarker.PRIORITY, IMarker.PRIORITY_HIGH);
         marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
     }
-    
-    @Override
-    protected void clean(
-            @SuppressWarnings("unused") final IProgressMonitor monitor)
-            throws CoreException {
-        // TOODO: implement
-    }
 
-    private void cleanBuild(final IProgressMonitor monitor)
-            throws CoreException {
+    private void cleanBuild(
+            final IProgressMonitor monitor) throws CoreException {
         clean(monitor);
-        fullBuild(monitor);
+        fullBuild();
     }
 
-    private void fullBuild(final IProgressMonitor monitor) {
+    private void fullBuild() {
         final IProject project = getProject();
         try {
             for (final IResourceVisitor visitor : getVisitors()) {
@@ -137,14 +132,11 @@ public class RustBuilder extends IncrementalProjectBuilder {
         }
     }
 
-    private List<RustBuilderVisitor> getVisitors() {
-        final EnumPreferenceStore store = OxidePlugin.getEnumPreferenceStore();
-        return ImmutableList.of((RustBuilderVisitor) new RustCompilerVisitor(
-                store));
+    private List<? extends RustBuilderVisitor> getVisitors() {
+        return ImmutableList.of(new RustCompilerVisitor());
     }
 
-    private void incrementalBuild(final IResourceDelta delta,
-            final IProgressMonitor monitor) {
+    private void incrementalBuild(final IResourceDelta delta) {
         try {
             for (final IResourceDeltaVisitor visitor : getVisitors()) {
                 delta.accept(visitor);

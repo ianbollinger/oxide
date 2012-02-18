@@ -20,6 +20,7 @@ public class OxideLogger {
             final Throwable throwable) {
         final Status status = new Status(severity, OxidePlugin.ID, IStatus.OK,
                 message, throwable);
+        // TODO: eliminate circular dependency.
         OxidePlugin.getDefault().getLog().log(status);
     }
 }

@@ -31,8 +31,8 @@ public class RustApplicationLauncher implements ILaunchConfigurationDelegate2 {
     @Override
     public boolean buildForLaunch(final ILaunchConfiguration configuration,
             @SuppressWarnings("unused") final String mode,
-            @SuppressWarnings("unused") final IProgressMonitor monitor)
-            throws CoreException {
+            @SuppressWarnings("unused")
+            final IProgressMonitor monitor) throws CoreException {
         final String project = configuration.getAttribute(
                 RustLaunchAttribute.PROJECT.toString(), "");
         final String executable = configuration.getAttribute(
@@ -42,7 +42,7 @@ public class RustApplicationLauncher implements ILaunchConfigurationDelegate2 {
 
     @Override
     public boolean finalLaunchCheck(
-            @SuppressWarnings("unused") final ILaunchConfiguration configuration,
+            @SuppressWarnings("unused") final ILaunchConfiguration config,
             @SuppressWarnings("unused") final String mode,
             @SuppressWarnings("unused") final IProgressMonitor monitor) {
         return true;
@@ -56,7 +56,8 @@ public class RustApplicationLauncher implements ILaunchConfigurationDelegate2 {
 
     @Override
     public boolean preLaunchCheck(
-            @SuppressWarnings("unused") final ILaunchConfiguration configuration,
+            @SuppressWarnings("unused")
+            final ILaunchConfiguration configuration,
             @SuppressWarnings("unused") final String mode,
             @SuppressWarnings("unused") final IProgressMonitor monitor) {
         return true;
@@ -64,10 +65,9 @@ public class RustApplicationLauncher implements ILaunchConfigurationDelegate2 {
 
     @Override
     public void launch(final ILaunchConfiguration configuration,
-            @SuppressWarnings("unused") final String mode,
-            final ILaunch launch,
-            @SuppressWarnings("unused") final IProgressMonitor monitor)
-            throws CoreException {
+            @SuppressWarnings("unused") final String mode, final ILaunch launch,
+            @SuppressWarnings("unused")
+            final IProgressMonitor monitor) throws CoreException {
         execute(configuration, launch);
     }
 
@@ -101,17 +101,18 @@ public class RustApplicationLauncher implements ILaunchConfigurationDelegate2 {
             final IPath projectPath = project.getLocation();
             final String executableName = relativeExecutablePath.lastSegment();
             IPath executablePath;
-            if (!Util.isWindows()) {
-                executablePath = Path.fromOSString(".").append(executableName);
-            } else {
+            if (Util.isWindows()) {
                 executablePath = Path.fromOSString(executableName);
+            } else {
+                executablePath = Path.fromOSString(".").append(executableName);
             }
             final String commandLine = projectPath.append(executablePath)
                     .toOSString();
             final String workingDirectory = projectPath.toOSString();
             final List<String> arguments = Lists.newArrayList();
             arguments.add(commandLine);
-            final List<String> argumentsList = argumentsAsList(programArguments);
+            final List<String> argumentsList =
+                    argumentsAsList(programArguments);
             if (argumentsList != null) {
                 arguments.addAll(argumentsList);
             }
@@ -138,7 +139,7 @@ public class RustApplicationLauncher implements ILaunchConfigurationDelegate2 {
     // TODO: move this somewhere appropriate.
     private List<String> argumentsAsList(final String arguments) {
         final List<String> argumentsList = Lists.newArrayList();
-        if (arguments == null || arguments.trim().length() == 0) {
+        if (arguments == null || arguments.trim().isEmpty()) {
             return argumentsList;
         }
         boolean inQuote = false;
@@ -178,6 +179,6 @@ public class RustApplicationLauncher implements ILaunchConfigurationDelegate2 {
             }
         }
         argumentsList.add(arg.toString());
-        return argumentsList.size() == 0 ? null : argumentsList;
+        return argumentsList.isEmpty() ? null : argumentsList;
     }
 }

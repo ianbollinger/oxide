@@ -14,16 +14,21 @@ public class BasicTemplateContext extends TemplateContext {
     }
 
     @Override
-    public TemplateBuffer evaluate(final Template template)
-            throws BadLocationException, TemplateException {
+    public TemplateBuffer evaluate(
+            final Template template) throws TemplateException {
         final TemplateTranslator translator = new TemplateTranslator();
         final TemplateBuffer buffer = translator.translate(template);
-        getContextType().resolve(buffer, this);
+        try {
+            getContextType().resolve(buffer, this);
+        } catch (final BadLocationException e) {
+            throw new TemplateException(e);
+        }
         return buffer;
     }
 
     @Override
-    public boolean canEvaluate(final Template template) {
+    public boolean canEvaluate(
+            @SuppressWarnings("unused") final Template template) {
         return true;
     }
 }
