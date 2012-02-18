@@ -16,6 +16,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.google.code.findbugs</groupId>
+      <artifactId>jsr305</artifactId>
+      <version>1.3.9</version>
+    </dependency>
+    <dependency>
       <groupId>com.google.inject</groupId>
       <artifactId>guice</artifactId>
       <version>3.0</version>
@@ -33,11 +38,11 @@
         <configuration>
           <instructions>
             <Bundle-ClassPath>${maven-dependencies}</Bundle-ClassPath>
-            <Embed-Dependency>guice</Embed-Dependency>
+            <Embed-Dependency>jsr305,guice</Embed-Dependency>
             <Embed-Transitive>true</Embed-Transitive>
             <Embed-Directory>jars</Embed-Directory>
             <Bundle-License></Bundle-License>
-            <_exportcontents>!com.google.inject.internal.*,com.google.inject.*;version="3.0"</_exportcontents>
+            <_exportcontents>javax.annotation.*;version="1.3.9",!com.google.inject.internal.*,com.google.inject.*;version="3.0"</_exportcontents>
             <_nouses>true</_nouses>
           </instructions>
         </configuration>

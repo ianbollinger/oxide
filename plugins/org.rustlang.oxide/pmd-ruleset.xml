@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="oxide"
+    xmlns="http://pmd.sf.net/ruleset/1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pmd.sf.net/ruleset/1.0.0 http://pmd.sf.net/ruleset_xml_schema.xsd"
+    xsi:noNamespaceSchemaLocation="http://pmd.sf.net/ruleset_xml_schema.xsd">
+
+  <description>PMD static analysis rule set for Oxide.</description>
+
+    <rule ref="rulesets/basic.xml"/>
+    <rule ref="rulesets/braces.xml"/>
+    <rule ref="rulesets/clone.xml"/>
+    <rule ref="rulesets/codesize.xml"/>
+    <rule ref="rulesets/controversial.xml">
+      <exclude name="AvoidFinalLocalVariable"/>
+      <exclude name="CallSuperInConstructor"/>
+      <exclude name="DataflowAnomalyAnalysis"/>
+      <exclude name="DefaultPackage"/>
+      <exclude name="NullAssignment"/>
+      <exclude name="OnlyOneReturn"/>
+      <exclude name="AvoidUsingVolatile"/>
+    </rule>
+    <rule ref="rulesets/coupling.xml"/>
+    <rule ref="rulesets/design.xml">
+      <exclude name="EqualsNull"/>
+      <exclude name="UnnecessaryLocalBeforeReturn"/>
+    </rule>
+    <rule ref="rulesets/finalizers.xml"/>
+    <rule ref="rulesets/imports.xml">
+      <exclude name="UnusedImports"/>
+    </rule>
+    <rule ref="rulesets/javabeans.xml">
+      <exclude name="BeanMembersShouldSerialize"/>
+    </rule>
+    <rule ref="rulesets/junit.xml">
+      <exclude name="JUnitAssertionsShouldIncludeMessage"/>
+      <exclude name="TestClassWithoutTestCases"/>
+      <exclude name="JUnitTestsShouldIncludeAssert"/>
+    </rule>
+    <rule ref="rulesets/logging-java.xml"/>
+    <!-- <rule ref="rulesets/maven.xml"/>  -->
+    <rule ref="rulesets/migrating.xml"/>
+    <rule ref="rulesets/naming.xml">
+      <exclude name="LongVariable"/>
+      <exclude name="ShortMethodName"/>
+      <exclude name="ShortVariable"/>
+    </rule>
+    <rule ref="rulesets/optimizations.xml"/>
+    <rule ref="rulesets/strictexception.xml">
+      <!-- <exclude name="AvoidThrowingNullPointerException"/> -->
+    </rule>
+    <rule ref="rulesets/strings.xml">
+      <exclude name="AvoidDuplicateLiterals"/>
+    </rule>
+    <rule ref="rulesets/sunsecure.xml"/>
+    <rule ref="rulesets/typeresolution.xml">
+      <exclude name="UnusedImports"/>
+      <exclude name="SignatureDeclareThrowsException"/>
+      <exclude name="CloneMethodMustImplementCloneable"/>
+      <exclude name="LooseCoupling"/>
+    </rule>
+    <rule ref="rulesets/unusedcode.xml"/>
+
+</ruleset>

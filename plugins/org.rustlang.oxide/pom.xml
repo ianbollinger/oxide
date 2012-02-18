@@ -11,4 +11,20 @@
   <artifactId>org.rustlang.oxide</artifactId>
   <packaging>eclipse-plugin</packaging>
   <name>Oxide UI plug-in</name>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <artifactId>maven-pmd-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>findbugs-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>
