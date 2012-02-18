@@ -2,6 +2,8 @@ package org.rustlang.oxide.wizards;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.util.List;
+import com.google.common.collect.ImmutableList;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -29,7 +31,7 @@ public class RustProjectWizard extends Wizard implements INewWizard,
     public static final String ID =
             "org.rustlang.oxide.wizards.RustProjectWizard";
     private IWorkspace workspace;
-    private IConfigurationElement config;
+    private IConfigurationElement configuration;
     private RustNewProjectWizardPage projectPage;
     private WizardNewProjectReferencePage referencePage;
     private TemplateStore templateStore;
@@ -38,7 +40,7 @@ public class RustProjectWizard extends Wizard implements INewWizard,
     public void setInitializationData(final IConfigurationElement config,
             @SuppressWarnings("unused") final String propertyName,
             @SuppressWarnings("unused") final Object data) {
-        this.config = config;
+        this.configuration = config;
     }
 
     @Override
@@ -54,7 +56,8 @@ public class RustProjectWizard extends Wizard implements INewWizard,
     public void addPages() {
         addPage(projectPage);
         if (projectsInWorkspace()) {
-            addPage(provideReferencedProjectsPage());
+            referencePage = provideReferencedProjectsPage();
+            addPage(referencePage);
         }
     }
 
@@ -81,23 +84,25 @@ public class RustProjectWizard extends Wizard implements INewWizard,
             log(e);
             return false;
         }
-        updatePerspective(config);
+        updatePerspective(configuration);
         return true;
     }
 
-    private IProject[] getReferencedProjects() {
-        return (referencePage != null) ? referencePage.getReferencedProjects()
-                : new IProject[] {};
+    private List<IProject> getReferencedProjects() {
+        if (referencePage == null) {
+            return ImmutableList.of();
+        }
+        return ImmutableList.copyOf(referencePage.getReferencedProjects());
     }
 
-    IWizardPage provideReferencedProjectsPage() {
-        final IWizardPage page = new WizardNewProjectReferencePage(
-                "rustReferenceProjectPage");
+    WizardNewProjectReferencePage provideReferencedProjectsPage() {
+        final WizardNewProjectReferencePage page =
+                new WizardNewProjectReferencePage("rustReferenceProjectPage");
         page.setTitle("Rust Project");
         page.setDescription("Select referenced projects.");
         return page;
     }
-    
+
     RustNewProjectWizardPage provideNewProjectPage(
             final IStructuredSelection selection) {
         return new RustNewProjectWizardPage(selection);
@@ -145,7 +150,8 @@ public class RustProjectWizard extends Wizard implements INewWizard,
 
     RustCreateProjectOperation provideCreateProjectOperation(
             final IProject project, final URI location,
-            final IProject[] referencedProjects, final IWorkspace workspace2,
+            final List<IProject> referencedProjects,
+            final IWorkspace workspace2,
             final TemplateStore templateStore2,
             final TemplateContext templateContext) {
         return new RustCreateProjectOperation(project, location,
