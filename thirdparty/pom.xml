@@ -7,26 +7,68 @@
     <groupId>org.rustlang.oxide</groupId>
     <artifactId>parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <relativePath>../../pom.xml</relativePath>
   </parent>
-  <artifactId>org.rustlang.oxide.thirdparty</artifactId>
-  <packaging>eclipse-plugin</packaging>
+  <artifactId>thirdparty</artifactId>
+  <packaging>bundle</packaging>
   <name>Oxide third-party packages</name>
   <description>Third-party packages for Oxide.</description>
 
   <properties>
-    <tycho-version>0.14.0</tycho-version>
+    <bundlePath>${basedir}/../plugins/org.rustlang.oxide.thirdparty</bundlePath>
   </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.google.code.findbugs</groupId>
+      <artifactId>jsr305</artifactId>
+      <version>1.3.9</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.inject</groupId>
+      <artifactId>guice</artifactId>
+      <version>3.0</version>
+    </dependency>
+  </dependencies>
 
   <build>
     <defaultGoal>install</defaultGoal>
     <plugins>
 
       <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-maven-plugin</artifactId>
-        <version>${tycho-version}</version>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.4</version>
+        <executions>
+          <execution>
+            <id>unpack-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${bundlePath}</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>2.3.6</version>
         <extensions>true</extensions>
+        <configuration>
+          <manifestLocation>${bundlePath}/META-INF</manifestLocation>
+          <instructions>
+            <Bundle-Version>0.0.1.qualifier</Bundle-Version>
+            <Embed-Dependency>*;inline=true</Embed-Dependency>
+            <Bundle-License></Bundle-License>
+            <Embed-Transitive>true</Embed-Transitive>
+            <_exportcontents>javax.annotation.*;version="1.3.9",!com.google.inject.internal.*,com.google.inject.*;version="3.0",org.aopalliance.*;version="1.0",javax.inject</_exportcontents>
+            <Import-Package>!com.google.inject.internal.asm.util</Import-Package>
+            <_nouses>true</_nouses>
+          </instructions>
+        </configuration>
       </plugin>
 
       <plugin>
@@ -74,7 +116,7 @@
           </execution>
         </executions>
       </plugin>
+
     </plugins>
   </build>
-
 </project>
