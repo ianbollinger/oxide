@@ -4,6 +4,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -43,6 +44,11 @@ public class OxideModule extends AbstractModule {
     @Provides
     IWorkspace provideWorkspace() {
         return ResourcesPlugin.getWorkspace();
+    }
+
+    @Provides
+    IWorkspaceRoot provideWorkspaceRoot(final IWorkspace workspace) {
+        return workspace.getRoot();
     }
 
     @Provides

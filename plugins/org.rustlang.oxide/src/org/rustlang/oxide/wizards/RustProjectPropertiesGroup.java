@@ -1,5 +1,7 @@
 package org.rustlang.oxide.wizards;
 
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
@@ -12,7 +14,6 @@ import org.eclipse.swt.widgets.Text;
 import org.rustlang.oxide.common.swt.EnumRadioGroup;
 import org.rustlang.oxide.language.model.CrateType;
 
-// TODO: why not have this extend composite directly?
 public class RustProjectPropertiesGroup {
     private final Composite parent;
     private final Font font;
@@ -27,9 +28,10 @@ public class RustProjectPropertiesGroup {
     private final Text briefDescriptionField;
     private final Text longDescriptionField;
 
-    RustProjectPropertiesGroup(final Composite parent, final Font font) {
+    @Inject
+    RustProjectPropertiesGroup(@Assisted final Composite parent) {
         this.parent = parent;
-        this.font = font;
+        this.font = parent.getFont();
         // TODO: replace with factories (ugh.)
         this.propertiesGroup = createGroup("Crate properties");
         this.crateTypeGroup = createCrateTypeGroup();

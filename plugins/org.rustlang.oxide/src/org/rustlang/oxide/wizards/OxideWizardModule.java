@@ -13,13 +13,17 @@ public class OxideWizardModule extends AbstractModule {
     @Override
     protected void configure() {
         install(new FactoryModuleBuilder()
-                .implement(RustNewProjectWizardPage.class,
-                        RustNewProjectWizardPage.class)
-                .build(WizardPageFactory.class));
+                .implement(RustProjectWizardPage.class,
+                        RustProjectWizardPage.class)
+                .build(RustProjectWizardPageFactory.class));
         install(new FactoryModuleBuilder()
                 .implement(RustCreateProjectOperation.class,
                         RustCreateProjectOperation.class)
                 .build(RustCreateProjectOperationFactory.class));
+        install(new FactoryModuleBuilder()
+                .implement(RustProjectPropertiesGroup.class,
+                        RustProjectPropertiesGroup.class)
+                .build(RustProjectPropertiesGroupFactory.class));
     }
 
     @Provides

@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -16,7 +16,6 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.dialogs.WizardNewProjectReferencePage;
-import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 import org.rustlang.oxide.OxideLogger;
 import org.rustlang.oxide.OxidePlugin;
 import org.rustlang.oxide.RustCreateProjectOperationFactory;
@@ -27,27 +26,30 @@ public class RustProjectWizard extends Wizard implements INewWizard,
         IExecutableExtension {
     public static final String ID =
             "org.rustlang.oxide.wizards.RustProjectWizard";
-    private final IWorkspace workspace;
     private IConfigurationElement configuration;
-    private RustNewProjectWizardPage projectPage;
+    private RustProjectWizardPage projectPage;
+    private final IWorkspaceRoot workspaceRoot;
     private final WizardNewProjectReferencePage referencePage;
-    private final WizardPageFactory projectPageFactory;
-    private final RustCreateProjectOperationFactory createProjectOperationFactory;
+    private final RustProjectWizardPageFactory projectPageFactory;
+    private final RustCreateProjectOperationFactory newProjectOperationFactory;
     private final ImageDescriptor imageDescriptor;
+    private final PerspectiveUpdater perspectiveUpdater;
     private final OxideLogger logger;
 
     @Inject
     RustProjectWizard(final WizardNewProjectReferencePage referencePage,
-            final WizardPageFactory projectPageFactory,
-            final RustCreateProjectOperationFactory createProjectOperationFactory,
-            final IWorkspace workspace,
+            final RustProjectWizardPageFactory projectPageFactory,
+            final RustCreateProjectOperationFactory newProjectOperationFactory,
+            final IWorkspaceRoot workspaceRoot,
             final ImageDescriptor imageDescriptor,
+            final PerspectiveUpdater perspectiveUpdater,
             final OxideLogger logger) {
         this.referencePage = referencePage;
         this.projectPageFactory = projectPageFactory;
-        this.createProjectOperationFactory = createProjectOperationFactory;
-        this.workspace = workspace;
+        this.newProjectOperationFactory = newProjectOperationFactory;
+        this.workspaceRoot = workspaceRoot;
         this.imageDescriptor = imageDescriptor;
+        this.perspectiveUpdater = perspectiveUpdater;
         this.logger = logger;
     }
 
@@ -74,8 +76,7 @@ public class RustProjectWizard extends Wizard implements INewWizard,
     }
 
     private boolean projectsInWorkspace() {
-        // TODO: LoD violation.
-        return workspace.getRoot().getProjects().length > 0;
+        return workspaceRoot.getProjects().length > 0;
     }
 
     // TODO: most of this should be moved elsewhere.
@@ -83,7 +84,7 @@ public class RustProjectWizard extends Wizard implements INewWizard,
     public boolean performFinish() {
         final TemplateContext templateContext = provideTemplateContext(
                 projectPage.provideModel());
-        final IRunnableWithProgress operation = createProjectOperationFactory.create(
+        final IRunnableWithProgress operation = newProjectOperationFactory.create(
                 projectPage.getProjectHandle(), projectPage.getLocationURI(),
                 getReferencedProjects(), templateContext);
         final boolean fork = true;
@@ -96,7 +97,7 @@ public class RustProjectWizard extends Wizard implements INewWizard,
             logger.log(e);
             return false;
         }
-        updatePerspective(configuration);
+        perspectiveUpdater.update(configuration);
         return true;
     }
 
@@ -105,11 +106,6 @@ public class RustProjectWizard extends Wizard implements INewWizard,
             return ImmutableList.of();
         }
         return ImmutableList.copyOf(referencePage.getReferencedProjects());
-    }
-
-    // TODO: eliminate static call.
-    void updatePerspective(final IConfigurationElement config2) {
-        BasicNewProjectResourceWizard.updatePerspective(config2);
     }
 
     // TODO: make this a factory.

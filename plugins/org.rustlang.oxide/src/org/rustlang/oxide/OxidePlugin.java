@@ -34,12 +34,12 @@ public class OxidePlugin extends AbstractUIPlugin {
         return imageDescriptorFromPlugin(ID, imageFilePath);
     }
 
-    public static EnumPreferenceStore getEnumPreferenceStore() {
-        return getInstance(EnumPreferenceStore.class);
-    }
-
     public static OxideLogger getLogger() {
         return getInstance(OxideLogger.class);
+    }
+
+    public static EnumPreferenceStore getEnumPreferenceStore() {
+        return getInstance(EnumPreferenceStore.class);
     }
 
     public static <T> T getInstance(final Class<T> clazz) {
