@@ -13,6 +13,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.CharStreams;
+import com.google.inject.Inject;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -23,13 +24,22 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.DebugPlugin;
-import org.rustlang.oxide.OxidePlugin;
+import org.rustlang.oxide.OxideLogger;
 import org.rustlang.oxide.common.Collections3;
 import org.rustlang.oxide.common.EnumPreferenceStore;
 import org.rustlang.oxide.preferences.RustPreferenceKey;
 
 public class RustBuilder extends IncrementalProjectBuilder {
     public static final String ID = "org.rustlang.oxide.RustBuilder";
+    private final EnumPreferenceStore preferenceStore;
+    private final OxideLogger logger;
+
+    @Inject
+    RustBuilder(final EnumPreferenceStore preferenceStore,
+            final OxideLogger logger) {
+        this.preferenceStore = preferenceStore;
+        this.logger = logger;
+    }
 
     @Override
     protected IProject[] build(final int kind,
@@ -48,15 +58,16 @@ public class RustBuilder extends IncrementalProjectBuilder {
             }
         }
         final IProject project = getProject();
-        project.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
-        final EnumPreferenceStore store = OxidePlugin.getEnumPreferenceStore();
+        final boolean includeSubtypes = true;
+        project.deleteMarkers(IMarker.PROBLEM, includeSubtypes,
+                IResource.DEPTH_INFINITE);
         final IResource crateFile = project.getFile(project.getName() + ".rc");
-        rustc(crateFile, project.getProject().getLocation().toFile(), store);
+        rustc(crateFile, project.getProject().getLocation().toFile());
         return null;
     }
 
-    private void rustc(final IResource resource, final File workingDirectory,
-            final EnumPreferenceStore preferenceStore) throws CoreException {
+    private void rustc(final IResource resource,
+            final File workingDirectory) throws CoreException {
         final String file = resource.getProjectRelativePath().toOSString();
         // TODO: --warn-unused-imports
         final String compilerPath = preferenceStore
@@ -74,6 +85,7 @@ public class RustBuilder extends IncrementalProjectBuilder {
         builder.add(file);
         final String[] commandLine = Collections3.toArray(builder.build(),
                 String.class);
+        // TODO: eliminate static call.
         final Process process = DebugPlugin.exec(commandLine, workingDirectory);
         try {
             final InputStream inputStream = process.getInputStream();
@@ -82,11 +94,12 @@ public class RustBuilder extends IncrementalProjectBuilder {
                     Charsets.UTF_8);
             parseLines(CharStreams.readLines(reader));
         } catch (final IOException e) {
-            OxidePlugin.getLogger().log(e);
+            logger.log(e);
         }
     }
 
     private void parseLines(final List<String> lines) throws CoreException {
+        // TOD: inject
         final Pattern p = Pattern
                 .compile("^([^:]+):(\\d+):(\\d+): (\\d+):(\\d+) error: (.+)$");
         for (final String line : lines) {
@@ -128,7 +141,7 @@ public class RustBuilder extends IncrementalProjectBuilder {
                 project.accept(visitor);
             }
         } catch (final CoreException e) {
-            OxidePlugin.getLogger().log(e);
+            logger.log(e);
         }
     }
 
@@ -142,7 +155,7 @@ public class RustBuilder extends IncrementalProjectBuilder {
                 delta.accept(visitor);
             }
         } catch (final CoreException e) {
-            OxidePlugin.getLogger().log(e);
+            logger.log(e);
         }
     }
 }
