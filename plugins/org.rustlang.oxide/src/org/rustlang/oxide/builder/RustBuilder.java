@@ -13,7 +13,6 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.CharStreams;
-import com.google.inject.Inject;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -25,6 +24,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.DebugPlugin;
 import org.rustlang.oxide.OxideLogger;
+import org.rustlang.oxide.OxidePlugin;
 import org.rustlang.oxide.common.Collections3;
 import org.rustlang.oxide.common.EnumPreferenceStore;
 import org.rustlang.oxide.preferences.RustPreferenceKey;
@@ -34,11 +34,9 @@ public class RustBuilder extends IncrementalProjectBuilder {
     private final EnumPreferenceStore preferenceStore;
     private final OxideLogger logger;
 
-    @Inject
-    RustBuilder(final EnumPreferenceStore preferenceStore,
-            final OxideLogger logger) {
-        this.preferenceStore = preferenceStore;
-        this.logger = logger;
+    public RustBuilder() {
+        this.preferenceStore = OxidePlugin.getEnumPreferenceStore();
+        this.logger = OxidePlugin.getLogger();
     }
 
     @Override
