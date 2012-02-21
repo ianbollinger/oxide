@@ -8,13 +8,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 import org.rustlang.oxide.language.model.CrateAttributes;
 
-// TODO: rename to RustProjectWizardPage
-public class RustNewProjectWizardPage extends WizardNewProjectCreationPage {
+public class RustProjectWizardPage extends WizardNewProjectCreationPage {
     private final IStructuredSelection currentSelection;
     private RustProjectPropertiesGroup properties;
 
     @Inject
-    RustNewProjectWizardPage(
+    RustProjectWizardPage(
             @Assisted final IStructuredSelection currentSelection) {
         super("rustNewProjectPage");
         setTitle("Rust Project");
