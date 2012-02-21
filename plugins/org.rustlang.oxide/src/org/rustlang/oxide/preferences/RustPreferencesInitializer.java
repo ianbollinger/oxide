@@ -14,7 +14,6 @@ public class RustPreferencesInitializer extends AbstractPreferenceInitializer {
     }
 
     private String getDefaultCompilerName() {
-        System.getenv("PATH");
         return getExecutableName("rustc");
     }
 

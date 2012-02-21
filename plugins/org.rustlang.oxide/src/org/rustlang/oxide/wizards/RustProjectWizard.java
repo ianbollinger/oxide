@@ -1,40 +1,55 @@
 package org.rustlang.oxide.wizards;
 
 import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
 import java.util.List;
 import com.google.common.collect.ImmutableList;
+import com.google.inject.Inject;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.templates.TemplateContext;
-import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.dialogs.WizardNewProjectReferencePage;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
+import org.rustlang.oxide.OxideLogger;
 import org.rustlang.oxide.OxidePlugin;
-import org.rustlang.oxide.RustCreateProjectOperation;
+import org.rustlang.oxide.RustCreateProjectOperationFactory;
 import org.rustlang.oxide.language.model.CrateAttributes;
 import org.rustlang.oxide.templates.BasicTemplateContext;
-import org.rustlang.oxide.templates.RustTemplateContextType;
 
 public class RustProjectWizard extends Wizard implements INewWizard,
         IExecutableExtension {
     public static final String ID =
             "org.rustlang.oxide.wizards.RustProjectWizard";
-    private IWorkspace workspace;
+    private final IWorkspace workspace;
     private IConfigurationElement configuration;
     private RustNewProjectWizardPage projectPage;
-    private WizardNewProjectReferencePage referencePage;
-    private TemplateStore templateStore;
+    private final WizardNewProjectReferencePage referencePage;
+    private final WizardPageFactory projectPageFactory;
+    private final RustCreateProjectOperationFactory createProjectOperationFactory;
+    private final ImageDescriptor imageDescriptor;
+    private final OxideLogger logger;
+
+    @Inject
+    RustProjectWizard(final WizardNewProjectReferencePage referencePage,
+            final WizardPageFactory projectPageFactory,
+            final RustCreateProjectOperationFactory createProjectOperationFactory,
+            final IWorkspace workspace,
+            final ImageDescriptor imageDescriptor,
+            final OxideLogger logger) {
+        this.referencePage = referencePage;
+        this.projectPageFactory = projectPageFactory;
+        this.createProjectOperationFactory = createProjectOperationFactory;
+        this.workspace = workspace;
+        this.imageDescriptor = imageDescriptor;
+        this.logger = logger;
+    }
 
     @Override
     public void setInitializationData(final IConfigurationElement config,
@@ -46,22 +61,20 @@ public class RustProjectWizard extends Wizard implements INewWizard,
     @Override
     public void init(@SuppressWarnings("unused") final IWorkbench workbench,
             final IStructuredSelection selection) {
-        setDefaultPageImageDescriptor(provideImageDescriptor());
-        this.workspace = provideWorkspace();
-        this.projectPage = provideNewProjectPage(selection);
-        this.templateStore = provideTemplateStore();
+        this.projectPage = projectPageFactory.create(selection);
+        setDefaultPageImageDescriptor(imageDescriptor);
     }
 
     @Override
     public void addPages() {
         addPage(projectPage);
         if (projectsInWorkspace()) {
-            referencePage = provideReferencedProjectsPage();
             addPage(referencePage);
         }
     }
 
     private boolean projectsInWorkspace() {
+        // TODO: LoD violation.
         return workspace.getRoot().getProjects().length > 0;
     }
 
@@ -69,11 +82,10 @@ public class RustProjectWizard extends Wizard implements INewWizard,
     @Override
     public boolean performFinish() {
         final TemplateContext templateContext = provideTemplateContext(
-                projectPage.createModel());
-        final IRunnableWithProgress operation = provideCreateProjectOperation(
+                projectPage.provideModel());
+        final IRunnableWithProgress operation = createProjectOperationFactory.create(
                 projectPage.getProjectHandle(), projectPage.getLocationURI(),
-                getReferencedProjects(), workspace, templateStore,
-                templateContext);
+                getReferencedProjects(), templateContext);
         final boolean fork = true;
         final boolean cancelable = true;
         try {
@@ -81,7 +93,7 @@ public class RustProjectWizard extends Wizard implements INewWizard,
         } catch (final InterruptedException e) {
             return false;
         } catch (final InvocationTargetException e) {
-            log(e);
+            logger.log(e);
             return false;
         }
         updatePerspective(configuration);
@@ -95,43 +107,15 @@ public class RustProjectWizard extends Wizard implements INewWizard,
         return ImmutableList.copyOf(referencePage.getReferencedProjects());
     }
 
-    WizardNewProjectReferencePage provideReferencedProjectsPage() {
-        final WizardNewProjectReferencePage page =
-                new WizardNewProjectReferencePage("rustReferenceProjectPage");
-        page.setTitle("Rust Project");
-        page.setDescription("Select referenced projects.");
-        return page;
-    }
-
-    RustNewProjectWizardPage provideNewProjectPage(
-            final IStructuredSelection selection) {
-        return new RustNewProjectWizardPage(selection);
-    }
-
-    ImageDescriptor provideImageDescriptor() {
-        return OxidePlugin.getImageDescriptor("icons/rust-logo-64x64.png");
-    }
-
-    IWorkspace provideWorkspace() {
-        return ResourcesPlugin.getWorkspace();
-    }
-
-    TemplateStore provideTemplateStore() {
-        return OxidePlugin.getTemplateStore();
-    }
-
-    void log(final Throwable e) {
-        OxidePlugin.getLogger().log(e);
-    }
-
+    // TODO: eliminate static call.
     void updatePerspective(final IConfigurationElement config2) {
         BasicNewProjectResourceWizard.updatePerspective(config2);
     }
 
-    // TODO: move this logic somewhere so it can be tested.
+    // TODO: make this a factory.
     TemplateContext provideTemplateContext(final CrateAttributes model) {
-        final TemplateContext templateContext = new BasicTemplateContext(
-                provideTemplateContextType());
+        final TemplateContext templateContext = OxidePlugin.getInstance(
+                BasicTemplateContext.class);
         templateContext.setVariable("project_name", model.getName());
         templateContext.setVariable("crate_type", model.getType().getValue());
         templateContext.setVariable("version", model.getVersion());
@@ -142,20 +126,5 @@ public class RustProjectWizard extends Wizard implements INewWizard,
         templateContext.setVariable("brief", model.getBriefDescription());
         templateContext.setVariable("desc", model.getLongDescription());
         return templateContext;
-    }
-
-    RustTemplateContextType provideTemplateContextType() {
-        return new RustTemplateContextType();
-    }
-
-    RustCreateProjectOperation provideCreateProjectOperation(
-            final IProject project, final URI location,
-            final List<IProject> referencedProjects,
-            final IWorkspace workspace2,
-            final TemplateStore templateStore2,
-            final TemplateContext templateContext) {
-        return new RustCreateProjectOperation(project, location,
-                referencedProjects, workspace2, templateStore2,
-                templateContext, OxidePlugin.getLogger());
     }
 }

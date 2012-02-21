@@ -5,6 +5,7 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
+import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.rustlang.oxide.OxidePlugin;
@@ -75,7 +76,9 @@ public class RustLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
 
     public void update() {
         // validate();
-        getLaunchConfigurationDialog().updateButtons();
-        getLaunchConfigurationDialog().updateMessage();
+        final ILaunchConfigurationDialog dialog =
+                getLaunchConfigurationDialog();
+        dialog.updateButtons();
+        dialog.updateMessage();
     }
 }

@@ -5,7 +5,7 @@ import com.google.common.collect.ObjectArrays;
 
 public final class Collections3 {
     private Collections3() {
-        // cannot instantiate
+        // Cannot instantiate class.
     }
 
     public static <T> T[] toArray(final Collection<T> collection,

@@ -18,7 +18,8 @@
    </rule>
    <rule ref="rulesets/coupling.xml"/>
    <rule ref="rulesets/design.xml">
-      <exclude name="EqualsNull"/>
+      <exclude name="ReturnEmptyArrayRatherThanNull"/>
+      <exclude name="MissingBreakInSwitch"/>
       <exclude name="UnnecessaryLocalBeforeReturn"/>
    </rule>
    <rule ref="rulesets/finalizers.xml"/>
@@ -30,7 +31,6 @@
    </rule>
    <rule ref="rulesets/junit.xml">
       <exclude name="JUnitAssertionsShouldIncludeMessage"/>
-      <exclude name="TestClassWithoutTestCases"/>
       <exclude name="JUnitTestsShouldIncludeAssert"/>
    </rule>
    <rule ref="rulesets/logging-java.xml"/>
@@ -42,9 +42,11 @@
    </rule>
    <rule ref="rulesets/optimizations.xml"/>
    <rule ref="rulesets/strictexception.xml"/>
-   <rule ref="rulesets/strings.xml">
-      <exclude name="AvoidDuplicateLiterals"/>
-   </rule>
+   <rule ref="rulesets/strings.xml"/>
    <rule ref="rulesets/sunsecure.xml"/>
+   <rule ref="rulesets/typeresolution.xml">
+      <exclude name="UnusedImports"/>
+      <exclude name="SignatureDeclareThrowsException"/>
+   </rule>
    <rule ref="rulesets/unusedcode.xml"/>
 </ruleset>

@@ -4,7 +4,7 @@ import com.google.common.collect.ObjectArrays;
 
 public final class ObjectArrays2 {
     private ObjectArrays2() {
-        // cannot instantiate
+        // Cannot instantiate class.
     }
 
     public static <T> T[] remove(final T[] array, final int index) {

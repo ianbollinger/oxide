@@ -3,6 +3,7 @@ package org.rustlang.oxide.text;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import com.google.inject.Inject;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
@@ -10,7 +11,8 @@ import org.eclipse.swt.widgets.Display;
 public class RustColorManager {
     private final Map<RGB, Color> colorTable;
 
-    public RustColorManager() {
+    @Inject
+    RustColorManager() {
         this.colorTable = new HashMap<RGB, Color>();
     }
 

@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.Text;
 import org.rustlang.oxide.common.swt.EnumRadioGroup;
 import org.rustlang.oxide.language.model.CrateType;
 
+// TODO: why not have this extend composite directly?
 public class RustProjectPropertiesGroup {
     private final Composite parent;
     private final Font font;
@@ -29,6 +30,7 @@ public class RustProjectPropertiesGroup {
     RustProjectPropertiesGroup(final Composite parent, final Font font) {
         this.parent = parent;
         this.font = font;
+        // TODO: replace with factories (ugh.)
         this.propertiesGroup = createGroup("Crate properties");
         this.crateTypeGroup = createCrateTypeGroup();
         this.versionField = createVersionField();

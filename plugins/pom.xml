@@ -17,6 +17,7 @@
   </properties>
 
   <modules>
+    <module>org.rustlang.oxide.thirdparty</module>
     <module>org.rustlang.oxide</module>
   </modules>
 

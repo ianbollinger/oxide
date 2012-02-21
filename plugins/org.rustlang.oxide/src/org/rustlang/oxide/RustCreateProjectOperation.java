@@ -7,6 +7,8 @@ import java.net.URI;
 import java.util.List;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ObjectArrays;
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
@@ -37,11 +39,15 @@ public class RustCreateProjectOperation extends WorkspaceModifyOperation {
     private final TemplateContext templateContext;
     private final OxideLogger logger;
 
-    public RustCreateProjectOperation(final IProject project,
-            final URI location, final List<IProject> referencedProjects,
-            final IWorkspace workspace, final TemplateStore templateStore,
-            final TemplateContext templateContext,
-            final OxideLogger logger) {
+    @Inject
+    RustCreateProjectOperation(
+            final OxideLogger logger,
+            final IWorkspace workspace,
+            final TemplateStore templateStore,
+            @Assisted final IProject project,
+            @Assisted final URI location,
+            @Assisted final List<IProject> referencedProjects,
+            @Assisted final TemplateContext templateContext) {
         this.location = location;
         this.project = project;
         this.referencedProjects = referencedProjects;
@@ -68,6 +74,10 @@ public class RustCreateProjectOperation extends WorkspaceModifyOperation {
     private IProjectDescription createProjectDescription() {
         final IProjectDescription description = workspace
                 .newProjectDescription(project.getName());
+        // TODO: handle this correctly.
+        // if (location != null) {
+        // description.setLocationURI(location);
+        // }
         if (!referencedProjects.isEmpty()) {
             description.setReferencedProjects(
                     Collections3.toArray(referencedProjects, IProject.class));
@@ -75,31 +85,29 @@ public class RustCreateProjectOperation extends WorkspaceModifyOperation {
         final String[] newNatureIds = ObjectArrays.concat(
                 description.getNatureIds(), RustNature.ID);
         description.setNatureIds(newNatureIds);
-        if (location != null) {
-            description.setLocationURI(location);
-        }
         return description;
     }
 
     private void ceateAndOpenProject(final IProjectDescription description,
             final IProgressMonitor monitor) throws CoreException {
         // TODO: refactor.
-        project.create(createSubProgressMonitor(monitor));
+        project.create(provideSubProgressMonitor(monitor));
         if (monitor.isCanceled()) {
             throw new OperationCanceledException();
         }
         project.open(IResource.BACKGROUND_REFRESH,
-                createSubProgressMonitor(monitor));
+                provideSubProgressMonitor(monitor));
         if (monitor.isCanceled()) {
             throw new OperationCanceledException();
         }
-        project.setDescription(description, createSubProgressMonitor(monitor));
+        project.setDescription(description, provideSubProgressMonitor(monitor));
         if (monitor.isCanceled()) {
             throw new OperationCanceledException();
         }
     }
 
-    private IProgressMonitor createSubProgressMonitor(
+    // TODO: make this a factory.
+    IProgressMonitor provideSubProgressMonitor(
             final IProgressMonitor monitor) {
         return new SubProgressMonitor(monitor, WORK_SCALE);
     }
@@ -124,7 +132,7 @@ public class RustCreateProjectOperation extends WorkspaceModifyOperation {
             final IProgressMonitor monitor) throws CoreException {
         final InputStream stream = getTemplateInputStream(templateName);
         final boolean force = false;
-        final IProgressMonitor monitor2 = createSubProgressMonitor(monitor);
+        final IProgressMonitor monitor2 = provideSubProgressMonitor(monitor);
         project.getFile(fileName).create(stream, force, monitor2);
         if (monitor.isCanceled()) {
             throw new OperationCanceledException();

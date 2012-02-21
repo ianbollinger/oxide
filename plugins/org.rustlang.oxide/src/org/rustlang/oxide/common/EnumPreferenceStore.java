@@ -1,12 +1,14 @@
 package org.rustlang.oxide.common;
 
+import com.google.inject.Inject;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 
 public class EnumPreferenceStore {
     private final IPreferenceStore store;
 
-    public EnumPreferenceStore(final IPreferenceStore store) {
+    @Inject
+    EnumPreferenceStore(final IPreferenceStore store) {
         this.store = store;
     }
 

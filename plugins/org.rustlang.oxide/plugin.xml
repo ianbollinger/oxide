@@ -1,257 +1,198 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+  <extension-point id="modules"
+      name="Guice binding modules"
+      schema="schema/modules.exsd"/>
 
-   <extension point="org.eclipse.ui.perspectives">
-      <perspective
-            class="org.rustlang.oxide.perspective.RustPerspective"
-            icon="icons/rust-logo-16x16.png"
-            id="org.rustlang.oxide.perspective.RustPerspective"
-            name="Rust">
-      </perspective>
-   </extension>
+  <extension point="org.rustlang.oxide.modules">
+    <module class="org.rustlang.oxide.wizards.OxideWizardModule"/>
+    <module class="org.rustlang.oxide.OxideModule"/>
+  </extension>
 
-   <extension
-         point="org.eclipse.ui.perspectiveExtensions">
-      <perspectiveExtension
-            targetID="org.rustlang.oxide.perspective.RustPerspective">
-         <actionSet
-               id="org.eclipse.debug.ui.launchActionSet">
-         </actionSet>
-         <newWizardShortcut
-               id="org.rustlang.oxide.wizards.RustProjectWizard">
-         </newWizardShortcut>
-         <newWizardShortcut
-               id="org.eclipse.ui.wizards.new.folder">
-         </newWizardShortcut>
-         <perspectiveShortcut
-               id="org.eclipse.ui.wizards.new.file">
-         </perspectiveShortcut>
-         <newWizardShortcut
-               id="org.eclipse.ui.editors.wizards.UntitledTextFileWizard">
-         </newWizardShortcut>
-         <viewShortcut
-               id="org.eclipse.search.ui.views.SearchView">
-         </viewShortcut>
-         <viewShortcut
-               id="org.eclipse.ui.console.ConsoleView">
-         </viewShortcut>
-         <viewShortcut
-               id="org.eclipse.ui.views.ContentOutline">
-         </viewShortcut>
-         <viewShortcut
-               id="org.eclipse.ui.views.ProblemView">
-         </viewShortcut>
-         <viewShortcut
-               id="org.eclipse.ui.views.ResourceNavigator">
-         </viewShortcut>
-         <viewShortcut
-               id="org.eclipse.pde.runtime.LogView">
-         </viewShortcut>
-         <viewShortcut
-               id="org.eclipse.ui.views.TaskList">
-         </viewShortcut>
-         <view
-               id="org.eclipse.ui.views.ResourceNavigator"
-               minimized="false"
-               ratio="0.25"
-               relationship="left"
-               relative="org.eclipse.ui.editorss">
-         </view>
-         <view
-               id="org.eclipse.ui.views.ProblemView"
-               minimized="false"
-               ratio="0.75"
-               relationship="bottom"
-               relative="org.eclipse.ui.editorss">
-         </view>
-         <view
-               id="org.eclipse.ui.views.ContentOutline"
-               minimized="false"
-               ratio="0.75"
-               relationship="right"
-               relative="org.eclipse.ui.editorss">
-         </view>
-      </perspectiveExtension>
-   </extension>
+  <extension point="org.eclipse.ui.perspectives">
+    <perspective id="org.rustlang.oxide.perspective.RustPerspective"
+        class="org.rustlang.oxide.common.GuiceExtensionFactory"
+        name="Rust"
+        icon="icons/rust-logo-16x16.png"/>
+  </extension>
+
+  <extension point="org.eclipse.ui.perspectiveExtensions">
+    <perspectiveExtension
+          targetID="org.rustlang.oxide.perspective.RustPerspective">
+      <actionSet id="org.eclipse.debug.ui.launchActionSet"/>
+      <newWizardShortcut id="org.rustlang.oxide.wizards.RustProjectWizard"/>
+      <newWizardShortcut id="org.eclipse.ui.wizards.new.folder"/>
+      <perspectiveShortcut id="org.eclipse.ui.wizards.new.file"/>
+      <newWizardShortcut
+          id="org.eclipse.ui.editors.wizards.UntitledTextFileWizard"/>
+      <viewShortcut id="org.eclipse.search.ui.views.SearchView"/>
+      <viewShortcut id="org.eclipse.ui.console.ConsoleView"/>
+      <viewShortcut id="org.eclipse.ui.views.ContentOutline"/>
+      <viewShortcut id="org.eclipse.ui.views.ProblemView"/>
+      <viewShortcut id="org.eclipse.ui.views.ResourceNavigator"/>
+      <viewShortcut id="org.eclipse.pde.runtime.LogView"/>
+      <viewShortcut id="org.eclipse.ui.views.TaskList"/>
+      <view id="org.eclipse.ui.views.ResourceNavigator"
+          minimized="false"
+          ratio="0.25"
+          relationship="left"
+          relative="org.eclipse.ui.editorss"/>
+      <view id="org.eclipse.ui.views.ProblemView"
+          minimized="false"
+          ratio="0.75"
+          relationship="bottom"
+          relative="org.eclipse.ui.editorss"/>
+      <view id="org.eclipse.ui.views.ContentOutline"
+          minimized="false"
+          ratio="0.75"
+          relationship="right"
+          relative="org.eclipse.ui.editorss"/>
+    </perspectiveExtension>
+  </extension>
 
    <extension point="org.eclipse.ui.editors">
-      <editor
-            class="org.rustlang.oxide.editor.RustEditor"
-            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
-            default="true"
-            extensions="rs,rc"
-            icon="icons/rust-logo-16x16.png"
-            id="org.rustlang.oxide.editor.RustEditor"
-            name="Rust Editor">
-         <contentTypeBinding contentTypeId="org.rustlang.oxide.rustfile">
-         </contentTypeBinding>
-      </editor>
+     <editor id="org.rustlang.oxide.editor.RustEditor"   
+         class="org.rustlang.oxide.common.GuiceExtensionFactory"
+         contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+         default="true"
+         extensions="rs,rc"
+         icon="icons/rust-logo-16x16.png"
+         name="Rust Editor">
+       <contentTypeBinding contentTypeId="org.rustlang.oxide.rustfile"/>
+    </editor>
+  </extension>
+
+  <extension point="org.eclipse.ui.editors.documentProviders">
+    <provider id="org.rustlang.oxide.editor.RustDocumentProvider"
+        class="org.rustlang.oxide.common.GuiceExtensionFactory"
+        extensions=".rs,.rc"/>
+  </extension>
+
+  <extension point="org.eclipse.ui.newWizards">
+    <category id="org.rustlang.eclipse.RustCategory"
+        name="Rust Wizards"/>
+    <wizard id="org.rustlang.oxide.wizards.RustProjectWizard"
+        class="org.rustlang.oxide.common.GuiceExtensionFactory"
+        canFinishEarly="false"
+        category="org.rustlang.eclipse.RustCategory"
+        finalPerspective="org.rustlang.oxide.perspective.RustPerspective"
+        hasPages="true"
+        icon="icons/rust-logo-16x16.png"
+        name="Rust Project"
+        preferredPerspectives="org.rustlang.oxide.perspective.RustPerspective"
+        project="true">
+      <description>Create a new Rust project</description>
+    </wizard>
+  </extension>
+
+  <extension point="org.eclipse.ui.preferencePages">
+    <page id="org.rustlang.oxide.preferences.RustPreferencePage"
+        class="org.rustlang.oxide.common.GuiceExtensionFactory"
+        name="Rust"/>
+    <page id="org.rustlang.oxide.preferences.RustEditorPreferencePage"
+        class="org.rustlang.oxide.common.GuiceExtensionFactory"
+        category="org.rustlang.oxide.preferences.RustPreferencePage"
+        name="Editor"/>
+    <page id="org.rustlang.oxide.preferences.RustSyntaxColoringPreferencePage"
+        class="org.rustlang.oxide.common.GuiceExtensionFactory"
+        category="org.rustlang.oxide.preferences.RustEditorPreferencePage"
+        name="Syntax Coloring"/>
+  </extension>
+
+  <extension point="org.eclipse.core.runtime.preferences">
+    <initializer
+        class="org.rustlang.oxide.preferences.RustPreferencesInitializer"/>
+  </extension>
+
+  <extension point="org.eclipse.core.contenttype.contentTypes">
+    <content-type id="org.rustlang.oxide.rustfile"
+        file-extensions="rs,rc"
+        name="Rust File"
+        base-type="org.eclipse.core.runtime.text"/>
+  </extension>
+
+  <extension id="RustBuilder"
+      name="Rust Builder"
+      point="org.eclipse.core.resources.builders">
+    <builder hasNature="true">
+      <run class="org.rustlang.oxide.builder.RustBuilder"/>
+    </builder>
+  </extension>
+
+  <extension id="RustNature"
+      name="Rust Nature"
+      point="org.eclipse.core.resources.natures">
+    <runtime>
+      <run class="org.rustlang.oxide.nature.RustNature"/>
+    </runtime>
+    <builder id="org.rustlang.oxide.RustBuilder"/> 
+  </extension>
+
+  <extension point="org.eclipse.debug.core.launchConfigurationTypes">
+    <launchConfigurationType id="org.rustlang.oxide.launch.configuration"
+        delegate="org.rustlang.oxide.launch.RustApplicationLauncher"
+        delegateName="Rust Application Launcher"
+        modes="run, debug"
+        name="Rust Application"/>
    </extension>
 
-   <extension point="org.eclipse.ui.editors.documentProviders">
-      <provider
-            class="org.rustlang.oxide.editor.RustDocumentProvider"
-            id="org.rustlang.oxide.editor.RustDocumentProvider"
-            extensions=".rs,.rc"/>
-   </extension>
+  <extension point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+    <launchConfigurationTypeImage
+        id="org.rustlang.oxide.launch.configurationTypeImage"
+        configTypeID="org.rustlang.oxide.launch.configuration"
+        icon="icons/rust-logo-16x16.png">
+    </launchConfigurationTypeImage>
+  </extension>
 
-   <extension point="org.eclipse.ui.newWizards">
-      <category
-            id="org.rustlang.eclipse.RustCategory"
-            name="Rust Wizards">
-      </category>
-      <wizard
-            canFinishEarly="false"
-            category="org.rustlang.eclipse.RustCategory"
-            class="org.rustlang.oxide.wizards.RustProjectWizard"
-            finalPerspective="org.rustlang.oxide.perspective.RustPerspective"
-            hasPages="true"
-            icon="icons/rust-logo-16x16.png"
-            id="org.rustlang.oxide.wizards.RustProjectWizard"
-            name="Rust Project"
-            preferredPerspectives="org.rustlang.oxide.perspective.RustPerspective"
-            project="true">
-         <description>
-            Create a new Rust project
-         </description>
-      </wizard>
-   </extension>
+  <extension point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+    <launchConfigurationTabGroup
+        id="org.rustlang.oxide.launch.RustLaunchConfigurationTabGroup"
+        class="org.rustlang.oxide.common.GuiceExtensionFactory"
+        type="org.rustlang.oxide.launch.configuration"/>
+  </extension>
 
-   <extension
-         point="org.eclipse.ui.preferencePages">
-      <page
-            class="org.rustlang.oxide.preferences.RustPreferencePage"
-            id="RustPreferencePage"
-            name="Rust">
-      </page>
-      <page
-            category="RustPreferencePage"
-            class="org.rustlang.oxide.preferences.RustEditorPreferencePage"
-            id="RustEditorPreferencePage"
-            name="Editor">
-      </page>
-      <page
-            category="RustEditorPreferencePage"
-            class="org.rustlang.oxide.preferences.RustSyntaxColoringPreferencePage"
-            id="RustSyntaxColoringPreferencePage"
-            name="Syntax Coloring">
-      </page>
-   </extension>
+  <extension point="org.eclipse.debug.ui.launchShortcuts">
+    <shortcut id="org.rustlang.oxide.launch.RustLaunchShortcut"
+        class="org.rustlang.oxide.common.GuiceExtensionFactory"
+        icon="icons/rust-logo-16x16.png"
+        label="Rust Application"
+        modes="run,debug">
+      <description mode="run"
+          description="Runs a Rust application"/>
+      <configurationType id="org.rustlang.oxide.launch.configuration"/>
+      <contextualLaunch>
+        <enablement>
+          <with variable="selection">
+            <count value="1"/>
+            <iterate>
+              <or>
+                <test property="org.eclipse.debug.ui.matchesPattern"
+                    value="*.rs"/>
+                <test property="org.eclipse.debug.ui.matchesPattern"
+                    value="*.rc"/>
+              </or>
+            </iterate>
+          </with>
+        </enablement>
+      </contextualLaunch>
+    </shortcut>
+  </extension>
 
-   <extension point="org.eclipse.core.runtime.preferences">
-      <initializer class="org.rustlang.oxide.preferences.RustPreferencesInitializer"/>
-   </extension>
+  <extension point="org.eclipse.ui.commands">
+    <command id="org.rustlang.oxide.runRustApplication"
+        categoryId="org.eclipse.debug.ui.category.run"
+        description="Run Rust Application"
+        name="Run Rust Application"/>
+  </extension>
 
-   <extension point="org.eclipse.core.contenttype.contentTypes">
-      <content-type
-            file-extensions="rs,rc"
-            name="Rust File"
-            id="org.rustlang.oxide.rustfile"
-            base-type="org.eclipse.core.runtime.text"/>
-   </extension>
-
-   <extension
-         id="RustBuilder"
-         name="Rust Builder"
-         point="org.eclipse.core.resources.builders">
-      <builder
-            hasNature="true">
-         <run class="org.rustlang.oxide.builder.RustBuilder">
-         </run>
-      </builder>
-   </extension>
-
-   <extension
-         id="RustNature"
-         name="Rust Nature"
-         point="org.eclipse.core.resources.natures">
-      <runtime>
-         <run class="org.rustlang.oxide.nature.RustNature">
-         </run>
-      </runtime>
-      <builder id="org.rustlang.oxide.RustBuilder"/> 
-   </extension>
-   <extension
-         point="org.eclipse.debug.core.launchConfigurationTypes">
-      <launchConfigurationType
-            delegate="org.rustlang.oxide.launch.RustApplicationLauncher"
-            delegateName="Rust Application Launcher"
-            id="org.rustlang.oxide.launch.configuration"
-            modes="run, debug"
-            name="Rust Application">
-      </launchConfigurationType>
-   </extension>
-   <extension
-         point="org.eclipse.debug.ui.launchConfigurationTypeImages">
-      <launchConfigurationTypeImage
-            configTypeID="org.rustlang.oxide.launch.configuration"
-            icon="icons/rust-logo-16x16.png"
-            id="org.rustlang.oxide.launch.configurationTypeImage">
-      </launchConfigurationTypeImage>
-   </extension>
-   <extension
-         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
-      <launchConfigurationTabGroup
-            class="org.rustlang.oxide.launch.RustLaunchConfigurationTabGroup"
-            id="org.rustlang.oxide.launch.configurationTabGroup"
-            type="org.rustlang.oxide.launch.configuration">
-      </launchConfigurationTabGroup>
-   </extension>
-   <extension
-         point="org.eclipse.debug.ui.launchShortcuts">
-      <shortcut
-            class="org.rustlang.oxide.launch.RustLaunchShortcut"
-            icon="icons/rust-logo-16x16.png"
-            id="org.rustlang.oxide.launch.RustLaunchShortcut"
-            label="Rust Application"
-            modes="run,debug">
-         <description
-               description="Runs a Rust application"
-               mode="run">
-         </description>
-         <configurationType id="org.rustlang.oxide.launch.configuration"/>
-         <contextualLaunch>
-            <enablement>
-               <with variable="selection">
-                  <count value="1"/>
-                  <iterate>
-                     <or>
-                        <test
-                              property="org.eclipse.debug.ui.matchesPattern"
-                              value="*.rs">
-                        </test>
-                        <test
-                              property="org.eclipse.debug.ui.matchesPattern"
-                              value="*.rc">
-                        </test>
-                     </or>
-                  </iterate>
-               </with>
-            </enablement>
-         </contextualLaunch>
-      </shortcut>
-   </extension>
-   <extension
-         point="org.eclipse.ui.commands">
-      <command
-            categoryId="org.eclipse.debug.ui.category.run"
-            description="Run Rust Application"
-            id="org.rustlang.oxide.runRustApplication"
-            name="Run Rust Application">
-      </command>
-   </extension>
-
-   <extension point="org.eclipse.ui.editors.templates">
-      <contextType
-            class="org.rustlang.oxide.templates.RustTemplateContextType"
-            id="org.rustlang.oxide.templates.RustTemplateContextType">
-      </contextType>
-      <template
-            id="org.rustlang.oxide.templates.crate"
-            contextTypeId="org.rustlang.oxide.templates.RustTemplateContextType"
-            autoinsert="false"
-            name="crate">
+  <extension point="org.eclipse.ui.editors.templates">
+    <contextType id="org.rustlang.oxide.templates.RustTemplateContextType"
+        class="org.rustlang.oxide.common.GuiceExtensionFactory"/>
+    <template id="org.rustlang.oxide.templates.crate"
+        contextTypeId="org.rustlang.oxide.templates.RustTemplateContextType"
+        autoinsert="false"
+        name="crate">
       <pattern>#[link(name = "${project_name}",
        vers = "${version}",
        uuid = "${uuid}",
@@ -264,12 +205,11 @@
 #[doc(brief = "${brief}",
       desc = "${desc}")];
 </pattern>
-      </template>
-      <template
-            autoinsert="false"
-            name="gitignore"
-            contextTypeId="org.rustlang.oxide.templates.RustTemplateContextType"
-            id="org.rustlang.oxide.templates.gitignore">
+    </template>
+    <template id="org.rustlang.oxide.templates.gitignore"
+        autoinsert="false"
+        name="gitignore"
+        contextTypeId="org.rustlang.oxide.templates.RustTemplateContextType">
       <pattern>${project_name}
 *.a
 *.dSYM
@@ -282,42 +222,38 @@
 *.swp
 *.tmp
 *~</pattern>
-      </template>
+    </template>
 
-      <template
-            autoinsert="false"
-            name="readme"
-            contextTypeId="org.rustlang.oxide.templates.RustTemplateContextType"
-            id="org.rustlang.oxide.editor.templates.readme">
+    <template id="org.rustlang.oxide.editor.templates.readme"
+        autoinsert="false"
+        name="readme"
+        contextTypeId="org.rustlang.oxide.templates.RustTemplateContextType">
       <pattern># ${project_name} - ${brief}
 
 ${desc}
 </pattern>
-      </template>
+    </template>
 
-      <template
-            autoinsert="false"
-            name="sourcefile"
-            contextTypeId="org.rustlang.oxide.templates.RustTemplateContextType"
-            id="org.rustlang.oxide.editor.templates.sourcefile">
+    <template id="org.rustlang.oxide.editor.templates.sourcefile"
+        autoinsert="false"
+        name="sourcefile"
+        contextTypeId="org.rustlang.oxide.templates.RustTemplateContextType">
       <pattern>// TODO: write
 </pattern>
-      </template>
+    </template>
 
-      <template
-            autoinsert="false"
-            name="license"
-            contextTypeId="org.rustlang.oxide.templates.RustTemplateContextType"
-            id="org.rustlang.oxide.editor.templates.license">
+    <template id="org.rustlang.oxide.editor.templates.license"
+        autoinsert="false"
+        name="license"
+        contextTypeId="org.rustlang.oxide.templates.RustTemplateContextType">
       <pattern>TODO: write
 </pattern>
-      </template>
+    </template>
 
-      <template
-            autoinsert="false"
-            name="MIT License"
-            contextTypeId="org.rustlang.oxide.templates.RustTemplateContextType"
-            id="org.rustlang.oxide.editor.templates.license.mit">
+    <template id="org.rustlang.oxide.editor.templates.license.mit"
+        autoinsert="false"
+        name="MIT License"
+        contextTypeId="org.rustlang.oxide.templates.RustTemplateContextType">
       <pattern>Copyright (c) ${year} ${author}
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -338,7 +274,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 </pattern>
-      </template>
+    </template>
+  </extension>
 
-   </extension>
 </plugin>

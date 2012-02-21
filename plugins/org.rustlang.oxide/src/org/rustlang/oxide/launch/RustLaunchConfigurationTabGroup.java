@@ -12,11 +12,14 @@ public class RustLaunchConfigurationTabGroup extends
     public void createTabs(
             @SuppressWarnings("unused") final ILaunchConfigurationDialog dialog,
             @SuppressWarnings("unused") final String mode) {
-        final ILaunchConfigurationTab[] tabs = new ILaunchConfigurationTab[] {
+        setTabs(provideConfigurationTabs());
+    }
+
+    protected ILaunchConfigurationTab[] provideConfigurationTabs() {
+        return new ILaunchConfigurationTab[] {
             new RustLaunchConfigurationTab(),
             new EnvironmentTab(),
             new CommonTab()
         };
-        setTabs(tabs);
     }
 }

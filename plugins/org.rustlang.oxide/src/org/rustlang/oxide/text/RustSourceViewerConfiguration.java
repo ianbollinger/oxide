@@ -1,5 +1,6 @@
 package org.rustlang.oxide.text;
 
+import com.google.inject.Inject;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
@@ -14,7 +15,8 @@ public class RustSourceViewerConfiguration extends
     private RustCodeScanner codeScanner;
     private final RustColorManager colorManager;
 
-    public RustSourceViewerConfiguration(final RustColorManager colorManager) {
+    @Inject
+    RustSourceViewerConfiguration(final RustColorManager colorManager) {
         this.colorManager = colorManager;
     }
 

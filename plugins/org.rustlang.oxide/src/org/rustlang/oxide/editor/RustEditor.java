@@ -1,5 +1,6 @@
 package org.rustlang.oxide.editor;
 
+import com.google.inject.Inject;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.rustlang.oxide.text.RustColorManager;
 import org.rustlang.oxide.text.RustSourceViewerConfiguration;
@@ -9,12 +10,13 @@ public class RustEditor extends TextEditor {
             "org.rustlang.oxide.editor.RustEditor";
     private final RustColorManager colorManager;
 
-    public RustEditor() {
-        super();
-        this.colorManager = new RustColorManager();
-        setSourceViewerConfiguration(new RustSourceViewerConfiguration(
-                colorManager));
-        setDocumentProvider(new RustDocumentProvider());
+    @Inject
+    RustEditor(final RustColorManager colorManager,
+            final RustSourceViewerConfiguration configuration,
+            final RustDocumentProvider provider) {
+        this.colorManager = colorManager;
+        setSourceViewerConfiguration(configuration);
+        setDocumentProvider(provider);
     }
 
     @Override

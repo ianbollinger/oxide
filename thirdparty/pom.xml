@@ -28,6 +28,21 @@
       <artifactId>guice</artifactId>
       <version>3.0</version>
     </dependency>
+    <dependency>
+      <groupId>com.google.inject.extensions</groupId>
+      <artifactId>guice-assistedinject</artifactId>
+      <version>3.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.ops4j</groupId>
+      <artifactId>peaberry</artifactId>
+      <version>1.1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.ops4j</groupId>
+      <artifactId>peaberry.eclipse</artifactId>
+      <version>1.1.1</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -64,8 +79,9 @@
             <Embed-Dependency>*;inline=true</Embed-Dependency>
             <Bundle-License></Bundle-License>
             <Embed-Transitive>true</Embed-Transitive>
-            <_exportcontents>javax.annotation.*;version="1.3.9",!com.google.inject.internal.*,com.google.inject.*;version="3.0",org.aopalliance.*;version="1.0",javax.inject</_exportcontents>
-            <Import-Package>!com.google.inject.internal.asm.util</Import-Package>
+            <_exportcontents>org.ops4j.peaberry.*;version="1.1.1",javax.annotation.*;version="1.3.9",!com.google.inject.internal.*,com.google.inject.*;version="3.0",org.aopalliance.*;version="1.0",javax.inject</_exportcontents>
+            <Import-Package>!javax.naming,!javax.naming.ldap,!org.eclipse.core.runtime,!org.osgi.framework,!com.google.inject.internal.asm.util</Import-Package>
+            <Require-Bundle>org.eclipse.core.runtime</Require-Bundle>
             <_nouses>true</_nouses>
           </instructions>
         </configuration>
