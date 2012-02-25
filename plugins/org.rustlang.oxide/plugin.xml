@@ -6,7 +6,7 @@
       schema="schema/modules.exsd"/>
 
   <extension point="org.rustlang.oxide.modules">
-    <module class="org.rustlang.oxide.wizards.OxideWizardModule"/>
+    <module class="org.rustlang.oxide.wizards.RustWizardModule"/>
     <module class="org.rustlang.oxide.OxideModule"/>
   </extension>
 
@@ -102,7 +102,7 @@
 
   <extension point="org.eclipse.core.runtime.preferences">
     <initializer
-        class="org.rustlang.oxide.preferences.RustPreferencesInitializer"/>
+        class="org.rustlang.oxide.common.GuiceExtensionFactory:org.rustlang.oxide.preferences.RustPreferencesInitializer"/>
   </extension>
 
   <extension point="org.eclipse.core.contenttype.contentTypes">
@@ -112,7 +112,7 @@
         base-type="org.eclipse.core.runtime.text"/>
   </extension>
 
-  <extension id="RustBuilder"
+  <extension id="org.rustlang.oxide.RustBuilder"
       name="Rust Builder"
       point="org.eclipse.core.resources.builders">
     <builder hasNature="true">
@@ -120,7 +120,7 @@
     </builder>
   </extension>
 
-  <extension id="RustNature"
+  <extension id="org.rustlang.oxide.RustNature"
       name="Rust Nature"
       point="org.eclipse.core.resources.natures">
     <runtime>

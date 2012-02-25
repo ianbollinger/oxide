@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition>
+  <import>
+    <package>org.rustlang.oxide.model</package>
+  </import>
+
+  <composite>
+    <id>project</id>
+    <documentation>
+      <title>title</title>
+      <content>help</content>
+    </documentation>
+    <content>
+      <property-editor>ProjectName</property-editor>
+      <group>
+        <label>Linkage</label>
+        <content>
+          <property-editor>CrateName</property-editor>
+          <property-editor>Version</property-editor>
+          <property-editor>Uuid</property-editor>
+          <property-editor>Url</property-editor>
+        </content>
+      </group>
+      <group>
+        <label>Type</label>
+        <content>
+          <property-editor>
+            <property>Type</property>
+            <show-label>false</show-label>
+          </property-editor>
+        </content>
+      </group>
+      <group>
+        <label>Documentation</label>
+        <content>
+          <property-editor>Brief</property-editor>
+          <property-editor>
+            <property>Description</property>
+            <scale-vertically>true</scale-vertically>
+          </property-editor>
+        </content>
+        <scale-vertically>true</scale-vertically>
+      </group>
+      <group>
+        <label>Metadata</label>
+        <content>
+          <property-editor>Author</property-editor>
+          <property-editor>License</property-editor>
+        </content>
+      </group>
+    </content>
+    <scale-vertically>true</scale-vertically>
+  </composite>
+
+  <wizard>
+    <id>wizard</id>
+    <label>Rust Project</label>
+    <page>
+      <id>main.page</id>
+      <label>Rust Project</label>
+      <description>Create a new Rust project.</description>
+      <content>
+        <with>
+          <path>Project</path>
+          <default-panel>
+            <content>
+              <include>project</include>
+            </content>
+          </default-panel>
+        </with>
+      </content>
+      <scale-vertically>true</scale-vertically>
+    </page>
+  </wizard>
+
+</definition>

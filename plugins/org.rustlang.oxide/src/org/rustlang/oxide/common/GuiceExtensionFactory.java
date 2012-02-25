@@ -46,7 +46,8 @@ public final class GuiceExtensionFactory implements IExecutableExtension,
     @Override
     public Object create() throws CoreException {
         if (className == null) {
-            throw newCoreException("Configuration is missing class information.");
+            throw newCoreException(
+                    "Configuration is missing class information.");
         }
         final Class<?> clazz;
         try {

@@ -1,10 +1,8 @@
-package org.rustlang.oxide;
+package org.rustlang.oxide.model;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.util.List;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ObjectArrays;
 import com.google.inject.Inject;
@@ -23,38 +21,39 @@ import org.eclipse.jface.text.templates.TemplateBuffer;
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateException;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
+import org.eclipse.sapphire.modeling.ProgressMonitor;
+import org.eclipse.sapphire.modeling.Status;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
-import org.rustlang.oxide.common.Collections3;
+import org.rustlang.oxide.OxideLogger;
 import org.rustlang.oxide.nature.RustNature;
 
 public class RustCreateProjectOperation extends WorkspaceModifyOperation {
     // TODO: provide way of keeping this number in sync.
     private static final int NUMBER_OF_TASKS = 8;
     private static final int WORK_SCALE = 1000;
-    private final List<IProject> referencedProjects;
     private final IProject project;
-    private final URI location;
     private final IWorkspace workspace;
     private final TemplateStore templateStore;
     private final TemplateContext templateContext;
     private final OxideLogger logger;
 
     @Inject
-    RustCreateProjectOperation(
-            final OxideLogger logger,
-            final IWorkspace workspace,
-            final TemplateStore templateStore,
+    RustCreateProjectOperation(final OxideLogger logger,
+            final IWorkspace workspace, final TemplateStore templateStore,
             @Assisted final IProject project,
-            @Assisted final URI location,
-            @Assisted final List<IProject> referencedProjects,
             @Assisted final TemplateContext templateContext) {
-        this.location = location;
         this.project = project;
-        this.referencedProjects = referencedProjects;
         this.workspace = workspace;
         this.templateStore = templateStore;
         this.templateContext = templateContext;
         this.logger = logger;
+    }
+
+    public static final Status execute(
+            @SuppressWarnings("unused") final RustProjectOperation context,
+            @SuppressWarnings("unused") final ProgressMonitor monitor) {
+        // HACK: this method does nothing and exists to keep Sapphire happy.
+        return Status.createOkStatus();
     }
 
     @Override
@@ -78,10 +77,6 @@ public class RustCreateProjectOperation extends WorkspaceModifyOperation {
         // if (location != null) {
         // description.setLocationURI(location);
         // }
-        if (!referencedProjects.isEmpty()) {
-            description.setReferencedProjects(
-                    Collections3.toArray(referencedProjects, IProject.class));
-        }
         final String[] newNatureIds = ObjectArrays.concat(
                 description.getNatureIds(), RustNature.ID);
         description.setNatureIds(newNatureIds);
@@ -107,8 +102,7 @@ public class RustCreateProjectOperation extends WorkspaceModifyOperation {
     }
 
     // TODO: make this a factory.
-    IProgressMonitor provideSubProgressMonitor(
-            final IProgressMonitor monitor) {
+    IProgressMonitor provideSubProgressMonitor(final IProgressMonitor monitor) {
         return new SubProgressMonitor(monitor, WORK_SCALE);
     }
 
@@ -116,7 +110,8 @@ public class RustCreateProjectOperation extends WorkspaceModifyOperation {
             final IProgressMonitor monitor) throws CoreException {
         try {
             templateStore.load();
-        } catch (IOException e) {
+        } catch (final IOException e) {
+            // TODO: don't ignore exception.
             return;
         }
         // TODO: handle monitor appropriately here.
