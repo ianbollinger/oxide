@@ -8,7 +8,7 @@ public class RustTemplateContextFactory {
     private final TemplateContext templateContext;
 
     @Inject
-    RustTemplateContextFactory(final BasicTemplateContext templateContext) {
+    RustTemplateContextFactory(final TemplateContext templateContext) {
         this.templateContext = templateContext;
     }
 
