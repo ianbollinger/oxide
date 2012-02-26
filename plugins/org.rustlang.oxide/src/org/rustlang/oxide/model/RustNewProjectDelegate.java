@@ -19,7 +19,7 @@ public class RustNewProjectDelegate {
     private final RustTemplateContextFactory templateContextFactory;
     private final PerspectiveUpdater perspectiveUpdater;
     private final IWorkspaceRoot workspaceRoot;
-    private final RustProjectOperationModel element;
+    private final RustProject element;
     private final IConfigurationElement configuration;
     private final ProgressMonitor monitor;
 
@@ -28,7 +28,7 @@ public class RustNewProjectDelegate {
             final RustTemplateContextFactory templateContextFactory,
             final PerspectiveUpdater perspectiveUpdater,
             final IWorkspaceRoot workspaceRoot,
-            @Assisted final RustProjectOperationModel element,
+            @Assisted final RustProject element,
             @Assisted final IConfigurationElement configuration,
             @Assisted final ProgressMonitor monitor) {
         this.factory = factory;
@@ -50,10 +50,9 @@ public class RustNewProjectDelegate {
     }
 
     public void run() {
-        final RustProject modelElement = element.getProject();
         final TemplateContext templateContext = templateContextFactory
-                .create(modelElement);
-        final String projectName = modelElement.getProjectName().getContent();
+                .create(element);
+        final String projectName = element.getProjectName().getContent();
         final IProject project = workspaceRoot.getProject(projectName);
         final IRunnableWithProgress operation = factory.create(project,
                 templateContext);

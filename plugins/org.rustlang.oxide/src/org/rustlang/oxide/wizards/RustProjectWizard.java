@@ -16,6 +16,7 @@ import org.rustlang.oxide.wizards.RustWizardModule.ProjectDefinition;
 public class RustProjectWizard extends SapphireWizard<RustProjectOperationModel>
         implements INewWizard, IExecutableExtension {
     private final RustNewProjectDelegateFactory projectOperationFactory;
+    private final RustProjectOperationModel element;
     private IConfigurationElement configuration;
 
     @Inject
@@ -23,12 +24,13 @@ public class RustProjectWizard extends SapphireWizard<RustProjectOperationModel>
             final RustNewProjectDelegateFactory projectOperationFactory,
             @ProjectDefinition final String definition) {
         super(element, definition);
+        this.element = element;
         this.projectOperationFactory = projectOperationFactory;
     }
 
     @Override
     protected Status performFinish(final ProgressMonitor monitor) {
-        projectOperationFactory.create(getModelElement(), configuration,
+        projectOperationFactory.create(element.getProject(), configuration,
                 monitor).run();
         return super.performFinish(monitor);
     }

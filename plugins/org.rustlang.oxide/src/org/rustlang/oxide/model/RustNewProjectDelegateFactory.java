@@ -4,6 +4,6 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.sapphire.modeling.ProgressMonitor;
 
 public interface RustNewProjectDelegateFactory {
-    RustNewProjectDelegate create(RustProjectOperationModel element,
+    RustNewProjectDelegate create(RustProject element,
             IConfigurationElement configuration, ProgressMonitor monitor);
 }
