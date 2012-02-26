@@ -11,8 +11,9 @@ import org.eclipse.sapphire.modeling.annotations.Label;
 import org.eclipse.sapphire.modeling.annotations.Type;
 
 @GenerateImpl
-public interface RustProjectOperation extends IExecutableModelElement {
-    ModelElementType TYPE = new ModelElementType(RustProjectOperation.class);
+public interface RustProjectOperationModel extends IExecutableModelElement {
+    ModelElementType TYPE = new ModelElementType(
+            RustProjectOperationModel.class);
 
     @Type(base = RustProject.class)
     @Label(standard = "rust project")
@@ -22,6 +23,6 @@ public interface RustProjectOperation extends IExecutableModelElement {
     RustProject getProject();
 
     @Override
-    @DelegateImplementation(RustCreateProjectOperation.class)
+    @DelegateImplementation(RustNewProjectDelegate.class)
     Status execute(ProgressMonitor monitor);
 }

@@ -20,7 +20,6 @@ public class UuidValueSerializationServiceFactory extends ServiceFactory {
             @SuppressWarnings("unused") final ServiceContext context,
             @SuppressWarnings("unused")
             final Class<? extends Service> service) {
-        // TODO: inject
         return new UuidValueSerializationService();
     }
 }

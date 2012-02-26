@@ -22,7 +22,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <target.jdk>1.6</target.jdk>
+    <maven.compiler.target>1.6</maven.compiler.target>
+    <maven.compiler.source>${maven.compiler.target}</maven.compiler.source>
   </properties>
 
   <licenses>

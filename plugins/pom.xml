@@ -19,6 +19,7 @@
   <modules>
     <module>org.rustlang.oxide.thirdparty</module>
     <module>org.rustlang.oxide</module>
+    <module>org.rustlang.oxide.tests</module>
   </modules>
 
   <repositories>
@@ -69,7 +70,7 @@
             <rulesets>
               <ruleset>${basedir}/pmd-ruleset.xml</ruleset>
             </rulesets>
-            <targetJdk>${target.jdk}</targetJdk>
+            <targetJdk>${maven.compiler.target}</targetJdk>
           </configuration>
           <executions>
             <execution>

@@ -11,6 +11,7 @@ public class UuidInitialValueService extends InitialValueService {
 
     @Override
     protected InitialValueServiceData compute() {
+        // TODO: cache value?
         return new InitialValueServiceData(UUID.randomUUID().toString());
     }
 

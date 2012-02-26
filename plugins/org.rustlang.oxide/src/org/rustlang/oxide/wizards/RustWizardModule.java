@@ -12,33 +12,30 @@ import com.google.inject.AbstractModule;
 import com.google.inject.BindingAnnotation;
 import com.google.inject.Provides;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.rustlang.oxide.OxidePlugin;
-import org.rustlang.oxide.model.RustCreateProjectOperation;
-import org.rustlang.oxide.model.RustCreateProjectOperationFactory;
-import org.rustlang.oxide.model.RustProjectOperation;
+import org.rustlang.oxide.model.RustNewProjectDelegate;
+import org.rustlang.oxide.model.RustNewProjectDelegateFactory;
+import org.rustlang.oxide.model.RustNewProjectOperation;
+import org.rustlang.oxide.model.RustNewProjectOperationFactory;
+import org.rustlang.oxide.model.RustProjectOperationModel;
 
 public class RustWizardModule extends AbstractModule {
     @Override
     protected void configure() {
         install(new FactoryModuleBuilder()
-                .implement(RustCreateProjectOperation.class,
-                        RustCreateProjectOperation.class)
-                .build(RustCreateProjectOperationFactory.class));
+                .implement(RustNewProjectDelegate.class,
+                        RustNewProjectDelegate.class)
+                .build(RustNewProjectDelegateFactory.class));
+        install(new FactoryModuleBuilder()
+                .implement(RustNewProjectOperation.class,
+                        RustNewProjectOperation.class)
+                .build(RustNewProjectOperationFactory.class));
         bindConstant().annotatedWith(ProjectDefinition.class)
                 .to("org.rustlang.oxide/ui/Project.sdef!wizard");
     }
 
     @Provides
-    RustProjectOperation provideRustProjectOperation() {
-        return RustProjectOperation.TYPE.instantiate();
-    }
-
-    // TODO: use this again.
-    @Provides
-    ImageDescriptor provideImageDescriptor() {
-        // TODO: inject plug-in.
-        return OxidePlugin.getImageDescriptor("icons/rust-logo-64x64.png");
+    RustProjectOperationModel provideRustProjectOperation() {
+        return RustProjectOperationModel.TYPE.instantiate();
     }
 
     // TODO: use this again.

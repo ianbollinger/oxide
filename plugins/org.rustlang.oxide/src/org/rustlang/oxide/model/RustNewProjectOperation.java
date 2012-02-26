@@ -21,39 +21,30 @@ import org.eclipse.jface.text.templates.TemplateBuffer;
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateException;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
-import org.eclipse.sapphire.modeling.ProgressMonitor;
-import org.eclipse.sapphire.modeling.Status;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.rustlang.oxide.OxideLogger;
 import org.rustlang.oxide.nature.RustNature;
 
-public class RustCreateProjectOperation extends WorkspaceModifyOperation {
+public class RustNewProjectOperation extends WorkspaceModifyOperation {
     // TODO: provide way of keeping this number in sync.
     private static final int NUMBER_OF_TASKS = 8;
     private static final int WORK_SCALE = 1000;
-    private final IProject project;
+    private final OxideLogger logger;
     private final IWorkspace workspace;
     private final TemplateStore templateStore;
+    private final IProject project;
     private final TemplateContext templateContext;
-    private final OxideLogger logger;
 
     @Inject
-    RustCreateProjectOperation(final OxideLogger logger,
+    RustNewProjectOperation(final OxideLogger logger,
             final IWorkspace workspace, final TemplateStore templateStore,
             @Assisted final IProject project,
             @Assisted final TemplateContext templateContext) {
-        this.project = project;
+        this.logger = logger;
         this.workspace = workspace;
         this.templateStore = templateStore;
+        this.project = project;
         this.templateContext = templateContext;
-        this.logger = logger;
-    }
-
-    public static final Status execute(
-            @SuppressWarnings("unused") final RustProjectOperation context,
-            @SuppressWarnings("unused") final ProgressMonitor monitor) {
-        // HACK: this method does nothing and exists to keep Sapphire happy.
-        return Status.createOkStatus();
     }
 
     @Override
