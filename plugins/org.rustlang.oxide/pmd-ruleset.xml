@@ -55,6 +55,14 @@
          is generally preferable. -->
     <exclude name="MissingBreakInSwitch"/>
 
+    <!-- Rationale: empty constructors should be package-private and annotated
+         with @Inject. Excluding this rule increases concision. -->
+    <exclude name="UncommentedEmptyConstructor"/>
+
+    <!-- Rationale: empty methods are common enough and commenting each one is
+         of dubious value. -->
+    <exclude name="UncommentedEmptyMethod"/>
+
     <!-- Rationale: this is almost always a good rule, but an exception must
          be made when putting @SuppressWarnings annotations on locals. This is
          often done when doing an unsafe cast before returning. -->
@@ -124,7 +132,12 @@
     <!-- <exclude name="AvoidThrowingNullPointerException"/> -->
   </rule>
   <rule ref="rulesets/strings.xml">
-    <!-- <exclude name="AvoidDuplicateLiterals"/> -->
+    <exclude name="AvoidDuplicateLiterals"/>
+  </rule>
+  <rule ref="rulesets/strings.xml/AvoidDuplicateLiterals">
+    <properties>
+      <property name="skipAnnotations" value="true"/>
+    </properties>
   </rule>
   <rule ref="rulesets/sunsecure.xml"/>
   <rule ref="rulesets/typeresolution.xml">
