@@ -2,9 +2,9 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Tests
 Bundle-SymbolicName: org.rustlang.oxide.tests
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 0.0.1.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Fragment-Host: org.rustlang.oxide;bundle-version="0.0.1"
+Fragment-Host: org.rustlang.oxide
 Require-Bundle: org.junit4,
  org.rustlang.oxide.thirdpartytest,
  org.eclipse.sapphire.osgi,
