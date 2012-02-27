@@ -13,12 +13,12 @@ import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.sapphire.modeling.ProgressMonitor;
 import org.eclipse.sapphire.modeling.Status;
 import org.eclipse.sapphire.platform.ProgressMonitorBridge;
-import org.rustlang.oxide.templates.RustTemplateContextFactory;
+import org.rustlang.oxide.templates.SapphireTemplateContextFactory;
 import org.rustlang.oxide.wizards.PerspectiveUpdater;
 
 public class RustNewProjectDelegate {
     private final RustNewProjectOperationFactory factory;
-    private final RustTemplateContextFactory templateContextFactory;
+    private final SapphireTemplateContextFactory templateContextFactory;
     private final PerspectiveUpdater perspectiveUpdater;
     private final IWorkspace workspace;
     private final IWorkspaceRoot workspaceRoot;
@@ -28,7 +28,7 @@ public class RustNewProjectDelegate {
 
     @Inject
     RustNewProjectDelegate(final RustNewProjectOperationFactory factory,
-            final RustTemplateContextFactory templateContextFactory,
+            final SapphireTemplateContextFactory templateContextFactory,
             final PerspectiveUpdater perspectiveUpdater,
             final IWorkspace workspace,
             final IWorkspaceRoot workspaceRoot,
@@ -56,11 +56,12 @@ public class RustNewProjectDelegate {
 
     public void run() {
         final TemplateContext templateContext = templateContextFactory
-                .create(element);
+                .create(RustProject.TYPE, element);
+        // TODO: remove LoD violation.
         final String projectName = element.getProjectName().getContent();
         final IProject project = workspaceRoot.getProject(projectName);
         final IProjectDescription description = workspace
-                .newProjectDescription(project.getName());
+                .newProjectDescription(projectName);
         final IRunnableWithProgress operation = factory.create(project,
                 description, templateContext);
         try {

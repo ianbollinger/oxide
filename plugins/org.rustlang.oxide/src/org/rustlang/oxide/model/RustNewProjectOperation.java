@@ -10,7 +10,6 @@ import com.google.inject.assistedinject.Assisted;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -95,6 +94,7 @@ public class RustNewProjectOperation extends WorkspaceModifyOperation {
     private void createFiles(final String projectName,
             final IProgressMonitor monitor) throws CoreException {
         try {
+            // TODO: this doesn't seem like my responsibility!
             templateStore.load();
         } catch (final IOException e) {
             // TODO: don't ignore exception.
@@ -127,8 +127,8 @@ public class RustNewProjectOperation extends WorkspaceModifyOperation {
         try {
             final TemplateBuffer buffer = templateContext.evaluate(template);
             // TODO: remove LoD violation.
-            return new ByteArrayInputStream(buffer.getString().getBytes(
-                    Charsets.UTF_8));
+            final byte[] bytes = buffer.getString().getBytes(Charsets.UTF_8);
+            return new ByteArrayInputStream(bytes);
         } catch (final BadLocationException e) {
             logger.log(e);
         } catch (final TemplateException e) {

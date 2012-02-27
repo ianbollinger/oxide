@@ -193,24 +193,24 @@
         contextTypeId="org.rustlang.oxide.templates.RustTemplateContextType"
         autoinsert="false"
         name="crate">
-      <pattern>#[link(name = "${project_name}",
-       vers = "${version}",
-       uuid = "${uuid}",
-       url = "${url}")];
+      <pattern>#[link(name = "${CrateName}",
+       vers = "${Version}",
+       uuid = "${Uuid}",
+       url = "${Url}")];
 
-#[author = "${author}"];
-#[license = "${license}"];
-#[crate_type = "${crate_type}"];
+#[author = "${Author}"];
+#[license = "${License}"];
+#[crate_type = "${Type}"];
 
-#[doc(brief = "${brief}",
-      desc = "${desc}")];
+#[doc(brief = "${Brief}",
+      desc = "${Description}")];
 </pattern>
     </template>
     <template id="org.rustlang.oxide.templates.gitignore"
         autoinsert="false"
         name="gitignore"
         contextTypeId="org.rustlang.oxide.templates.RustTemplateContextType">
-      <pattern>${project_name}
+      <pattern>${CrateName}
 *.a
 *.dSYM
 *.dll
@@ -228,9 +228,9 @@
         autoinsert="false"
         name="readme"
         contextTypeId="org.rustlang.oxide.templates.RustTemplateContextType">
-      <pattern># ${project_name} - ${brief}
+      <pattern># ${ProjectName} - ${Brief}
 
-${desc}
+${Description}
 </pattern>
     </template>
 
@@ -254,7 +254,7 @@ ${desc}
         autoinsert="false"
         name="MIT License"
         contextTypeId="org.rustlang.oxide.templates.RustTemplateContextType">
-      <pattern>Copyright (c) ${year} ${author}
+      <pattern>Copyright (c) ${Year} ${Author}
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
