@@ -61,15 +61,14 @@ public interface RustProject extends IModelElement {
     ValueProperty PROP_WORKING_SETS = new ValueProperty(TYPE,
             "WorkingSets");
 
-    // TODO: retrieve value.
     @Label(standard = "crate name")
+    @DefaultValue(text = "${ProjectName}")
     @Required
     ValueProperty PROP_CRATE_NAME = new ValueProperty(TYPE, "CrateName");
 
-    // TODO: default should be same as rustc.
     @Type(base = CrateType.class)
     @Label(standard = "type")
-    @InitialValue(text = "LIBRARY")
+    @InitialValue(text = "BINARY")
     @Required
     ValueProperty PROP_TYPE = new ValueProperty(TYPE, "Type");
 
@@ -86,7 +85,6 @@ public interface RustProject extends IModelElement {
 
     @Type(base = URL.class)
     @Label(standard = "URL")
-    @InitialValue(text = "http://example.org")
     @Required
     ValueProperty PROP_URL = new ValueProperty(TYPE, "Url");
 
