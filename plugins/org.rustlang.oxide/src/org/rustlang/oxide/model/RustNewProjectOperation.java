@@ -1,6 +1,6 @@
 package org.rustlang.oxide.model;
 
-import com.google.common.base.Throwables;
+import java.lang.reflect.InvocationTargetException;
 import com.google.common.collect.ObjectArrays;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
@@ -17,6 +17,7 @@ import org.eclipse.sapphire.modeling.ProgressMonitor;
 import org.eclipse.sapphire.modeling.Status;
 import org.eclipse.sapphire.platform.ProgressMonitorBridge;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
+import org.rustlang.oxide.OxideLogger;
 import org.rustlang.oxide.common.SubProgressMonitorFactory;
 import org.rustlang.oxide.nature.RustNature;
 import org.rustlang.oxide.templates.TemplateFileWriter;
@@ -26,27 +27,30 @@ public class RustNewProjectOperation extends WorkspaceModifyOperation {
     // TODO: provide way of keeping this number in sync.
     private static final int NUMBER_OF_TASKS = 7;
     private final SubProgressMonitorFactory subProgressMonitorFactory;
-    private final IProject project;
-    private final TemplateFileWriter fileFactory;
-    private final IProjectDescription description;
     private final PerspectiveUpdater perspectiveUpdater;
+    private final OxideLogger logger;
     private final IConfigurationElement configuration;
+    private final IProject project;
+    private final TemplateFileWriter fileWriter;
+    private final IProjectDescription description;
 
     @Inject
     RustNewProjectOperation(final IWorkspaceRoot root,
             final SubProgressMonitorFactory subProgressMonitorFactory,
             final PerspectiveUpdater perspectiveUpdater,
+            final OxideLogger logger,
             @Assisted final IConfigurationElement configuration,
             @Assisted final IProject project,
-            @Assisted final TemplateFileWriter fileFactory,
+            @Assisted final TemplateFileWriter fileWriter,
             @Assisted final IProjectDescription description) {
         super(root);
         this.subProgressMonitorFactory = subProgressMonitorFactory;
-        this.project = project;
-        this.fileFactory = fileFactory;
-        this.description = description;
         this.perspectiveUpdater = perspectiveUpdater;
+        this.logger = logger;
         this.configuration = configuration;
+        this.project = project;
+        this.fileWriter = fileWriter;
+        this.description = description;
     }
 
     /*
@@ -61,10 +65,11 @@ public class RustNewProjectOperation extends WorkspaceModifyOperation {
     public void run(final ProgressMonitor monitor) {
         try {
             run(ProgressMonitorBridge.create(monitor));
-        } catch (final Exception e) {
-            Throwables.propagate(e);
+        } catch (final InvocationTargetException e) {
+            logger.log(e);
+        } catch (final InterruptedException e) {
+            logger.log(e);
         }
-        perspectiveUpdater.update(configuration);
     }
 
     @Override
@@ -76,6 +81,7 @@ public class RustNewProjectOperation extends WorkspaceModifyOperation {
             configureDescription();
             createAndOpenProject(monitor);
             createFiles(description.getName(), monitor);
+            perspectiveUpdater.update(configuration);
         } finally {
             monitor.done();
         }
@@ -117,6 +123,6 @@ public class RustNewProjectOperation extends WorkspaceModifyOperation {
     private void createFile(final String fileName, final String templateName,
             final IProgressMonitor monitor) throws CoreException {
         final IFile file = project.getFile(fileName);
-        fileFactory.createFile(file, templateName, monitor);
+        fileWriter.createFile(file, templateName, monitor);
     }
 }

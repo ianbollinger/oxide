@@ -61,6 +61,7 @@ public interface RustProject extends IModelElement {
     ValueProperty PROP_WORKING_SETS = new ValueProperty(TYPE,
             "WorkingSets");
 
+    // TODO: automatically deduce name if project begins with rust prefix.
     @Label(standard = "crate name")
     @DefaultValue(text = "${ProjectName}")
     @Required
@@ -77,6 +78,8 @@ public interface RustProject extends IModelElement {
     @Required
     ValueProperty PROP_VERSION = new ValueProperty(TYPE, "Version");
 
+    // TODO: verify UUID.
+    // TODO: add action for re-generated UUID.
     @Type(base = UUID.class)
     @Label(standard = "uuid")
     @Service(impl = UuidInitialValueService.class)
@@ -89,6 +92,7 @@ public interface RustProject extends IModelElement {
     ValueProperty PROP_URL = new ValueProperty(TYPE, "Url");
 
     @Label(standard = "author")
+    @Service(impl = AuthorInitialValueService.class)
     ValueProperty PROP_AUTHOR = new ValueProperty(TYPE, "Author");
 
     @Label(standard = "license")
@@ -97,6 +101,7 @@ public interface RustProject extends IModelElement {
     @Label(standard = "brief")
     ValueProperty PROP_BRIEF = new ValueProperty(TYPE, "Brief");
 
+    // TODO: fix vertical scaling.
     @Label(standard = "description")
     @LongString
     ValueProperty PROP_DESCRIPTION = new ValueProperty(TYPE, "Description");
