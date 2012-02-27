@@ -19,14 +19,20 @@
   <modules>
     <module>org.rustlang.oxide.thirdparty</module>
     <module>org.rustlang.oxide</module>
+    <module>org.rustlang.oxide.thirdpartytest</module>
     <module>org.rustlang.oxide.tests</module>
   </modules>
 
   <repositories>
     <repository>
-      <id>indigo</id>
+      <id>eclipse-platform</id>
       <layout>p2</layout>
       <url>http://download.eclipse.org/releases/indigo</url>
+    </repository>
+    <repository>
+      <id>eclipse-sapphire</id>
+      <layout>p2</layout>
+      <url>http://download.eclipse.org/sapphire/0.4.0/repository</url>
     </repository>
     <repository>
       <id>guava-osgi</id>
