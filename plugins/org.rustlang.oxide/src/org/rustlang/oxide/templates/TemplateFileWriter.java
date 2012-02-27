@@ -2,7 +2,7 @@ package org.rustlang.oxide.templates;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import com.google.common.base.Charsets;
+import java.nio.charset.Charset;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import org.eclipse.core.resources.IFile;
@@ -21,16 +21,19 @@ import org.rustlang.oxide.common.SubProgressMonitorFactory;
 public class TemplateFileWriter {
     private final TemplateStore templateStore;
     private final SubProgressMonitorFactory subProgressMonitorFactory;
+    private final Charset charset;
     private final OxideLogger logger;
     private final TemplateContext templateContext;
 
     @Inject
     TemplateFileWriter(final TemplateStore templateStore,
             final SubProgressMonitorFactory subProgressMonitorFactory,
+            final Charset charset,
             final OxideLogger logger,
             @Assisted final TemplateContext templateContext) {
         this.templateStore = templateStore;
         this.subProgressMonitorFactory = subProgressMonitorFactory;
+        this.charset = charset;
         this.logger = logger;
         this.templateContext = templateContext;
     }
@@ -51,7 +54,7 @@ public class TemplateFileWriter {
         try {
             final TemplateBuffer buffer = templateContext.evaluate(template);
             // TODO: remove LoD violation.
-            final byte[] bytes = buffer.getString().getBytes(Charsets.UTF_8);
+            final byte[] bytes = buffer.getString().getBytes(charset);
             return new ByteArrayInputStream(bytes);
         } catch (final BadLocationException e) {
             logger.log(e);
