@@ -9,19 +9,19 @@ import org.eclipse.sapphire.modeling.Status;
 import org.eclipse.sapphire.ui.swt.SapphireWizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
-import org.rustlang.oxide.model.RustNewProjectDelegateFactory;
+import org.rustlang.oxide.model.RustNewProjectOperationFactory;
 import org.rustlang.oxide.model.RustProjectOperationModel;
 import org.rustlang.oxide.wizards.RustWizardModule.ProjectDefinition;
 
 public class RustProjectWizard extends SapphireWizard<RustProjectOperationModel>
         implements INewWizard, IExecutableExtension {
-    private final RustNewProjectDelegateFactory projectOperationFactory;
+    private final RustNewProjectOperationFactory projectOperationFactory;
     private final RustProjectOperationModel element;
     private IConfigurationElement configuration;
 
     @Inject
     RustProjectWizard(final RustProjectOperationModel element,
-            final RustNewProjectDelegateFactory projectOperationFactory,
+            final RustNewProjectOperationFactory projectOperationFactory,
             @ProjectDefinition final String definition) {
         super(element, definition);
         this.element = element;
@@ -30,8 +30,8 @@ public class RustProjectWizard extends SapphireWizard<RustProjectOperationModel>
 
     @Override
     protected Status performFinish(final ProgressMonitor monitor) {
-        projectOperationFactory.create(element.getProject(), configuration,
-                monitor).run();
+        projectOperationFactory.create(element.getProject(),
+                configuration).run(monitor);
         return super.performFinish(monitor);
     }
 

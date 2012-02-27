@@ -12,23 +12,17 @@ import com.google.inject.AbstractModule;
 import com.google.inject.BindingAnnotation;
 import com.google.inject.Provides;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
-import org.rustlang.oxide.model.RustNewProjectDelegate;
-import org.rustlang.oxide.model.RustNewProjectDelegateFactory;
 import org.rustlang.oxide.model.RustNewProjectOperation;
-import org.rustlang.oxide.model.RustNewProjectOperationFactory;
+import org.rustlang.oxide.model.RustNewProjectOperationInnerFactory;
 import org.rustlang.oxide.model.RustProjectOperationModel;
 
 public class RustWizardModule extends AbstractModule {
     @Override
     protected void configure() {
         install(new FactoryModuleBuilder()
-                .implement(RustNewProjectDelegate.class,
-                        RustNewProjectDelegate.class)
-                .build(RustNewProjectDelegateFactory.class));
-        install(new FactoryModuleBuilder()
                 .implement(RustNewProjectOperation.class,
                         RustNewProjectOperation.class)
-                .build(RustNewProjectOperationFactory.class));
+                .build(RustNewProjectOperationInnerFactory.class));
         bindConstant().annotatedWith(ProjectDefinition.class)
                 .to("org.rustlang.oxide/ui/Project.sdef!wizard");
     }

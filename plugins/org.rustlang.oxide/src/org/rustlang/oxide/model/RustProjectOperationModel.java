@@ -23,6 +23,6 @@ public interface RustProjectOperationModel extends IExecutableModelElement {
     RustProject getProject();
 
     @Override
-    @DelegateImplementation(RustNewProjectDelegate.class)
+    @DelegateImplementation(RustNewProjectOperation.class)
     Status execute(ProgressMonitor monitor);
 }
