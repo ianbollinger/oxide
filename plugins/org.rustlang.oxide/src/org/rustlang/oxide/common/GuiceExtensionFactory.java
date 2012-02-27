@@ -24,6 +24,7 @@ import org.ops4j.peaberry.eclipse.EclipseRegistry;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
+// TODO: replace.
 public final class GuiceExtensionFactory implements IExecutableExtension,
         IExecutableExtensionFactory {
     public static final String ID = "org.rustlang.oxide.modules";
@@ -66,6 +67,7 @@ public final class GuiceExtensionFactory implements IExecutableExtension,
         return o;
     }
 
+    // TODO: call
     public static void cleanup() {
         synchronized (INJECTORS) {
             for (final IContributor contributor : INJECTORS.keySet()) {

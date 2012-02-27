@@ -12,6 +12,8 @@ import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.sapphire.modeling.ProgressMonitor;
 import org.eclipse.sapphire.modeling.Status;
 import org.rustlang.oxide.templates.SapphireTemplateContextFactory;
+import org.rustlang.oxide.templates.TemplateFileWriter;
+import org.rustlang.oxide.templates.TemplateFileWriterFactory;
 import org.rustlang.oxide.wizards.PerspectiveUpdater;
 
 public class RustNewProjectDelegate {
@@ -23,6 +25,7 @@ public class RustNewProjectDelegate {
     private final RustProject element;
     private final IConfigurationElement configuration;
     private final ProgressMonitor monitor;
+    private final TemplateFileWriterFactory templateFileWriterFactory;
 
     @Inject
     RustNewProjectDelegate(final RustNewProjectOperationFactory factory,
@@ -30,6 +33,7 @@ public class RustNewProjectDelegate {
             final PerspectiveUpdater perspectiveUpdater,
             final IWorkspace workspace,
             final IWorkspaceRoot workspaceRoot,
+            final TemplateFileWriterFactory templateFileWriterFactory,
             @Assisted final RustProject element,
             @Assisted final IConfigurationElement configuration,
             @Assisted final ProgressMonitor monitor) {
@@ -38,6 +42,7 @@ public class RustNewProjectDelegate {
         this.perspectiveUpdater = perspectiveUpdater;
         this.workspace = workspace;
         this.workspaceRoot = workspaceRoot;
+        this.templateFileWriterFactory = templateFileWriterFactory;
         this.element = element;
         this.configuration = configuration;
         this.monitor = monitor;
@@ -60,8 +65,10 @@ public class RustNewProjectDelegate {
         final IProject project = workspaceRoot.getProject(projectName);
         final IProjectDescription description = workspace
                 .newProjectDescription(projectName);
+        final TemplateFileWriter templateFileFactory =
+                templateFileWriterFactory.create(templateContext);
         final RustNewProjectOperation operation = factory.create(project,
-                description, templateContext);
+                templateFileFactory, description);
         try {
             operation.run(monitor);
         } catch (final Exception e) {

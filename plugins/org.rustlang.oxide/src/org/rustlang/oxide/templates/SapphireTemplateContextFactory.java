@@ -28,6 +28,8 @@ public class SapphireTemplateContextFactory {
     private void setVariable(final IModelElement model,
             final ValueProperty property) {
         final Object value = model.read(property).getContent();
+        // TODO: this falsely assumes that any value can be deserialized
+        // by calling toString.
         final String stringValue = (value == null) ? "" : value.toString();
         templateContext.setVariable(property.getName(), stringValue);
     }

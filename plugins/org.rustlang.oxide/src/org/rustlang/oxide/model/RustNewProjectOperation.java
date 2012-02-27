@@ -1,10 +1,6 @@
 package org.rustlang.oxide.model;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import com.google.common.base.Charsets;
 import com.google.common.collect.ObjectArrays;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
@@ -15,40 +11,32 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.templates.Template;
-import org.eclipse.jface.text.templates.TemplateBuffer;
-import org.eclipse.jface.text.templates.TemplateContext;
-import org.eclipse.jface.text.templates.TemplateException;
-import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import org.eclipse.sapphire.modeling.ProgressMonitor;
 import org.eclipse.sapphire.platform.ProgressMonitorBridge;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
-import org.rustlang.oxide.OxideLogger;
+import org.rustlang.oxide.common.SubProgressMonitorFactory;
 import org.rustlang.oxide.nature.RustNature;
+import org.rustlang.oxide.templates.TemplateFileWriter;
 
 public class RustNewProjectOperation extends WorkspaceModifyOperation {
     // TODO: provide way of keeping this number in sync.
     private static final int NUMBER_OF_TASKS = 8;
-    private static final int WORK_SCALE = 1000;
-    private final OxideLogger logger;
-    private final TemplateStore templateStore;
+    private final SubProgressMonitorFactory subProgressMonitorFactory;
     private final IProject project;
+    private final TemplateFileWriter fileFactory;
     private final IProjectDescription description;
-    private final TemplateContext templateContext;
 
     @Inject
-    RustNewProjectOperation(final OxideLogger logger, final IWorkspaceRoot root,
-            final TemplateStore templateStore, @Assisted final IProject project,
-            @Assisted final IProjectDescription description,
-            @Assisted final TemplateContext templateContext) {
+    RustNewProjectOperation(final IWorkspaceRoot root,
+            final SubProgressMonitorFactory subProgressMonitorFactory,
+            @Assisted final IProject project,
+            @Assisted final TemplateFileWriter fileFactory,
+            @Assisted final IProjectDescription description) {
         super(root);
-        this.logger = logger;
-        this.templateStore = templateStore;
+        this.subProgressMonitorFactory = subProgressMonitorFactory;
         this.project = project;
+        this.fileFactory = fileFactory;
         this.description = description;
-        this.templateContext = templateContext;
     }
 
     public void run(final ProgressMonitor monitor)
@@ -61,8 +49,8 @@ public class RustNewProjectOperation extends WorkspaceModifyOperation {
     protected void execute(
             final IProgressMonitor monitor) throws CoreException {
         try {
-            monitor.beginTask("Creating Rust project", WORK_SCALE
-                    * NUMBER_OF_TASKS);
+            monitor.beginTask("Creating Rust project",
+                    subProgressMonitorFactory.getWorkScale() * NUMBER_OF_TASKS);
             configureDescription();
             ceateAndOpenProject(monitor);
             createFiles(description.getName(), monitor);
@@ -80,69 +68,35 @@ public class RustNewProjectOperation extends WorkspaceModifyOperation {
     private void ceateAndOpenProject(
             final IProgressMonitor monitor) throws CoreException {
         // TODO: refactor.
-        project.create(provideSubProgressMonitor(monitor));
+        project.create(subProgressMonitorFactory.create(monitor));
         if (monitor.isCanceled()) {
             throw new OperationCanceledException();
         }
         project.open(IResource.BACKGROUND_REFRESH,
-                provideSubProgressMonitor(monitor));
+                subProgressMonitorFactory.create(monitor));
         if (monitor.isCanceled()) {
             throw new OperationCanceledException();
         }
-        project.setDescription(description, provideSubProgressMonitor(monitor));
+        project.setDescription(description,
+                subProgressMonitorFactory.create(monitor));
         if (monitor.isCanceled()) {
             throw new OperationCanceledException();
         }
-    }
-
-    // TODO: make this a factory.
-    IProgressMonitor provideSubProgressMonitor(final IProgressMonitor monitor) {
-        return new SubProgressMonitor(monitor, WORK_SCALE);
     }
 
     private void createFiles(final String projectName,
             final IProgressMonitor monitor) throws CoreException {
-        try {
-            // TODO: this doesn't seem like my responsibility!
-            templateStore.load();
-        } catch (final IOException e) {
-            // TODO: don't ignore exception.
-            return;
-        }
         // TODO: handle monitor appropriately here.
-        createFileFromTemplate("README.md", "readme", monitor);
-        createFileFromTemplate("LICENSE.txt", "license", monitor);
-        // createFileFromTemplate(".gitignore", "gitignore", monitor);
-        createFileFromTemplate(projectName + ".rc", "crate", monitor);
-        createFileFromTemplate(projectName + ".rs", "sourcefile", monitor);
+        createFile("README.md", "readme", monitor);
+        createFile("LICENSE.txt", "license", monitor);
+        // createFile(".gitignore", "gitignore", monitor);
+        createFile(projectName + ".rc", "crate", monitor);
+        createFile(projectName + ".rs", "sourcefile", monitor);
     }
 
-    private void createFileFromTemplate(final String fileName,
-            final String templateName,
+    private void createFile(final String fileName, final String templateName,
             final IProgressMonitor monitor) throws CoreException {
-        final InputStream stream = getTemplateInputStream(templateName);
-        final boolean force = false;
-        final IProgressMonitor monitor2 = provideSubProgressMonitor(monitor);
-        // TODO: remove LoD violation.
-        project.getFile(fileName).create(stream, force, monitor2);
-        if (monitor.isCanceled()) {
-            throw new OperationCanceledException();
-        }
-    }
-
-    private InputStream getTemplateInputStream(final String name) {
-        // TODO: replace with findTeplateById
-        final Template template = templateStore.findTemplate(name);
-        try {
-            final TemplateBuffer buffer = templateContext.evaluate(template);
-            // TODO: remove LoD violation.
-            final byte[] bytes = buffer.getString().getBytes(Charsets.UTF_8);
-            return new ByteArrayInputStream(bytes);
-        } catch (final BadLocationException e) {
-            logger.log(e);
-        } catch (final TemplateException e) {
-            logger.log(e);
-        }
-        return new ByteArrayInputStream(new byte[] {});
+        fileFactory.createFile(project.getFile(fileName), templateName,
+                monitor);
     }
 }

@@ -2,9 +2,9 @@ package org.rustlang.oxide.model;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
-import org.eclipse.jface.text.templates.TemplateContext;
+import org.rustlang.oxide.templates.TemplateFileWriter;
 
 public interface RustNewProjectOperationFactory {
     RustNewProjectOperation create(IProject project,
-            IProjectDescription description, TemplateContext templateContext);
+            TemplateFileWriter factory, IProjectDescription description);
 }
