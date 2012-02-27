@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<extension xmlns="http://www.eclipse.org/sapphire/xmlns/extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <service>
-        <context>Sapphire.Property.Instance</context>
-        <type>org.rustlang.oxide.model.UuidValueSerializationService</type>
-        <factory>org.rustlang.oxide.model.UuidValueSerializationServiceFactory</factory>
-        <id>UuidValueSerializationService</id>
-    </service>
+<extension xmlns="http://www.eclipse.org/sapphire/xmlns/extension"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <service>
+    <id>UuidSerializationService</id>
+    <context>Sapphire.Property.Instance</context>
+    <type>org.rustlang.oxide.model.UuidSerializationService</type>
+    <factory>org.rustlang.oxide.model.UuidSerializationService$Factory</factory>
+  </service>
 </extension>

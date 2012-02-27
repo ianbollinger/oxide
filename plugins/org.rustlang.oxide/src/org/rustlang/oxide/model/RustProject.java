@@ -24,6 +24,8 @@ import org.eclipse.sapphire.modeling.annotations.ValidFileSystemResourceType;
 
 // TODO: standard formatting rules make this interface harder to maintain.
 // TODO: extract crate model?
+// TODO: fix formatting of capitalized type names.
+// TODO: add accelerators for all fields.
 @GenerateImpl
 public interface RustProject extends IModelElement {
     ModelElementType TYPE = new ModelElementType(RustProject.class);
@@ -73,15 +75,14 @@ public interface RustProject extends IModelElement {
     @Required
     ValueProperty PROP_TYPE = new ValueProperty(TYPE, "Type");
 
-    @Label(standard = "version")
+    @Label(standard = "&version")
     @InitialValue(text = "0.0.1")
     @Required
     ValueProperty PROP_VERSION = new ValueProperty(TYPE, "Version");
 
-    // TODO: verify UUID.
-    // TODO: add action for re-generated UUID.
+    // TODO: add action for re-generating UUID.
     @Type(base = UUID.class)
-    @Label(standard = "uuid")
+    @Label(standard = "&UUID")
     @Service(impl = UuidInitialValueService.class)
     @Required
     ValueProperty PROP_UUID = new ValueProperty(TYPE, "Uuid");
@@ -91,18 +92,18 @@ public interface RustProject extends IModelElement {
     @Required
     ValueProperty PROP_URL = new ValueProperty(TYPE, "Url");
 
-    @Label(standard = "author")
+    @Label(standard = "&author")
     @Service(impl = AuthorInitialValueService.class)
     ValueProperty PROP_AUTHOR = new ValueProperty(TYPE, "Author");
 
-    @Label(standard = "license")
+    @Label(standard = "&license")
     ValueProperty PROP_LICENSE = new ValueProperty(TYPE, "License");
 
-    @Label(standard = "brief")
+    @Label(standard = "brief", full = "brief description")
     ValueProperty PROP_BRIEF = new ValueProperty(TYPE, "Brief");
 
     // TODO: fix vertical scaling.
-    @Label(standard = "description")
+    @Label(standard = "description", full = "long description")
     @LongString
     ValueProperty PROP_DESCRIPTION = new ValueProperty(TYPE, "Description");
 
