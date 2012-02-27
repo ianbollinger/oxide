@@ -19,6 +19,7 @@ import org.eclipse.sapphire.modeling.annotations.LongString;
 import org.eclipse.sapphire.modeling.annotations.MustExist;
 import org.eclipse.sapphire.modeling.annotations.Required;
 import org.eclipse.sapphire.modeling.annotations.Service;
+import org.eclipse.sapphire.modeling.annotations.Services;
 import org.eclipse.sapphire.modeling.annotations.Type;
 import org.eclipse.sapphire.modeling.annotations.ValidFileSystemResourceType;
 
@@ -57,15 +58,14 @@ public interface RustProject extends IModelElement {
     ValueProperty PROP_ADD_PROJECT_TO_WORKING_SETS = new ValueProperty(TYPE,
             "AddProjectToWorkingSets");
 
-    // TODO: implement working sets.
     @Label(standard = "w&orking sets")
     @Enablement(expr = "false")
-    ValueProperty PROP_WORKING_SETS = new ValueProperty(TYPE,
-            "WorkingSets");
+    ValueProperty PROP_WORKING_SETS = new ValueProperty(TYPE, "WorkingSets");
 
     // TODO: automatically deduce name if project begins with rust prefix.
+    @Services({ @Service(impl = CrateNameDefaultValueService.class),
+            @Service(impl = CrateNameValidationService.class) })
     @Label(standard = "crate name")
-    @DefaultValue(text = "${ProjectName}")
     @Required
     ValueProperty PROP_CRATE_NAME = new ValueProperty(TYPE, "CrateName");
 
@@ -103,7 +103,7 @@ public interface RustProject extends IModelElement {
     ValueProperty PROP_BRIEF = new ValueProperty(TYPE, "Brief");
 
     // TODO: fix vertical scaling.
-    @Label(standard = "description", full = "long description")
+    @Label(standard = "long", full = "long description")
     @LongString
     ValueProperty PROP_DESCRIPTION = new ValueProperty(TYPE, "Description");
 
