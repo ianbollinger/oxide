@@ -1,17 +1,15 @@
 package org.rustlang.oxide.model;
 
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.text.templates.Template;
-import org.eclipse.jface.text.templates.TemplateBuffer;
 import org.eclipse.jface.text.templates.TemplateContext;
-import org.eclipse.jface.text.templates.TemplateVariable;
 import org.jukito.JukitoModule;
 import org.jukito.JukitoRunner;
 import org.jukito.MockProvider;
@@ -21,6 +19,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.rustlang.oxide.nature.RustNature;
+import org.rustlang.oxide.templates.TemplateFileWriter;
+import org.rustlang.oxide.wizards.PerspectiveUpdater;
 
 // TODO: verify file creation.
 // TODO: cover error branches.
@@ -30,19 +30,15 @@ public class RustNewProjectOperationTest {
     @Inject IProgressMonitor monitor;
 
     @Before
-    public void setUp(@Assisted final IProjectDescription description,
-            @Assisted final TemplateContext context,
-            @Assisted final IProject project) throws Exception {
+    public void setUp(@Assisted final IProjectDescription description) {
         when(description.getNatureIds()).thenReturn(new String[] {});
-        // TODO: this is here due to a LoD violation.
-        when(context.evaluate(Matchers.<Template>any())).thenReturn(
-                new TemplateBuffer("", new TemplateVariable[] {}));
-        // TODO: remove mock returning a mock.
-        final IFile file = mock(IFile.class);
-        when(project.getFile(Matchers.<String>any()))
-                .thenReturn(file);
     }
 
+    @Test
+    public void testExecute() {
+        assertTrue(RustNewProjectOperation.execute(null, null).ok());
+    }
+    
     @Test
     public void shouldBeginMonitorTask() throws Exception {
         operation.execute(monitor);
@@ -93,7 +89,10 @@ public class RustNewProjectOperationTest {
         protected void configureTest() {
             bindAnnotatedMock(IProject.class);
             bindAnnotatedMock(IProjectDescription.class);
+            bindAnnotatedMock(TemplateFileWriter.class);
             bindAnnotatedMock(TemplateContext.class);
+            bindAnnotatedMock(IConfigurationElement.class);
+            bindMock(PerspectiveUpdater.class).in(TestScope.SINGLETON);
         }
 
         // TODO: move somewhere appropriate.
