@@ -8,11 +8,9 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.sapphire.modeling.ProgressMonitor;
 import org.eclipse.sapphire.modeling.Status;
-import org.eclipse.sapphire.platform.ProgressMonitorBridge;
 import org.rustlang.oxide.templates.SapphireTemplateContextFactory;
 import org.rustlang.oxide.wizards.PerspectiveUpdater;
 
@@ -62,10 +60,10 @@ public class RustNewProjectDelegate {
         final IProject project = workspaceRoot.getProject(projectName);
         final IProjectDescription description = workspace
                 .newProjectDescription(projectName);
-        final IRunnableWithProgress operation = factory.create(project,
+        final RustNewProjectOperation operation = factory.create(project,
                 description, templateContext);
         try {
-            operation.run(ProgressMonitorBridge.create(monitor));
+            operation.run(monitor);
         } catch (final Exception e) {
             Throwables.propagate(e);
         }

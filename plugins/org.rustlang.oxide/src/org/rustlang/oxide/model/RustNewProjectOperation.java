@@ -3,6 +3,7 @@ package org.rustlang.oxide.model;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ObjectArrays;
 import com.google.inject.Inject;
@@ -21,6 +22,8 @@ import org.eclipse.jface.text.templates.TemplateBuffer;
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateException;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
+import org.eclipse.sapphire.modeling.ProgressMonitor;
+import org.eclipse.sapphire.platform.ProgressMonitorBridge;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.rustlang.oxide.OxideLogger;
 import org.rustlang.oxide.nature.RustNature;
@@ -46,6 +49,12 @@ public class RustNewProjectOperation extends WorkspaceModifyOperation {
         this.project = project;
         this.description = description;
         this.templateContext = templateContext;
+    }
+
+    public void run(final ProgressMonitor monitor)
+            throws InvocationTargetException, InterruptedException {
+        // TODO: remove static call.
+        run(ProgressMonitorBridge.create(monitor));
     }
 
     @Override
