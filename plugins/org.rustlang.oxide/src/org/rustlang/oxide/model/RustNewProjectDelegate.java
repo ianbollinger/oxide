@@ -4,6 +4,8 @@ import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -18,6 +20,7 @@ public class RustNewProjectDelegate {
     private final RustNewProjectOperationFactory factory;
     private final RustTemplateContextFactory templateContextFactory;
     private final PerspectiveUpdater perspectiveUpdater;
+    private final IWorkspace workspace;
     private final IWorkspaceRoot workspaceRoot;
     private final RustProject element;
     private final IConfigurationElement configuration;
@@ -27,6 +30,7 @@ public class RustNewProjectDelegate {
     RustNewProjectDelegate(final RustNewProjectOperationFactory factory,
             final RustTemplateContextFactory templateContextFactory,
             final PerspectiveUpdater perspectiveUpdater,
+            final IWorkspace workspace,
             final IWorkspaceRoot workspaceRoot,
             @Assisted final RustProject element,
             @Assisted final IConfigurationElement configuration,
@@ -34,6 +38,7 @@ public class RustNewProjectDelegate {
         this.factory = factory;
         this.templateContextFactory = templateContextFactory;
         this.perspectiveUpdater = perspectiveUpdater;
+        this.workspace = workspace;
         this.workspaceRoot = workspaceRoot;
         this.element = element;
         this.configuration = configuration;
@@ -54,8 +59,10 @@ public class RustNewProjectDelegate {
                 .create(element);
         final String projectName = element.getProjectName().getContent();
         final IProject project = workspaceRoot.getProject(projectName);
+        final IProjectDescription description = workspace
+                .newProjectDescription(project.getName());
         final IRunnableWithProgress operation = factory.create(project,
-                templateContext);
+                description, templateContext);
         try {
             operation.run(ProgressMonitorBridge.create(monitor));
         } catch (final Exception e) {
