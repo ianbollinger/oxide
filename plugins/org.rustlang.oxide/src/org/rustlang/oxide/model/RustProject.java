@@ -69,7 +69,7 @@ public interface RustProject extends IModelElement {
     // TODO: default should be same as rustc.
     @Type(base = CrateType.class)
     @Label(standard = "type")
-    @InitialValue(text = "library")
+    @InitialValue(text = "LIBRARY")
     @Required
     ValueProperty PROP_TYPE = new ValueProperty(TYPE, "Type");
 

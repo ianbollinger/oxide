@@ -2,7 +2,6 @@ package org.rustlang.oxide.model;
 
 import org.eclipse.sapphire.modeling.annotations.Label;
 
-// TODO: fix serialization.
 @Label(standard = "type", full = "crate type")
 public enum CrateType {
     @Label(standard = "library")
@@ -17,7 +16,8 @@ public enum CrateType {
         this.value = value;
     }
 
-    public String getValue() {
+    @Override
+    public String toString() {
         return value;
     }
 }
