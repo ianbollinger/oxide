@@ -1,6 +1,7 @@
 package org.rustlang.oxide.templates;
 
 import java.io.IOException;
+import com.google.common.base.Throwables;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
@@ -10,9 +11,11 @@ import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateContextType;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
-import org.rustlang.oxide.common.EclipseLogger;
 
 public class RustTemplateModule extends AbstractModule {
+    // TODO: make sure key is named appropriately.
+    private static final String RUST_TEMPLATE_STORE_KEY = "RUST_TEMPLATE_STORE";
+
     @Override
     protected void configure() {
         bind(TemplateContext.class).to(BasicTemplateContext.class);
@@ -24,16 +27,13 @@ public class RustTemplateModule extends AbstractModule {
     }
 
     @Provides @Singleton
-    TemplateStore provideTemplateStore(final EclipseLogger logger,
-            final IPreferenceStore preferenceStore) {
-        // TODO: store string constant somewhere, and make sure it's named
-        // appropriately.
+    TemplateStore provideTemplateStore(final IPreferenceStore preferenceStore) {
         final ContributionTemplateStore store = new ContributionTemplateStore(
-                preferenceStore, "RUST_TEMPLATE_STORE");
+                preferenceStore, RUST_TEMPLATE_STORE_KEY);
         try {
             store.load();
         } catch (final IOException e) {
-            logger.error(e.getMessage(), e);
+            throw Throwables.propagate(e);
         }
         return store;
     }

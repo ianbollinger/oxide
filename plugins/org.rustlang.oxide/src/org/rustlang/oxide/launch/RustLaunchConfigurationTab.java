@@ -9,11 +9,11 @@ import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.rustlang.oxide.OxidePlugin;
-import org.rustlang.oxide.common.EclipseLogger;
+import org.slf4j.Logger;
 
 public class RustLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
     private RustLaunchConfigurationTabComposite control;
-    private final EclipseLogger logger;
+    private final Logger logger;
 
     public RustLaunchConfigurationTab() {
         // TODO: inject.

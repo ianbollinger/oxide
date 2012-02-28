@@ -17,18 +17,18 @@ import org.eclipse.sapphire.modeling.ProgressMonitor;
 import org.eclipse.sapphire.modeling.Status;
 import org.eclipse.sapphire.platform.ProgressMonitorBridge;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
-import org.rustlang.oxide.common.EclipseLogger;
 import org.rustlang.oxide.common.SubProgressMonitorFactory;
 import org.rustlang.oxide.nature.RustNature;
 import org.rustlang.oxide.templates.TemplateFileWriter;
 import org.rustlang.oxide.wizards.PerspectiveUpdater;
+import org.slf4j.Logger;
 
 public class RustNewProjectOperation extends WorkspaceModifyOperation {
     // TODO: provide way of keeping this number in sync.
     private static final int NUMBER_OF_TASKS = 7;
     private final SubProgressMonitorFactory subProgressMonitorFactory;
     private final PerspectiveUpdater perspectiveUpdater;
-    private final EclipseLogger logger;
+    private final Logger logger;
     private final IConfigurationElement configuration;
     private final IProject project;
     private final TemplateFileWriter fileWriter;
@@ -37,8 +37,7 @@ public class RustNewProjectOperation extends WorkspaceModifyOperation {
     @Inject
     RustNewProjectOperation(final IWorkspaceRoot root,
             final SubProgressMonitorFactory subProgressMonitorFactory,
-            final PerspectiveUpdater perspectiveUpdater,
-            final EclipseLogger logger,
+            final PerspectiveUpdater perspectiveUpdater, final Logger logger,
             @Assisted final IConfigurationElement configuration,
             @Assisted final IProject project,
             @Assisted final TemplateFileWriter fileWriter,

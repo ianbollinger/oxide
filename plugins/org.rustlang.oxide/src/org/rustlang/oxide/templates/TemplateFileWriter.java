@@ -15,21 +15,21 @@ import org.eclipse.jface.text.templates.TemplateBuffer;
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateException;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
-import org.rustlang.oxide.common.EclipseLogger;
 import org.rustlang.oxide.common.SubProgressMonitorFactory;
+import org.slf4j.Logger;
 
 public class TemplateFileWriter {
     private final TemplateStore templateStore;
     private final SubProgressMonitorFactory subProgressMonitorFactory;
     private final Charset charset;
-    private final EclipseLogger logger;
+    private final Logger logger;
     private final TemplateContext templateContext;
 
     @Inject
     TemplateFileWriter(final TemplateStore templateStore,
             final SubProgressMonitorFactory subProgressMonitorFactory,
             final Charset charset,
-            final EclipseLogger logger,
+            final Logger logger,
             @Assisted final TemplateContext templateContext) {
         this.templateStore = templateStore;
         this.subProgressMonitorFactory = subProgressMonitorFactory;

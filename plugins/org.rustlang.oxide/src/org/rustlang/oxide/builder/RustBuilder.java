@@ -25,16 +25,17 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.DebugPlugin;
 import org.rustlang.oxide.OxidePlugin;
-import org.rustlang.oxide.common.EclipseLogger;
 import org.rustlang.oxide.common.EnumPreferenceStore;
 import org.rustlang.oxide.preferences.RustPreferenceKey;
+import org.slf4j.Logger;
 
 public class RustBuilder extends IncrementalProjectBuilder {
     public static final String ID = "org.rustlang.oxide.RustBuilder";
     private final EnumPreferenceStore preferenceStore;
-    private final EclipseLogger logger;
+    private final Logger logger;
 
     public RustBuilder() {
+        // TODO: inject.
         this.preferenceStore = OxidePlugin.getEnumPreferenceStore();
         this.logger = OxidePlugin.getLogger();
     }

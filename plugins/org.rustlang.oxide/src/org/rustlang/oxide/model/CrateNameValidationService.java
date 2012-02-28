@@ -1,5 +1,6 @@
 package org.rustlang.oxide.model;
 
+import com.google.common.base.Strings;
 import org.eclipse.sapphire.modeling.IModelElement;
 import org.eclipse.sapphire.modeling.Status;
 import org.eclipse.sapphire.modeling.Value;
@@ -12,7 +13,7 @@ public class CrateNameValidationService extends ValidationService {
     public Status validate() {
         final Value<?> value = context(IModelElement.class).read(
                 context(ValueProperty.class));
-        final String string = (String) value.getContent();
+        final String string = Strings.nullToEmpty((String) value.getContent());
         if (LexicalUtil.isRustIdentifier(string)) {
             return Status.createOkStatus();
         }

@@ -17,10 +17,10 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.part.FileEditorInput;
 import org.rustlang.oxide.OxidePlugin;
-import org.rustlang.oxide.common.EclipseLogger;
+import org.slf4j.Logger;
 
 public class RustLaunchShortcut implements ILaunchShortcut {
-    private final EclipseLogger logger;
+    private final Logger logger;
     private final ILaunchManager launchManager;
 
     public RustLaunchShortcut() {
