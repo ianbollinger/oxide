@@ -1,6 +1,7 @@
 package org.rustlang.oxide.launch;
 
 import java.util.List;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -17,7 +18,6 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ResourceListSelectionDialog;
 import org.rustlang.oxide.OxidePlugin;
-import org.rustlang.oxide.common.Collections3;
 import org.rustlang.oxide.nature.RustNature;
 
 public class RustLaunchConfigurationTabComposite extends Composite {
@@ -72,6 +72,7 @@ public class RustLaunchConfigurationTabComposite extends Composite {
 
     private Text createProjectField() {
         final Text text = new Text(projectGroup, SWT.BORDER);
+        // TODO: the listener is repeated.
         text.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(
@@ -124,8 +125,9 @@ public class RustLaunchConfigurationTabComposite extends Composite {
                             rustProjects.add(project);
                         }
                     }
-                    final IProject[] array = Collections3.toArray(rustProjects,
+                    final IProject[] array = Iterables.toArray(rustProjects,
                             IProject.class);
+                    // TODO: use a factory.
                     final ResourceListSelectionDialog dialog =
                             new ResourceListSelectionDialog(getShell(), array);
                     dialog.setTitle("Project Selection");
@@ -135,7 +137,8 @@ public class RustLaunchConfigurationTabComposite extends Composite {
                         projectField.setText(((IProject) objects[0]).getName());
                     }
                 } catch (final CoreException e) {
-                    OxidePlugin.getLogger().log(e);
+                    // TODO: inject logger
+                    OxidePlugin.getLogger().error(e.getMessage(), e);
                 }
             }
         });
@@ -193,7 +196,7 @@ public class RustLaunchConfigurationTabComposite extends Composite {
         return result.replace("\r", " ");
     }
 
-    private void updateState() {
+    final void updateState() {
         tab.update();
     }
 }

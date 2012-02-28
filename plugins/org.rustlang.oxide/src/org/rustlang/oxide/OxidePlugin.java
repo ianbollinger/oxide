@@ -5,8 +5,10 @@ import com.google.inject.Injector;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+import org.rustlang.oxide.common.EclipseLogger;
 import org.rustlang.oxide.common.EnumPreferenceStore;
 
+// TODO: eliminate circular dependencies.
 public class OxidePlugin extends AbstractUIPlugin {
     public static final String ID = "org.rustlang.oxide";
     private static OxidePlugin plugin;
@@ -34,8 +36,8 @@ public class OxidePlugin extends AbstractUIPlugin {
         return imageDescriptorFromPlugin(ID, imageFilePath);
     }
 
-    public static OxideLogger getLogger() {
-        return getInstance(OxideLogger.class);
+    public static EclipseLogger getLogger() {
+        return getInstance(EclipseLogger.class);
     }
 
     public static EnumPreferenceStore getEnumPreferenceStore() {

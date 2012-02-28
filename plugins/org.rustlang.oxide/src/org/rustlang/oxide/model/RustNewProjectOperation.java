@@ -17,7 +17,7 @@ import org.eclipse.sapphire.modeling.ProgressMonitor;
 import org.eclipse.sapphire.modeling.Status;
 import org.eclipse.sapphire.platform.ProgressMonitorBridge;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
-import org.rustlang.oxide.OxideLogger;
+import org.rustlang.oxide.common.EclipseLogger;
 import org.rustlang.oxide.common.SubProgressMonitorFactory;
 import org.rustlang.oxide.nature.RustNature;
 import org.rustlang.oxide.templates.TemplateFileWriter;
@@ -28,7 +28,7 @@ public class RustNewProjectOperation extends WorkspaceModifyOperation {
     private static final int NUMBER_OF_TASKS = 7;
     private final SubProgressMonitorFactory subProgressMonitorFactory;
     private final PerspectiveUpdater perspectiveUpdater;
-    private final OxideLogger logger;
+    private final EclipseLogger logger;
     private final IConfigurationElement configuration;
     private final IProject project;
     private final TemplateFileWriter fileWriter;
@@ -38,7 +38,7 @@ public class RustNewProjectOperation extends WorkspaceModifyOperation {
     RustNewProjectOperation(final IWorkspaceRoot root,
             final SubProgressMonitorFactory subProgressMonitorFactory,
             final PerspectiveUpdater perspectiveUpdater,
-            final OxideLogger logger,
+            final EclipseLogger logger,
             @Assisted final IConfigurationElement configuration,
             @Assisted final IProject project,
             @Assisted final TemplateFileWriter fileWriter,
@@ -66,9 +66,9 @@ public class RustNewProjectOperation extends WorkspaceModifyOperation {
         try {
             run(ProgressMonitorBridge.create(monitor));
         } catch (final InvocationTargetException e) {
-            logger.log(e);
+            logger.error(e.getMessage(), e);
         } catch (final InterruptedException e) {
-            logger.log(e);
+            logger.error(e.getMessage(), e);
         }
     }
 

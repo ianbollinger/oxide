@@ -6,8 +6,6 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.util.List;
-import com.google.common.collect.ImmutableList;
 import com.google.inject.AbstractModule;
 import com.google.inject.BindingAnnotation;
 import com.google.inject.Provides;
@@ -31,17 +29,6 @@ public class RustWizardModule extends AbstractModule {
     RustProjectOperationModel provideRustProjectOperation() {
         return RustProjectOperationModel.TYPE.instantiate();
     }
-
-    // TODO: use this again.
-    @Provides
-    List<String> provideLicenseNames() {
-        // TODO: get this list from somewhere appropriate.
-        return ImmutableList.of("Apache-2.0", "BSD-2-clause", "MIT", "GPL-3.0",
-                "LGPL-3.0");
-    }
-
-    @BindingAnnotation @Target({FIELD, METHOD, PARAMETER}) @Retention(RUNTIME)
-    public @interface Licenses {}
 
     @BindingAnnotation @Target({FIELD, METHOD, PARAMETER}) @Retention(RUNTIME)
     public @interface ProjectDefinition {}

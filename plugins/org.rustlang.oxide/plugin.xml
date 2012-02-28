@@ -6,6 +6,8 @@
       schema="schema/modules.exsd"/>
 
   <extension point="org.rustlang.oxide.modules">
+    <module class="org.rustlang.oxide.common.CommonModule"/>
+    <module class="org.rustlang.oxide.templates.RustTemplateModule"/>
     <module class="org.rustlang.oxide.wizards.RustWizardModule"/>
     <module class="org.rustlang.oxide.OxideModule"/>
   </extension>
@@ -90,6 +92,10 @@
     <page id="org.rustlang.oxide.preferences.RustPreferencePage"
         class="org.rustlang.oxide.common.GuiceExtensionFactory"
         name="Rust"/>
+    <page id="org.rustlang.oxide.preferences.RustProjectDefaultsPreferencePage"
+        class="org.rustlang.oxide.common.GuiceExtensionFactory"
+        category="org.rustlang.oxide.preferences.RustPreferencePage"
+        name="Project Defaults"/>
     <page id="org.rustlang.oxide.preferences.RustEditorPreferencePage"
         class="org.rustlang.oxide.common.GuiceExtensionFactory"
         category="org.rustlang.oxide.preferences.RustPreferencePage"

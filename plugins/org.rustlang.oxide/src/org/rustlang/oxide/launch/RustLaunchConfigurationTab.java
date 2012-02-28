@@ -9,12 +9,20 @@ import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.rustlang.oxide.OxidePlugin;
+import org.rustlang.oxide.common.EclipseLogger;
 
 public class RustLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
     private RustLaunchConfigurationTabComposite control;
+    private final EclipseLogger logger;
+
+    public RustLaunchConfigurationTab() {
+        // TODO: inject.
+        this.logger = OxidePlugin.getLogger();
+    }
 
     @Override
     public void createControl(final Composite parent) {
+        // TODO: make a factory.
         control = new RustLaunchConfigurationTabComposite(parent, this);
     }
 
@@ -43,6 +51,8 @@ public class RustLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
     @Override
     public void initializeFrom(final ILaunchConfiguration configuration) {
         try {
+            // TODO: this is a bit hacky. Should we wrap the
+            // ILaunchConfigration?
             final String projectName = configuration.getAttribute(
                     RustLaunchAttribute.PROJECT.toString(), "");
             final String executable = configuration.getAttribute(
@@ -53,7 +63,7 @@ public class RustLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
             control.setExecutable(executable);
             control.setProgramArguments(programArguments);
         } catch (final CoreException e) {
-            OxidePlugin.getLogger().log(e);
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -76,6 +86,7 @@ public class RustLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
 
     public void update() {
         // validate();
+        // TODO: LoD violation.
         final ILaunchConfigurationDialog dialog =
                 getLaunchConfigurationDialog();
         dialog.updateButtons();

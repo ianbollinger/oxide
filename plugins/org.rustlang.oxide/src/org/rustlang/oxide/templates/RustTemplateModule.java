@@ -10,7 +10,7 @@ import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateContextType;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
-import org.rustlang.oxide.OxideLogger;
+import org.rustlang.oxide.common.EclipseLogger;
 
 public class RustTemplateModule extends AbstractModule {
     @Override
@@ -24,7 +24,7 @@ public class RustTemplateModule extends AbstractModule {
     }
 
     @Provides @Singleton
-    TemplateStore provideTemplateStore(final OxideLogger logger,
+    TemplateStore provideTemplateStore(final EclipseLogger logger,
             final IPreferenceStore preferenceStore) {
         // TODO: store string constant somewhere, and make sure it's named
         // appropriately.
@@ -33,7 +33,7 @@ public class RustTemplateModule extends AbstractModule {
         try {
             store.load();
         } catch (final IOException e) {
-            logger.log(e);
+            logger.error(e.getMessage(), e);
         }
         return store;
     }

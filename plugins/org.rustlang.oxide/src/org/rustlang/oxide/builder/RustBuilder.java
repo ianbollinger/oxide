@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.io.CharStreams;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -23,16 +24,15 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.DebugPlugin;
-import org.rustlang.oxide.OxideLogger;
 import org.rustlang.oxide.OxidePlugin;
-import org.rustlang.oxide.common.Collections3;
+import org.rustlang.oxide.common.EclipseLogger;
 import org.rustlang.oxide.common.EnumPreferenceStore;
 import org.rustlang.oxide.preferences.RustPreferenceKey;
 
 public class RustBuilder extends IncrementalProjectBuilder {
     public static final String ID = "org.rustlang.oxide.RustBuilder";
     private final EnumPreferenceStore preferenceStore;
-    private final OxideLogger logger;
+    private final EclipseLogger logger;
 
     public RustBuilder() {
         this.preferenceStore = OxidePlugin.getEnumPreferenceStore();
@@ -81,7 +81,7 @@ public class RustBuilder extends IncrementalProjectBuilder {
             builder.add("-L").add(libraryPath);
         }
         builder.add(file);
-        final String[] commandLine = Collections3.toArray(builder.build(),
+        final String[] commandLine = Iterables.toArray(builder.build(),
                 String.class);
         // TODO: eliminate static call.
         final Process process = DebugPlugin.exec(commandLine, workingDirectory);
@@ -92,7 +92,7 @@ public class RustBuilder extends IncrementalProjectBuilder {
                     Charsets.UTF_8);
             parseLines(CharStreams.readLines(reader));
         } catch (final IOException e) {
-            logger.log(e);
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -139,7 +139,7 @@ public class RustBuilder extends IncrementalProjectBuilder {
                 project.accept(visitor);
             }
         } catch (final CoreException e) {
-            logger.log(e);
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -153,7 +153,7 @@ public class RustBuilder extends IncrementalProjectBuilder {
                 delta.accept(visitor);
             }
         } catch (final CoreException e) {
-            logger.log(e);
+            logger.error(e.getMessage(), e);
         }
     }
 }

@@ -15,21 +15,21 @@ import org.eclipse.jface.text.templates.TemplateBuffer;
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateException;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
-import org.rustlang.oxide.OxideLogger;
+import org.rustlang.oxide.common.EclipseLogger;
 import org.rustlang.oxide.common.SubProgressMonitorFactory;
 
 public class TemplateFileWriter {
     private final TemplateStore templateStore;
     private final SubProgressMonitorFactory subProgressMonitorFactory;
     private final Charset charset;
-    private final OxideLogger logger;
+    private final EclipseLogger logger;
     private final TemplateContext templateContext;
 
     @Inject
     TemplateFileWriter(final TemplateStore templateStore,
             final SubProgressMonitorFactory subProgressMonitorFactory,
             final Charset charset,
-            final OxideLogger logger,
+            final EclipseLogger logger,
             @Assisted final TemplateContext templateContext) {
         this.templateStore = templateStore;
         this.subProgressMonitorFactory = subProgressMonitorFactory;
@@ -57,9 +57,9 @@ public class TemplateFileWriter {
             final byte[] bytes = buffer.getString().getBytes(charset);
             return new ByteArrayInputStream(bytes);
         } catch (final BadLocationException e) {
-            logger.log(e);
+            logger.error(e.getMessage(), e);
         } catch (final TemplateException e) {
-            logger.log(e);
+            logger.error(e.getMessage(), e);
         }
         return new ByteArrayInputStream(new byte[] {});
     }

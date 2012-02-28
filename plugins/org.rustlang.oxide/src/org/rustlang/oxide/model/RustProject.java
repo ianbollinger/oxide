@@ -17,6 +17,7 @@ import org.eclipse.sapphire.modeling.annotations.InitialValue;
 import org.eclipse.sapphire.modeling.annotations.Label;
 import org.eclipse.sapphire.modeling.annotations.LongString;
 import org.eclipse.sapphire.modeling.annotations.MustExist;
+import org.eclipse.sapphire.modeling.annotations.PossibleValues;
 import org.eclipse.sapphire.modeling.annotations.Required;
 import org.eclipse.sapphire.modeling.annotations.Service;
 import org.eclipse.sapphire.modeling.annotations.Services;
@@ -26,7 +27,6 @@ import org.eclipse.sapphire.modeling.annotations.ValidFileSystemResourceType;
 // TODO: standard formatting rules make this interface harder to maintain.
 // TODO: extract crate model?
 // TODO: fix formatting of capitalized type names.
-// TODO: add accelerators for all fields.
 @GenerateImpl
 public interface RustProject extends IModelElement {
     ModelElementType TYPE = new ModelElementType(RustProject.class);
@@ -42,7 +42,7 @@ public interface RustProject extends IModelElement {
             "UseDefaultLocation");
 
     // TODO: browse should start in workspace.
-    @Label(standard = "&location", full = "project location directory")
+    @Label(standard = "&location", full = "project &location directory")
     @Type(base = Path.class)
     @AbsolutePath
     @ValidFileSystemResourceType(FileSystemResourceType.FOLDER)
@@ -62,15 +62,14 @@ public interface RustProject extends IModelElement {
     @Enablement(expr = "false")
     ValueProperty PROP_WORKING_SETS = new ValueProperty(TYPE, "WorkingSets");
 
-    // TODO: automatically deduce name if project begins with rust prefix.
     @Services({ @Service(impl = CrateNameDefaultValueService.class),
             @Service(impl = CrateNameValidationService.class) })
-    @Label(standard = "crate name")
+    @Label(standard = "&crate name")
     @Required
     ValueProperty PROP_CRATE_NAME = new ValueProperty(TYPE, "CrateName");
 
     @Type(base = CrateType.class)
-    @Label(standard = "type")
+    @Label(standard = "t&ype", full = "crate t&ype")
     @InitialValue(text = "BINARY")
     @Required
     ValueProperty PROP_TYPE = new ValueProperty(TYPE, "Type");
@@ -88,7 +87,7 @@ public interface RustProject extends IModelElement {
     ValueProperty PROP_UUID = new ValueProperty(TYPE, "Uuid");
 
     @Type(base = URL.class)
-    @Label(standard = "URL")
+    @Label(standard = "U&RL")
     @Required
     ValueProperty PROP_URL = new ValueProperty(TYPE, "Url");
 
@@ -96,14 +95,18 @@ public interface RustProject extends IModelElement {
     @Service(impl = AuthorInitialValueService.class)
     ValueProperty PROP_AUTHOR = new ValueProperty(TYPE, "Author");
 
-    @Label(standard = "&license")
+    @Label(standard = "l&icense")
+    // TODO: get licenses from appropriate location.
+    @PossibleValues(values = {"Apache-2.0", "BSD-2-clause", "MIT", "GPL-3.0",
+            "LGPL-3.0", "OTHER"})
+    @InitialValue(text = "MIT")
     ValueProperty PROP_LICENSE = new ValueProperty(TYPE, "License");
 
-    @Label(standard = "brief", full = "brief description")
+    @Label(standard = "bri&ef", full = "bri&ef description")
     ValueProperty PROP_BRIEF = new ValueProperty(TYPE, "Brief");
 
     // TODO: fix vertical scaling.
-    @Label(standard = "long", full = "long description")
+    @Label(standard = "lo&ng", full = "lo&ng description")
     @LongString
     ValueProperty PROP_DESCRIPTION = new ValueProperty(TYPE, "Description");
 

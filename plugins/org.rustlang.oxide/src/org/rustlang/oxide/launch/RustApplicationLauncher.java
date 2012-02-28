@@ -2,11 +2,11 @@ package org.rustlang.oxide.launch;
 
 import java.io.File;
 import java.util.List;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -17,16 +17,21 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.Launch;
 import org.eclipse.debug.core.model.ILaunchConfigurationDelegate2;
 import org.eclipse.jface.util.Util;
-import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.MessageConsole;
-import org.rustlang.oxide.OxidePlugin;
-import org.rustlang.oxide.common.Collections3;
 import org.rustlang.oxide.nature.RustNature;
 
 public class RustApplicationLauncher implements ILaunchConfigurationDelegate2 {
     public static final String ID = "org.rustlang.oxide.launch.configuration";
+    private final IWorkspaceRoot workspaceRoot;
+    private final IConsoleManager consoleManager;
+
+    public RustApplicationLauncher(final IWorkspaceRoot root,
+            final IConsoleManager consoleManager) {
+        this.workspaceRoot = root;
+        this.consoleManager = consoleManager;
+    }
 
     @Override
     public boolean buildForLaunch(final ILaunchConfiguration configuration,
@@ -51,6 +56,7 @@ public class RustApplicationLauncher implements ILaunchConfigurationDelegate2 {
     @Override
     public ILaunch getLaunch(final ILaunchConfiguration configuration,
             final String mode) {
+        // TODO: make a factory.
         return new Launch(configuration, mode, null);
     }
 
@@ -71,68 +77,77 @@ public class RustApplicationLauncher implements ILaunchConfigurationDelegate2 {
         execute(configuration, launch);
     }
 
-    private IProject getProject(final String projectName) {
-        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-        final IResource resource = root.findMember(projectName);
-        try {
-            if (resource instanceof IProject) {
-                final IProject project = (IProject) resource;
-                if (project.isOpen() && project.hasNature(RustNature.ID)) {
-                    return project;
-                }
+    private IProject getProject(final String projectName) throws CoreException {
+        final IResource resource = workspaceRoot.findMember(projectName);
+        if (resource instanceof IProject) {
+            final IProject project = (IProject) resource;
+            if (isOpenRustProject(project)) {
+                return project;
             }
-        } catch (final CoreException e) {
-            OxidePlugin.getLogger().log(e);
         }
+        // TODO: let's not return null.
         return null;
+    }
+
+    private boolean isOpenRustProject(
+            final IProject project) throws CoreException {
+        return project.isOpen() && project.hasNature(RustNature.ID);
     }
 
     private void execute(final ILaunchConfiguration configuration,
             final ILaunch launch) throws CoreException {
         final String projectName = configuration.getAttribute(
                 RustLaunchAttribute.PROJECT.toString(), "");
+        final IProject project = getProject(projectName);
+        if (project == null) {
+            return;
+        }
         final String executable = configuration.getAttribute(
                 RustLaunchAttribute.EXECUTABLE.toString(), "");
         final String programArguments = configuration.getAttribute(
                 RustLaunchAttribute.ARGUMENTS.toString(), "");
-        final IProject project = getProject(projectName);
-        if (project != null) {
-            final IPath relativeExecutablePath = Path.fromOSString(executable);
-            final IPath projectPath = project.getLocation();
-            final String executableName = relativeExecutablePath.lastSegment();
-            IPath executablePath;
-            if (Util.isWindows()) {
-                executablePath = Path.fromOSString(executableName);
-            } else {
-                executablePath = Path.fromOSString(".").append(executableName);
-            }
-            final String commandLine = projectPath.append(executablePath)
-                    .toOSString();
-            final String workingDirectory = projectPath.toOSString();
-            final List<String> arguments = Lists.newArrayList();
-            arguments.add(commandLine);
-            final List<String> argumentsList =
-                    argumentsAsList(programArguments);
-            if (argumentsList != null) {
-                arguments.addAll(argumentsList);
-            }
-            final Process process = DebugPlugin.exec(Collections3.toArray(
-                    arguments, String.class), new File(workingDirectory));
-            DebugPlugin.newProcess(launch, process, executableName);
-        }
+        final IPath relativeExecutablePath = Path.fromOSString(executable);
+        final IPath projectPath = project.getLocation();
+        final String executableName = relativeExecutablePath.lastSegment();
+        final IPath executablePath = getExecutablePath(executableName);
+        final File workingDirectory = new File(projectPath.toOSString());
+        final String commandLine = projectPath.append(executablePath)
+                .toOSString();
+        final List<String> arguments = Lists.newArrayList();
+        arguments.add(commandLine);
+        arguments.addAll(argumentsAsList(programArguments));
+        final String[] array = Iterables.toArray(arguments,
+                String.class);
+        spawnProcess(launch, executableName, workingDirectory, array);
+    }
+
+    // TODO: create a strategy for this.
+    void spawnProcess(final ILaunch launch, final String executableName,
+            final File workingDirectory,
+            final String[] array) throws CoreException {
+        final Process process = DebugPlugin.exec(array, workingDirectory);
+        DebugPlugin.newProcess(launch, process, executableName);
+    }
+
+    private IPath getExecutablePath(final String executableName) {
+        return Util.isWindows()
+                ? Path.fromOSString(executableName)
+                : Path.fromOSString(".").append(executableName);
     }
 
     public MessageConsole findMessageConsole(final String name) {
-        final ConsolePlugin plugin = ConsolePlugin.getDefault();
-        final IConsoleManager manager = plugin.getConsoleManager();
-        final IConsole[] existing = manager.getConsoles();
-        for (final IConsole element : existing) {
+        for (final IConsole element : consoleManager.getConsoles()) {
             if (name.equals(element.getName())) {
                 return (MessageConsole) element;
             }
         }
+        return createMessageConsole(name);
+    }
+
+    private MessageConsole createMessageConsole(final String name) {
+        // TODO: use factory.
         final MessageConsole console = new MessageConsole(name, null);
-        manager.addConsoles(new IConsole[] { console });
+        consoleManager.addConsoles(new IConsole[] { console });
         return console;
     }
 
@@ -144,12 +159,12 @@ public class RustApplicationLauncher implements ILaunchConfigurationDelegate2 {
         }
         boolean inQuote = false;
         boolean escape = false;
-        final StringBuilder arg = new StringBuilder();
-        int i = 0;
-        while (i < arguments.length()) {
-            final char c = arguments.charAt(i++);
+        final StringBuilder argument = new StringBuilder();
+        // TODO: this does not handle characters outside the BMP.
+        for (int i = 0; i < arguments.length(); ++i) {
+            final char c = arguments.charAt(i);
             if (escape) {
-                arg.append(c);
+                argument.append(c);
                 escape = false;
                 continue;
             }
@@ -158,27 +173,23 @@ public class RustApplicationLauncher implements ILaunchConfigurationDelegate2 {
                 continue;
             }
             if (inQuote) {
-                arg.append(c);
+                argument.append(c);
                 if (c == '"') {
                     inQuote = false;
                 }
-            } else {
-                if (c == '"') {
-                    inQuote = true;
-                    arg.append(c);
-                } else {
-                    if (Character.isSpaceChar(c)) {
-                        if (arg.length() > 0) {
-                            argumentsList.add(arg.toString());
-                            arg.delete(0, arg.length());
-                        }
-                    } else {
-                        arg.append(c);
-                    }
+            } else if (c == '"') {
+                inQuote = true;
+                argument.append(c);
+            } else if (Character.isSpaceChar(c)) {
+                if (argument.length() > 0) {
+                    argumentsList.add(argument.toString());
+                    argument.delete(0, argument.length());
                 }
+            } else {
+                argument.append(c);
             }
         }
-        argumentsList.add(arg.toString());
-        return argumentsList.isEmpty() ? null : argumentsList;
+        argumentsList.add(argument.toString());
+        return argumentsList;
     }
 }
