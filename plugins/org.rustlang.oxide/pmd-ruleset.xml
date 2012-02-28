@@ -101,7 +101,12 @@
     <exclude name="JUnitTestsShouldIncludeAssert"/>
 
   </rule>
-  <rule ref="rulesets/logging-java.xml"/>
+
+  <rule ref="rulesets/logging-java.xml">
+    <!-- Rationale: Loggers should be dependency injected like everything
+         else. -->
+    <exclude name="LoggerIsNotStaticFinal"/>
+  </rule>
 
   <!-- Rationale: this ruleset isn't supported yet. -->
   <!-- <rule ref="rulesets/maven.xml"/>  -->
