@@ -31,6 +31,7 @@
             <manifestLocation>${bundlePath}/META-INF</manifestLocation>
             <instructions>
               <Bundle-Version>0.0.1.qualifier</Bundle-Version>
+              <Bundle-RequiredExecutionEnvironment>JavaSE-1.6</Bundle-RequiredExecutionEnvironment>
               <Embed-Dependency>*;inline=true</Embed-Dependency>
               <Bundle-License></Bundle-License>
               <Embed-Transitive>true</Embed-Transitive>
