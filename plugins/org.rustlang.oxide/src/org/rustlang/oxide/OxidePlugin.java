@@ -5,6 +5,7 @@ import com.google.inject.Injector;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+import org.rustlang.oxide.common.CommonModule;
 import org.rustlang.oxide.common.EnumPreferenceStore;
 import org.slf4j.Logger;
 
@@ -17,7 +18,7 @@ public class OxidePlugin extends AbstractUIPlugin {
     @Override
     public void start(final BundleContext context) throws Exception {
         super.start(context);
-        injector = Guice.createInjector(new OxideModule());
+        injector = Guice.createInjector(new OxideModule(), new CommonModule());
         plugin = this;
     }
 
