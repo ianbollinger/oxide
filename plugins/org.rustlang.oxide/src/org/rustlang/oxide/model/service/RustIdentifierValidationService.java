@@ -1,4 +1,4 @@
-package org.rustlang.oxide.model;
+package org.rustlang.oxide.model.service;
 
 import com.google.common.base.Strings;
 import org.eclipse.sapphire.modeling.IModelElement;
@@ -8,7 +8,7 @@ import org.eclipse.sapphire.modeling.ValueProperty;
 import org.eclipse.sapphire.services.ValidationService;
 import org.rustlang.oxide.text.LexicalUtil;
 
-public class CrateNameValidationService extends ValidationService {
+public class RustIdentifierValidationService extends ValidationService {
     @Override
     public Status validate() {
         final Value<?> value = context(IModelElement.class).read(
@@ -17,6 +17,7 @@ public class CrateNameValidationService extends ValidationService {
         if (LexicalUtil.isRustIdentifier(string)) {
             return Status.createOkStatus();
         }
-        return Status.createErrorStatus(string + " is not a valid crate name.");
+        return Status.createErrorStatus(
+                string + " is not a valid rust identifier.");
     }
 }

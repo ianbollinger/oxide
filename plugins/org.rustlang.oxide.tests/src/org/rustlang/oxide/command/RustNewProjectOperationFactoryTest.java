@@ -1,4 +1,4 @@
-package org.rustlang.oxide.model;
+package org.rustlang.oxide.command;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
@@ -17,6 +17,10 @@ import org.jukito.TestScope;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.rustlang.oxide.command.RustNewProjectOperation;
+import org.rustlang.oxide.command.RustNewProjectOperationFactory;
+import org.rustlang.oxide.command.RustNewProjectOperationInnerFactory;
+import org.rustlang.oxide.model.RustProject;
 import org.rustlang.oxide.templates.SapphireTemplateContextFactory;
 import org.rustlang.oxide.templates.TemplateFileWriter;
 

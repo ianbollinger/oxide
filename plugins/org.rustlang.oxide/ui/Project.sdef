@@ -71,7 +71,22 @@
       </content>
       <scale-vertically>true</scale-vertically>
     </page>
-        <image>icons/rust-logo-64x64.png</image>
+    <image>icons/rust-logo-64x64.png</image>
   </wizard>
+  <composite>
+    <id>defaults</id>
+    <content>
+      <with>
+        <path>Project</path>
+        <default-panel>
+          <content>
+            <property-editor>Author</property-editor>
+            <property-editor>Url</property-editor>
+            <property-editor>License</property-editor>
+          </content>
+        </default-panel>
+      </with>
+    </content>
+  </composite>
 
 </definition>

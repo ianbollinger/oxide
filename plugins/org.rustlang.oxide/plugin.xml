@@ -8,7 +8,8 @@
   <extension point="org.rustlang.oxide.modules">
     <module class="org.rustlang.oxide.common.CommonModule"/>
     <module class="org.rustlang.oxide.templates.RustTemplateModule"/>
-    <module class="org.rustlang.oxide.wizards.RustWizardModule"/>
+    <module class="org.rustlang.oxide.command.RustCommandModule"/>
+    <module class="org.rustlang.oxide.model.RustModelModule"/>
     <module class="org.rustlang.oxide.OxideModule"/>
   </extension>
 
@@ -24,8 +25,9 @@
           targetID="org.rustlang.oxide.perspective.RustPerspective">
       <actionSet id="org.eclipse.debug.ui.launchActionSet"/>
       <newWizardShortcut id="org.rustlang.oxide.wizards.RustProjectWizard"/>
+      <newWizardShortcut id="org.rustlang.oxide.wizards.RustFileWizard"/>
       <newWizardShortcut id="org.eclipse.ui.wizards.new.folder"/>
-      <perspectiveShortcut id="org.eclipse.ui.wizards.new.file"/>
+      <newWizardShortcut id="org.eclipse.ui.wizards.new.file"/>
       <newWizardShortcut
           id="org.eclipse.ui.editors.wizards.UntitledTextFileWizard"/>
       <viewShortcut id="org.eclipse.search.ui.views.SearchView"/>
@@ -86,12 +88,28 @@
         project="true">
       <description>Create a new Rust project</description>
     </wizard>
+    <wizard id="org.rustlang.oxide.wizards.RustFileWizard"
+        class="org.rustlang.oxide.common.GuiceExtensionFactory"
+        canFinishEarly="false"
+        category="org.rustlang.eclipse.RustCategory"
+        finalPerspective="org.rustlang.oxide.perspective.RustPerspective"
+        hasPages="true"
+        icon="icons/rust-logo-16x16.png"
+        name="Rust Source File"
+        preferredPerspectives="org.rustlang.oxide.perspective.RustPerspective"
+        project="false">
+      <description>Create a new Rust source file</description>
+    </wizard>
   </extension>
 
   <extension point="org.eclipse.ui.preferencePages">
     <page id="org.rustlang.oxide.preferences.RustPreferencePage"
         class="org.rustlang.oxide.common.GuiceExtensionFactory"
         name="Rust"/>
+    <page id="org.rustlang.oxide.preferences.RustCompilerPreferencePage"
+        class="org.rustlang.oxide.common.GuiceExtensionFactory"
+        category="org.rustlang.oxide.preferences.RustPreferencePage"
+        name="Compiler"/>
     <page id="org.rustlang.oxide.preferences.RustProjectDefaultsPreferencePage"
         class="org.rustlang.oxide.common.GuiceExtensionFactory"
         category="org.rustlang.oxide.preferences.RustPreferencePage"

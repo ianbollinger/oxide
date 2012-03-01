@@ -9,7 +9,9 @@ import org.eclipse.sapphire.modeling.annotations.DelegateImplementation;
 import org.eclipse.sapphire.modeling.annotations.GenerateImpl;
 import org.eclipse.sapphire.modeling.annotations.Label;
 import org.eclipse.sapphire.modeling.annotations.Type;
+import org.rustlang.oxide.command.RustNewProjectOperation;
 
+// TODO: eliminate
 @GenerateImpl
 public interface RustProjectOperationModel extends IExecutableModelElement {
     ModelElementType TYPE = new ModelElementType(

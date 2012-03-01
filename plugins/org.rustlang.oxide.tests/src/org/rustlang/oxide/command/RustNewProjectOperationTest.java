@@ -1,4 +1,4 @@
-package org.rustlang.oxide.model;
+package org.rustlang.oxide.command;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
@@ -18,9 +18,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
+import org.rustlang.oxide.command.RustNewProjectOperation;
+import org.rustlang.oxide.common.PerspectiveUpdater;
 import org.rustlang.oxide.nature.RustNature;
 import org.rustlang.oxide.templates.TemplateFileWriter;
-import org.rustlang.oxide.wizards.PerspectiveUpdater;
 
 // TODO: verify file creation.
 // TODO: cover error branches.

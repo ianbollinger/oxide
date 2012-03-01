@@ -1,4 +1,4 @@
-package org.rustlang.oxide.model;
+package org.rustlang.oxide.model.service;
 
 import com.google.common.base.Strings;
 import org.eclipse.sapphire.modeling.IModelElement;
@@ -7,6 +7,7 @@ import org.eclipse.sapphire.modeling.ModelPropertyListener;
 import org.eclipse.sapphire.modeling.Value;
 import org.eclipse.sapphire.services.DefaultValueService;
 import org.eclipse.sapphire.services.DefaultValueServiceData;
+import org.rustlang.oxide.model.RustProject;
 
 public class CrateNameDefaultValueService extends DefaultValueService {
     @Override

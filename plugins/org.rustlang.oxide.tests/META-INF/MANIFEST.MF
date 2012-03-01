@@ -6,6 +6,4 @@ Bundle-Version: 0.0.1.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Fragment-Host: org.rustlang.oxide
 Require-Bundle: org.junit4,
- org.rustlang.oxide.thirdpartytest,
- org.eclipse.sapphire.osgi,
- org.eclipse.sapphire.modeling.xml
+ org.rustlang.oxide.thirdpartytest

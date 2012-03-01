@@ -23,6 +23,10 @@ import org.eclipse.sapphire.modeling.annotations.Service;
 import org.eclipse.sapphire.modeling.annotations.Services;
 import org.eclipse.sapphire.modeling.annotations.Type;
 import org.eclipse.sapphire.modeling.annotations.ValidFileSystemResourceType;
+import org.rustlang.oxide.model.service.AuthorInitialValueService;
+import org.rustlang.oxide.model.service.CrateNameDefaultValueService;
+import org.rustlang.oxide.model.service.RustIdentifierValidationService;
+import org.rustlang.oxide.model.service.UuidInitialValueService;
 
 // TODO: standard formatting rules make this interface harder to maintain.
 // TODO: extract crate model?
@@ -63,7 +67,7 @@ public interface RustProject extends IModelElement {
     ValueProperty PROP_WORKING_SETS = new ValueProperty(TYPE, "WorkingSets");
 
     @Services({ @Service(impl = CrateNameDefaultValueService.class),
-            @Service(impl = CrateNameValidationService.class) })
+            @Service(impl = RustIdentifierValidationService.class) })
     @Label(standard = "&crate name")
     @Required
     ValueProperty PROP_CRATE_NAME = new ValueProperty(TYPE, "CrateName");

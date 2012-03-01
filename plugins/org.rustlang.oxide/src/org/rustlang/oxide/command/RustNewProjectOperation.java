@@ -1,4 +1,4 @@
-package org.rustlang.oxide.model;
+package org.rustlang.oxide.command;
 
 import java.lang.reflect.InvocationTargetException;
 import com.google.common.collect.ObjectArrays;
@@ -17,10 +17,11 @@ import org.eclipse.sapphire.modeling.ProgressMonitor;
 import org.eclipse.sapphire.modeling.Status;
 import org.eclipse.sapphire.platform.ProgressMonitorBridge;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
+import org.rustlang.oxide.common.PerspectiveUpdater;
 import org.rustlang.oxide.common.SubProgressMonitorFactory;
+import org.rustlang.oxide.model.RustProjectOperationModel;
 import org.rustlang.oxide.nature.RustNature;
 import org.rustlang.oxide.templates.TemplateFileWriter;
-import org.rustlang.oxide.wizards.PerspectiveUpdater;
 import org.slf4j.Logger;
 
 public class RustNewProjectOperation extends WorkspaceModifyOperation {

@@ -1,4 +1,4 @@
-package org.rustlang.oxide.wizards;
+package org.rustlang.oxide.common;
 
 import com.google.inject.Inject;
 import org.eclipse.core.runtime.IConfigurationElement;

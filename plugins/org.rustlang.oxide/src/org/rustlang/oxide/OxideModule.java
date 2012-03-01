@@ -2,40 +2,17 @@ package org.rustlang.oxide;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
-import com.google.inject.Singleton;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.ILog;
-import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.core.runtime.Plugin;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 public class OxideModule extends AbstractModule {
     @Override
     protected void configure() {
+        bind(Plugin.class).to(AbstractUIPlugin.class);
     }
 
     @Provides
-    IPreferenceStore providePreferenceStore(final OxidePlugin plugin) {
-        return plugin.getPreferenceStore();
-    }
-
-    @Provides @Singleton
-    ILog provideLog(final OxidePlugin plugin) {
-        return plugin.getLog();
-    }
-
-    @Provides
-    IWorkspace provideWorkspace() {
-        return ResourcesPlugin.getWorkspace();
-    }
-
-    @Provides
-    IWorkspaceRoot provideWorkspaceRoot(final IWorkspace workspace) {
-        return workspace.getRoot();
-    }
-
-    @Provides
-    OxidePlugin providePlugin() {
+    AbstractUIPlugin providePlugin() {
         return OxidePlugin.getDefault();
     }
 }

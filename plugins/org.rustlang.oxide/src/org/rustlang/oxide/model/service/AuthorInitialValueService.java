@@ -1,4 +1,4 @@
-package org.rustlang.oxide.model;
+package org.rustlang.oxide.model.service;
 
 import org.eclipse.sapphire.services.InitialValueService;
 import org.eclipse.sapphire.services.InitialValueServiceData;

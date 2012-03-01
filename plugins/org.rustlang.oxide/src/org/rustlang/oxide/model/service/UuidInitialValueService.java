@@ -1,4 +1,4 @@
-package org.rustlang.oxide.model;
+package org.rustlang.oxide.model.service;
 
 import java.util.UUID;
 import org.eclipse.sapphire.services.InitialValueService;

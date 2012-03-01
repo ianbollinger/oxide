@@ -5,7 +5,7 @@ public final class LexicalUtil {
     }
 
     public static boolean isRustIdentifier(final String string) {
-        if (!isRustIdentifierStart(string.charAt(0))) {
+        if (string.isEmpty() || !isRustIdentifierStart(string.charAt(0))) {
             return false;
         }
         for (int i = 1; i < string.length(); ++i) {

@@ -1,4 +1,4 @@
-package org.rustlang.oxide.model;
+package org.rustlang.oxide.command;
 
 import com.google.inject.Inject;
 import org.eclipse.core.resources.IProject;
@@ -7,6 +7,7 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.jface.text.templates.TemplateContext;
+import org.rustlang.oxide.model.RustProject;
 import org.rustlang.oxide.templates.SapphireTemplateContextFactory;
 import org.rustlang.oxide.templates.TemplateFileWriter;
 import org.rustlang.oxide.templates.TemplateFileWriterFactory;
