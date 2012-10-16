@@ -1,1 +1,1 @@
-target.pmd.pmdruleset.settings
+/build/bin/target//plugins/org.rustlang.oxide.thirdparty/!/plugins/org.rustlang.oxide.thirdparty/pom.xml/plugins/org.rustlang.oxide.thirdpartytest/!/plugins/org.rustlang.oxide.thirdpartytest/pom.xml*.apt_generated*.pmd*.pmdruleset*.settings
