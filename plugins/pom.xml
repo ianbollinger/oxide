@@ -19,6 +19,7 @@
   <modules>
     <module>org.rustlang.oxide.thirdparty</module>
     <module>org.rustlang.oxide</module>
+    <module>../assembly</module>
     <!-- TODO: Re-enable tests when I figure out how to get tycho-surefire to
          set up the class path correctly. -->
     <!-- <module>org.rustlang.oxide.thirdpartytest</module> -->
@@ -189,6 +190,25 @@
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-surefire-plugin</artifactId>
         <version>${tycho-version}</version>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>build-thirdparty-bundles</id>
+            <phase>none</phase>
+          </execution>
+          <execution>
+            <id>build-oxide</id>
+            <phase>none</phase>
+          </execution>
+          <execution>
+            <id>build-assembly</id>
+            <phase>none</phase>
+          </execution>
+        </executions>
       </plugin>
 
     </plugins>

@@ -10,6 +10,7 @@
   </parent>
   <artifactId>thirdparty</artifactId>
   <packaging>bundle</packaging>
+  <name>Oxide third-party bundle (run-time)</name>
 
   <dependencies>
     <dependency>
@@ -40,6 +41,8 @@
   </dependencies>
 
   <build>
+    <defaultGoal>install</defaultGoal>
+
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>

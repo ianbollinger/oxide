@@ -10,6 +10,7 @@
   </parent>
   <artifactId>thirdpartytest</artifactId>
   <packaging>bundle</packaging>
+  <name>Oxide third-party bundle (test-only)</name>
 
   <dependencies>
     <dependency>
