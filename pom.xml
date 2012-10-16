@@ -18,11 +18,13 @@
     <maven>3.0</maven>
   </prerequisites>
 
+  <!--
   <modules>
     <module>thirdparty</module>
     <module>plugins</module>
     <module>assembly</module>
   </modules>
+  -->
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -70,8 +72,47 @@
           <artifactId>maven-resources-plugin</artifactId>
           <version>2.6</version>
         </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>1.2.1</version>
+        </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>build-thirdparty-bundles</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <workingDirectory>thirdparty</workingDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>build-oxide</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <workingDirectory>plugins</workingDirectory>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <executable>mvn</executable>
+          <arguments>
+            <argument>install</argument>
+          </arguments>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
 </project>
 

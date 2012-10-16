@@ -10,12 +10,17 @@
   </parent>
   <artifactId>thirdparty-parent</artifactId>
   <packaging>pom</packaging>
-  <name>Oxide third-party packages</name>
-  <description>Third-party packages for Oxide.</description>
+  <name>Oxide third-party bundles</name>
+  <description>Third-party OSGI bundles for Oxide.</description>
 
   <properties>
     <bundlePath>${basedir}/../../plugins/org.rustlang.oxide.${project.name}</bundlePath>
   </properties>
+
+  <modules>
+    <module>main</module>
+    <module>test</module>
+  </modules>
 
   <build>
     <defaultGoal>install</defaultGoal>
@@ -105,6 +110,22 @@
         </executions>
       </plugin>
 
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>build-thirdparty-bundles</id>
+            <phase>none</phase>
+          </execution>
+          <execution>
+            <id>build-oxide</id>
+            <phase>none</phase>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
 </project>
+

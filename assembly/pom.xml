@@ -5,11 +5,12 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.rustlang.oxide</groupId>
-    <artifactId>parent</artifactId>
+    <artifactId>plugins</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
   <artifactId>assembly</artifactId>
   <packaging>pom</packaging>
+  <name>Oxide assembly</name>
 
   <dependencies>
     <dependency>
@@ -22,6 +23,7 @@
   <build>
     <defaultGoal>package</defaultGoal>
     <plugins>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
@@ -44,6 +46,7 @@
           </execution>
         </executions>
       </plugin>
+
     </plugins>
   </build>
 </project>
