@@ -24,4 +24,3 @@ Require-Bundle: org.rustlang.oxide.thirdparty,
  com.google.guava
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Import-Package: com.google.inject
