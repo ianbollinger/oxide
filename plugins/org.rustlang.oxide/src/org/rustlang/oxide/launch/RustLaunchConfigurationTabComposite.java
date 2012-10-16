@@ -1,6 +1,29 @@
+/*
+ * Copyright 2012 Ian D. Bollinger
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package org.rustlang.oxide.launch;
 
 import java.util.List;
+import javax.annotation.Nullable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.eclipse.core.resources.IProject;
@@ -76,7 +99,8 @@ public class RustLaunchConfigurationTabComposite extends Composite {
         text.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(
-                    @SuppressWarnings("unused") final ModifyEvent event) {
+                    @SuppressWarnings("unused") @Nullable
+                    final ModifyEvent event) {
                 updateState();
             }
         });
@@ -88,7 +112,8 @@ public class RustLaunchConfigurationTabComposite extends Composite {
         text.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(
-                    @SuppressWarnings("unused") final ModifyEvent event) {
+                    @SuppressWarnings("unused") @Nullable
+                    final ModifyEvent event) {
                 updateState();
             }
         });
@@ -101,7 +126,8 @@ public class RustLaunchConfigurationTabComposite extends Composite {
         button.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(
-                    @SuppressWarnings("unused") final SelectionEvent event) {
+                    @SuppressWarnings("unused") @Nullable
+                    final SelectionEvent event) {
                 // TODO: browse for the executable.
             }
         });
@@ -114,7 +140,8 @@ public class RustLaunchConfigurationTabComposite extends Composite {
         button.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(
-                    @SuppressWarnings("unused") final SelectionEvent event) {
+                    @SuppressWarnings("unused") @Nullable
+                    final SelectionEvent event) {
                 try {
                     final IProject[] projects = ResourcesPlugin.getWorkspace()
                             .getRoot().getProjects();
@@ -157,7 +184,8 @@ public class RustLaunchConfigurationTabComposite extends Composite {
         text.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(
-                    @SuppressWarnings("unused") final ModifyEvent event) {
+                    @SuppressWarnings("unused") @Nullable
+                    final ModifyEvent event) {
                 updateState();
             }
         });
@@ -166,6 +194,7 @@ public class RustLaunchConfigurationTabComposite extends Composite {
 
     // domain logic -----------------------------------------------------------
 
+    @SuppressWarnings("null")
     public Text getProjectField() {
         return projectField;
     }
@@ -175,7 +204,9 @@ public class RustLaunchConfigurationTabComposite extends Composite {
     }
 
     public String getProject() {
-        return projectField.getText();
+        final String text = projectField.getText();
+        assert text != null;
+        return text;
     }
 
     public void setExecutable(final String file) {
@@ -183,7 +214,9 @@ public class RustLaunchConfigurationTabComposite extends Composite {
     }
 
     public String getExecutable() {
-        return executableField.getText();
+        final String text = executableField.getText();
+        assert text != null;
+        return text;
     }
 
     public void setProgramArguments(final String args) {
@@ -192,8 +225,9 @@ public class RustLaunchConfigurationTabComposite extends Composite {
 
     public String getProgramArguments() {
         final String result = programArgumentsTextArea.getText().replace("\n",
-                " ");
-        return result.replace("\r", " ");
+                " ").replace("\r", " ");
+        assert result != null;
+        return result;
     }
 
     final void updateState() {

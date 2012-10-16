@@ -1,7 +1,31 @@
+/*
+ * Copyright 2012 Ian D. Bollinger
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package org.rustlang.oxide.launch;
 
 import java.io.File;
 import java.util.List;
+import javax.annotation.Nullable;
+import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.eclipse.core.resources.IProject;
@@ -34,9 +58,10 @@ public class RustApplicationLauncher implements ILaunchConfigurationDelegate2 {
     }
 
     @Override
-    public boolean buildForLaunch(final ILaunchConfiguration configuration,
-            @SuppressWarnings("unused") final String mode,
-            @SuppressWarnings("unused")
+    public boolean buildForLaunch(
+            @SuppressWarnings("null") final ILaunchConfiguration configuration,
+            @SuppressWarnings("unused") @Nullable final String mode,
+            @SuppressWarnings("unused") @Nullable
             final IProgressMonitor monitor) throws CoreException {
         final String project = configuration.getAttribute(
                 RustLaunchAttribute.PROJECT.toString(), "");
@@ -47,46 +72,52 @@ public class RustApplicationLauncher implements ILaunchConfigurationDelegate2 {
 
     @Override
     public boolean finalLaunchCheck(
-            @SuppressWarnings("unused") final ILaunchConfiguration config,
-            @SuppressWarnings("unused") final String mode,
-            @SuppressWarnings("unused") final IProgressMonitor monitor) {
+            @SuppressWarnings("unused") @Nullable
+            final ILaunchConfiguration config,
+            @SuppressWarnings("unused") @Nullable final String mode,
+            @SuppressWarnings("unused") @Nullable
+            final IProgressMonitor monitor) {
         return true;
     }
 
     @Override
-    public ILaunch getLaunch(final ILaunchConfiguration configuration,
-            final String mode) {
+    public ILaunch getLaunch(
+            @SuppressWarnings("null") final ILaunchConfiguration configuration,
+            @SuppressWarnings("null") final String mode) {
         // TODO: make a factory.
         return new Launch(configuration, mode, null);
     }
 
     @Override
     public boolean preLaunchCheck(
-            @SuppressWarnings("unused")
+            @SuppressWarnings("unused") @Nullable
             final ILaunchConfiguration configuration,
-            @SuppressWarnings("unused") final String mode,
-            @SuppressWarnings("unused") final IProgressMonitor monitor) {
+            @SuppressWarnings("unused") @Nullable final String mode,
+            @SuppressWarnings("unused") @Nullable
+            final IProgressMonitor monitor) {
         return true;
     }
 
     @Override
-    public void launch(final ILaunchConfiguration configuration,
-            @SuppressWarnings("unused") final String mode, final ILaunch launch,
-            @SuppressWarnings("unused")
+    public void launch(
+            @SuppressWarnings("null") final ILaunchConfiguration configuration,
+            @SuppressWarnings("unused") @Nullable final String mode,
+            @SuppressWarnings("null") final ILaunch launch,
+            @SuppressWarnings("unused") @Nullable
             final IProgressMonitor monitor) throws CoreException {
         execute(configuration, launch);
     }
 
-    private IProject getProject(final String projectName) throws CoreException {
+    private Optional<IProject> getProject(
+            final String projectName) throws CoreException {
         final IResource resource = workspaceRoot.findMember(projectName);
         if (resource instanceof IProject) {
             final IProject project = (IProject) resource;
             if (isOpenRustProject(project)) {
-                return project;
+                return Optional.of(project);
             }
         }
-        // TODO: let's not return null.
-        return null;
+        return Optional.absent();
     }
 
     private boolean isOpenRustProject(
@@ -98,10 +129,12 @@ public class RustApplicationLauncher implements ILaunchConfigurationDelegate2 {
             final ILaunch launch) throws CoreException {
         final String projectName = configuration.getAttribute(
                 RustLaunchAttribute.PROJECT.toString(), "");
-        final IProject project = getProject(projectName);
-        if (project == null) {
+        assert projectName != null;
+        final Optional<IProject> possibleProject = getProject(projectName);
+        if (!possibleProject.isPresent()) {
             return;
         }
+        final IProject project = possibleProject.get();
         final String executable = configuration.getAttribute(
                 RustLaunchAttribute.EXECUTABLE.toString(), "");
         final String programArguments = configuration.getAttribute(
@@ -109,6 +142,7 @@ public class RustApplicationLauncher implements ILaunchConfigurationDelegate2 {
         final IPath relativeExecutablePath = Path.fromOSString(executable);
         final IPath projectPath = project.getLocation();
         final String executableName = relativeExecutablePath.lastSegment();
+        assert executableName != null;
         final IPath executablePath = getExecutablePath(executableName);
         final File workingDirectory = new File(projectPath.toOSString());
         final String commandLine = projectPath.append(executablePath)
@@ -130,9 +164,11 @@ public class RustApplicationLauncher implements ILaunchConfigurationDelegate2 {
     }
 
     private IPath getExecutablePath(final String executableName) {
-        return Util.isWindows()
+        final IPath path = Util.isWindows()
                 ? Path.fromOSString(executableName)
                 : Path.fromOSString(".").append(executableName);
+        assert path != null;
+        return path;
     }
 
     public MessageConsole findMessageConsole(final String name) {
@@ -152,7 +188,7 @@ public class RustApplicationLauncher implements ILaunchConfigurationDelegate2 {
     }
 
     // TODO: move this somewhere appropriate.
-    private List<String> argumentsAsList(final String arguments) {
+    private List<String> argumentsAsList(@Nullable final String arguments) {
         final List<String> argumentsList = Lists.newArrayList();
         if (arguments == null || arguments.trim().isEmpty()) {
             return argumentsList;

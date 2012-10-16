@@ -1,3 +1,25 @@
+/*
+ * Copyright 2012 Ian D. Bollinger
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package org.rustlang.oxide.command;
 
 import java.lang.reflect.InvocationTargetException;
@@ -59,7 +81,9 @@ public class RustNewProjectOperation extends WorkspaceModifyOperation {
     public static final Status execute(
             @SuppressWarnings("unused") final RustProjectOperationModel context,
             @SuppressWarnings("unused") final ProgressMonitor monitor) {
-        return Status.createOkStatus();
+        final Status status = Status.createOkStatus();
+        assert status != null;
+        return status;
     }
 
     public void run(final ProgressMonitor monitor) {
@@ -74,22 +98,27 @@ public class RustNewProjectOperation extends WorkspaceModifyOperation {
 
     @Override
     protected void execute(
+            @SuppressWarnings("null")
             final IProgressMonitor monitor) throws CoreException {
         try {
             monitor.beginTask("Creating Rust project",
                     subProgressMonitorFactory.getWorkScale() * NUMBER_OF_TASKS);
             configureDescription();
             createAndOpenProject(monitor);
-            createFiles(description.getName(), monitor);
-            perspectiveUpdater.update(configuration);
+            final String name = description.getName();
+            assert name != null;
+            createFiles(name, monitor);
+            perspectiveUpdater.update(getConfiguration());
         } finally {
             monitor.done();
         }
     }
 
     private void configureDescription() {
-        final String[] newNatureIds = ObjectArrays.concat(
-                description.getNatureIds(), RustNature.ID);
+        final String[] natureIds = description.getNatureIds();
+        assert natureIds != null;
+        final String[] newNatureIds = ObjectArrays.concat(natureIds,
+                RustNature.ID);
         description.setNatureIds(newNatureIds);
     }
 
@@ -123,6 +152,12 @@ public class RustNewProjectOperation extends WorkspaceModifyOperation {
     private void createFile(final String fileName, final String templateName,
             final IProgressMonitor monitor) throws CoreException {
         final IFile file = project.getFile(fileName);
+        assert file != null;
         fileWriter.createFile(file, templateName, monitor);
+    }
+
+    @SuppressWarnings("null")
+    IConfigurationElement getConfiguration() {
+        return configuration;
     }
 }

@@ -100,7 +100,7 @@ public class RustNewProjectOperationTest {
         private <T> void bindAnnotatedMock(final Class<T> clazz) {
             bind(clazz)
                     .annotatedWith(Assisted.class)
-                    .toProvider(new MockProvider<T>(clazz))
+                    .toProvider(new MockProvider<>(clazz))
                     .in(TestScope.SINGLETON);
         }
     }

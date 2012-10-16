@@ -1,3 +1,25 @@
+/*
+ * Copyright 2012 Ian D. Bollinger
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package org.rustlang.oxide.builder;
 
 import java.io.File;
@@ -9,6 +31,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.annotation.Nullable;
+
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
@@ -41,8 +66,11 @@ public class RustBuilder extends IncrementalProjectBuilder {
     }
 
     @Override
+    @Nullable
     protected IProject[] build(final int kind,
-            @SuppressWarnings("unused") final Map<String, String> args,
+            @SuppressWarnings("unused") @Nullable
+            final Map<String, String> args,
+            @SuppressWarnings("null")
             final IProgressMonitor monitor) throws CoreException {
         if (kind == IncrementalProjectBuilder.CLEAN_BUILD) {
             cleanBuild(monitor);
@@ -61,13 +89,17 @@ public class RustBuilder extends IncrementalProjectBuilder {
         project.deleteMarkers(IMarker.PROBLEM, includeSubtypes,
                 IResource.DEPTH_INFINITE);
         final IResource crateFile = project.getFile(project.getName() + ".rc");
-        rustc(crateFile, project.getProject().getLocation().toFile());
+        final File file = project.getProject().getLocation().toFile();
+        assert crateFile != null && file != null;
+        rustc(crateFile, file);
+        // Returning null is part of this method's contract, unfortunately.
         return null;
     }
 
     private void rustc(final IResource resource,
             final File workingDirectory) throws CoreException {
         final String file = resource.getProjectRelativePath().toOSString();
+        assert file != null;
         // TODO: --warn-unused-imports
         final String compilerPath = preferenceStore
                 .getString(RustPreferenceKey.COMPILER_PATH);
@@ -79,6 +111,7 @@ public class RustBuilder extends IncrementalProjectBuilder {
         builder.add(compilerPath);
         // TODO: .add("--no-trans");
         for (final String libraryPath : libraryPathList) {
+            assert libraryPath != null;
             builder.add("-L").add(libraryPath);
         }
         builder.add(file);
@@ -112,6 +145,7 @@ public class RustBuilder extends IncrementalProjectBuilder {
             // final int lineEnd = Integer.parseInt(m.group(4));
             // final int columnEnd = Integer.parseInt(m.group(5));
             final String message = m.group(6);
+            assert resource != null && message != null;
             reportError(resource, lineStart, message);
         }
     }

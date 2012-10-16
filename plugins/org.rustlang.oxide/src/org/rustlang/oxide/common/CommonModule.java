@@ -1,3 +1,25 @@
+/*
+ * Copyright 2012 Ian D. Bollinger
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package org.rustlang.oxide.common;
 
 import java.nio.charset.Charset;
@@ -32,26 +54,36 @@ public class CommonModule extends AbstractModule {
 
     @Provides
     IWorkspace provideWorkspace() {
-        return ResourcesPlugin.getWorkspace();
+        final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        assert workspace != null;
+        return workspace;
     }
 
     @Provides
     IWorkspaceRoot provideWorkspaceRoot(final IWorkspace workspace) {
-        return workspace.getRoot();
+        final IWorkspaceRoot root = workspace.getRoot();
+        assert root != null;
+        return root;
     }
 
     @Provides
     ILog provideLog(final Plugin plugin) {
-        return plugin.getLog();
+        final ILog log = plugin.getLog();
+        assert log != null;
+        return log;
     }
 
     @Provides
     IPreferenceStore providePreferenceStore(final AbstractUIPlugin plugin) {
-        return plugin.getPreferenceStore();
+        final IPreferenceStore preferenceStore = plugin.getPreferenceStore();
+        assert preferenceStore != null;
+        return preferenceStore;
     }
 
     @Provides
     StatusManager provideStatusManager() {
-        return StatusManager.getManager();
+        final StatusManager manager = StatusManager.getManager();
+        assert manager != null;
+        return manager;
     }
 }

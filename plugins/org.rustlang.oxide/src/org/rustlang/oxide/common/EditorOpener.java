@@ -1,3 +1,25 @@
+/*
+ * Copyright 2012 Ian D. Bollinger
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package org.rustlang.oxide.common;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -17,10 +39,12 @@ public class EditorOpener {
 
     public void open(final IFile file,
             final IWorkbench workbench) throws PartInitException {
-        reveal(file, workbench.getActiveWorkbenchWindow());
-        final IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-        if (window != null) {
-            final IWorkbenchPage page = window.getActivePage();
+        final IWorkbenchWindow window1 = workbench.getActiveWorkbenchWindow();
+        assert window1 != null;
+        reveal(file, window1);
+        final IWorkbenchWindow window2 = workbench.getActiveWorkbenchWindow();
+        if (window2 != null) {
+            final IWorkbenchPage page = window2.getActivePage();
             if (page != null) {
                 final boolean activate = true;
                 open(page, file, activate);

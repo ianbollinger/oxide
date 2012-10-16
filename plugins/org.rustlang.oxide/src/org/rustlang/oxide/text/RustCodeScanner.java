@@ -1,3 +1,25 @@
+/*
+ * Copyright 2012 Ian D. Bollinger
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package org.rustlang.oxide.text;
 
 import org.eclipse.jface.text.TextAttribute;
@@ -14,14 +36,11 @@ import org.eclipse.swt.SWT;
 
 public class RustCodeScanner extends BufferedRuleBasedScanner {
     private static final String[] KEYWORDS = {
-        "alt", "as", "assert", "be", "bind", "break", "check", "claim", "const",
-        "cont", "copy", "do", "else", "enum", "export", "fail", "false", "fn",
-        "for", "if", "iface", "impl", "import", "in", "let", "log", "mod",
-        "move", "mutable", "native", "of", "pure", "resource", "ret", "self",
-        "to", "type", "unchecked", "unsafe", "use", "while", "with",
-        // TYPES
-        "bool", "char", "f32", "f64", "float", "i16", "i32", "i64", "i8",
-        "int", "str", "u16", "u32", "u64", "u8", "uint", "vec"
+        "as", "assert", "bind", "break", "const", "copy", "do", "drop", "else",
+        "enum", "extern", "fail", "false", "fn", "for", "if", "impl", "let",
+        "log", "loop", "mod", "move", "mut", "priv", "pub", "pure", "ref",
+        "return", "self", "static", "struct", "trait", "type", "unsafe", "use",
+        "while"
     };
 
     public RustCodeScanner(final RustColorManager manager) {

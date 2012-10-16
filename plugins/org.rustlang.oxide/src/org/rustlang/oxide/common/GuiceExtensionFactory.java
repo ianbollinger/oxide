@@ -1,7 +1,30 @@
+/*
+ * Copyright 2012 Ian D. Bollinger
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package org.rustlang.oxide.common;
 
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.inject.Guice;
@@ -36,7 +59,8 @@ public final class GuiceExtensionFactory implements IExecutableExtension,
 
     @Override
     public void setInitializationData(final IConfigurationElement config,
-            @SuppressWarnings("unused") final String name, final Object data) {
+            @SuppressWarnings("unused") @Nullable final String name,
+            final Object data) {
         configuration = config;
         contributor = config.getContributor();
         className = data instanceof String
@@ -60,6 +84,7 @@ public final class GuiceExtensionFactory implements IExecutableExtension,
             throw newCoreException(e);
         }
         final Object o = getInjector().getInstance(clazz);
+        assert o != null;
         if (o instanceof IExecutableExtension) {
             final IExecutableExtension extension = (IExecutableExtension) o;
             extension.setInitializationData(configuration, null, null);
@@ -87,6 +112,7 @@ public final class GuiceExtensionFactory implements IExecutableExtension,
                 modules.add(getOSGiServiceRegistry());
                 modules.addAll(getModulesContributedByProject());
                 injector = Guice.createInjector(modules.build());
+                assert injector != null;
                 INJECTORS.put(contributor, injector);
             }
             return injector;
@@ -97,7 +123,9 @@ public final class GuiceExtensionFactory implements IExecutableExtension,
         final Bundle bundle = ContributorFactoryOSGi.resolve(contributor);
         final BundleContext bundleContext = bundle.getBundleContext();
         final ServiceRegistry registry = EclipseRegistry.eclipseRegistry();
-        return Peaberry.osgiModule(bundleContext, registry);
+        final Module result = Peaberry.osgiModule(bundleContext, registry);
+        assert result != null;
+        return result;
     }
 
     private List<Module> getModulesContributedByProject() throws CoreException {
@@ -107,7 +135,9 @@ public final class GuiceExtensionFactory implements IExecutableExtension,
                 .getConfigurationElementsFor(ID);
         for (final IConfigurationElement e : elements) {
             if (contributor.equals(e.getContributor())) {
-                modules.add((Module) e.createExecutableExtension("class"));
+                final Object extension = e.createExecutableExtension("class");
+                assert extension != null;
+                modules.add((Module) extension);
             }
         }
         return modules.build();

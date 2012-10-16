@@ -1,3 +1,25 @@
+/*
+ * Copyright 2012 Ian D. Bollinger
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package org.rustlang.oxide.command;
 
 import java.lang.reflect.InvocationTargetException;
@@ -46,17 +68,18 @@ public class RustNewFileOperation {
         try {
             final IFile file = getFileHandle();
             final IRunnableWithProgress op = operationFactory.create(file,
-                    shell);
-            // TODO: thread containment violation.
+                    getShell());
+            // FIXME: thread containment violation.
             runnableContext.run(true, true, op);
-            editorOpener.open(file, workbench);
-            return Status.createOkStatus();
-        } catch (final InterruptedException e) {
-            return Status.createErrorStatus(e);
-        } catch (final InvocationTargetException e) {
-            return Status.createErrorStatus(e);
-        } catch (final PartInitException e) {
-            return Status.createErrorStatus(e);
+            editorOpener.open(file, getWorkbench());
+            final Status status = Status.createOkStatus();
+            assert status != null;
+            return status;
+        } catch (final InterruptedException | InvocationTargetException |
+                PartInitException e) {
+            final Status status = Status.createErrorStatus(e);
+            assert status != null;
+            return status;
         }
     }
 
@@ -64,12 +87,27 @@ public class RustNewFileOperation {
         final Path folderName = model.getFolder().getContent();
         final String fileName = model.getName().getContent();
         final Path newFilePath = folderName.append(fileName + ".rs");
-        return workspaceRoot.getFile(PathBridge.create(newFilePath));
+        final IFile file = workspaceRoot.getFile(
+                PathBridge.create(newFilePath));
+        assert file != null;
+        return file;
     }
 
     public static Status execute(
             @SuppressWarnings("unused") final RustSourceFile model,
             @SuppressWarnings("unused") final ProgressMonitor monitor) {
-        return Status.createOkStatus();
+        final Status status = Status.createOkStatus();
+        assert status != null;
+        return status;
+    }
+
+    @SuppressWarnings("null")
+    private Shell getShell() {
+        return shell;
+    }
+
+    @SuppressWarnings("null")
+    private IWorkbench getWorkbench() {
+        return workbench;
     }
 }

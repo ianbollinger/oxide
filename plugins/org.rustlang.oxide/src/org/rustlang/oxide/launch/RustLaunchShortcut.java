@@ -1,5 +1,28 @@
+/*
+ * Copyright 2012 Ian D. Bollinger
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package org.rustlang.oxide.launch;
 
+import javax.annotation.Nullable;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -30,7 +53,8 @@ public class RustLaunchShortcut implements ILaunchShortcut {
     }
 
     @Override
-    public void launch(final ISelection selection, final String mode) {
+    public void launch(@Nullable final ISelection selection,
+            @SuppressWarnings("null") final String mode) {
         if (!(selection instanceof TreeSelection)) {
             return;
         }
@@ -41,6 +65,7 @@ public class RustLaunchShortcut implements ILaunchShortcut {
         }
         final IFile file = (IFile) element;
         final String projectName = file.getProject().getName();
+        assert projectName != null;
         try {
             launch(projectName, mode);
         } catch (final CoreException e) {
@@ -49,7 +74,8 @@ public class RustLaunchShortcut implements ILaunchShortcut {
     }
 
     @Override
-    public void launch(final IEditorPart editor, final String mode) {
+    public void launch(@SuppressWarnings("null") final IEditorPart editor,
+            @SuppressWarnings("null") final String mode) {
         final IEditorInput editorInput = editor.getEditorInput();
         if (!(editorInput instanceof FileEditorInput)) {
             return;
@@ -57,6 +83,7 @@ public class RustLaunchShortcut implements ILaunchShortcut {
         final FileEditorInput fileEditorInput = (FileEditorInput) editorInput;
         final IFile file = fileEditorInput.getFile();
         final String projectName = file.getProject().getName();
+        assert projectName != null;
         try {
             launch(projectName, mode);
         } catch (final CoreException e) {
