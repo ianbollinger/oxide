@@ -4,7 +4,8 @@ Bundle-Name: Oxide - Rust Development Environment
 Bundle-SymbolicName: org.rustlang.oxide;singleton:=true
 Bundle-Version: 0.0.1.qualifier
 Bundle-Activator: org.rustlang.oxide.OxidePlugin
-Require-Bundle: org.eclipse.core.runtime,
+Require-Bundle: org.rustlang.oxide.thirdparty,
+ org.eclipse.core.runtime,
  org.eclipse.core.databinding,
  org.eclipse.core.databinding.beans,
  org.eclipse.core.databinding.property,
@@ -20,7 +21,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.sapphire.workspace,
  org.eclipse.sapphire.ui,
  org.slf4j.api,
- com.google.guava,
- org.rustlang.oxide.thirdparty
+ com.google.guava
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Import-Package: com.google.inject

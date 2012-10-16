@@ -13,26 +13,28 @@
   <name>Oxide plug-ins</name>
 
   <properties>
-    <tycho-version>0.14.0</tycho-version>
+    <tycho-version>0.15.0</tycho-version>
   </properties>
 
   <modules>
     <module>org.rustlang.oxide.thirdparty</module>
     <module>org.rustlang.oxide</module>
-    <module>org.rustlang.oxide.thirdpartytest</module>
-    <module>org.rustlang.oxide.tests</module>
+    <!-- TODO: Re-enable tests when I figure out how to get tycho-surefire to
+         set up the class path correctly. -->
+    <!-- <module>org.rustlang.oxide.thirdpartytest</module> -->
+    <!-- <module>org.rustlang.oxide.tests</module> -->
   </modules>
 
   <repositories>
     <repository>
       <id>eclipse-platform</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/releases/indigo</url>
+      <url>http://download.eclipse.org/releases/juno</url>
     </repository>
     <repository>
       <id>eclipse-sapphire</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/sapphire/0.4.0/repository</url>
+      <url>http://download.eclipse.org/sapphire/0.5.3/repository</url>
     </repository>
     <repository>
       <id>guava-osgi</id>
@@ -51,14 +53,14 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>2.9</version>
+          <version>2.9.1</version>
           <configuration>
             <failOnViolation>false</failOnViolation>
             <configLocation>checkstyle-checks.xml</configLocation>
           </configuration>
           <executions>
             <execution>
-              <phase>verify</phase> 
+              <phase>verify</phase>
               <goals>
                 <goal>checkstyle</goal>
               </goals>
@@ -90,7 +92,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>findbugs-maven-plugin</artifactId>
-          <version>2.4.0</version>
+          <version>2.5.2</version>
           <configuration>
             <effort>Max</effort>
             <threshold>Exp</threshold>
@@ -192,3 +194,4 @@
     </plugins>
   </build>
 </project>
+
