@@ -3,80 +3,194 @@
           "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
 <module name="Checker">
 
-  <property name="severity" value="warning"></property>
+  <property name="severity" value="warning"/>
 
   <module name="TreeWalker">
     <!-- annotations ======================================================= -->
-    <module name="AnnotationUseStyle"/>
+    <module name="AnnotationUseStyle">
+      <property name="elementStyle" value="compact_no_array"/>
+      <property name="closingParens" value="never"/>
+      <property name="trailingArrayComma" value="never"/>
+    </module>
     <module name="MissingDeprecated"/>
-    <module name="MissingOverride"/>
+    <module name="MissingOverride">
+      <property name="javaFiveCompatibility" value="false"/>
+    </module>
     <module name="PackageAnnotation"/>
     <!-- unused <module name="SuppressWarnings"/>-->
 
     <!-- block checks ====================================================== -->
+    <!-- Rational: methods should be small enough that nested blocks are never
+         needed. -->
     <module name="AvoidNestedBlocks"/>
-    <module name="EmptyBlock"/>
-    <module name="LeftCurly"/>
-    <module name="NeedBraces"/>
-    <module name="RightCurly"/>
+
+    <module name="EmptyBlock">
+      <property name="option" value="stmt"/>
+      <property name="tokens"
+                value="LITERAL_CATCH, LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY,
+                       LITERAL_IF, LITERAL_FOR, LITERAL_TRY, LITERAL_WHILE,
+                       INSTANCE_INIT, STATIC_INIT"/>
+    </module>
+
+    <!-- Rationale: Keeping the opening brace on the same line promotes
+         concision; additionally, it is the prevailing Java style. -->
+    <module name="LeftCurly">
+      <property name="option" value="eol"/>
+      <property name="maxLineLength" value="80"/>
+      <property name="tokens"
+                value="CLASS_DEF, CTOR_DEF, INTERFACE_DEF, LITERAL_CATCH,
+                       LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY, LITERAL_FOR,
+                       LITERAL_IF, LITERAL_SWITCH, LITERAL_SYNCHRONIZED,
+                       LITERAL_TRY, LITERAL_WHILE, METHOD_DEF"/>
+    </module>
+
+    <!-- Rationale: while concision is generally preferred, this seems to be the
+         prevailing Java style. It at least promotes consistency. -->
+    <module name="NeedBraces">
+      <property name="tokens" value="LITERAL_DO, LITERAL_ELSE, LITERAL_IF,
+                                     LITERAL_FOR, LITERAL_WHILE"/>
+    </module>
+
+    <!-- Rationale: Keeping the closing brace on the same line as certain
+         constructs is more concise; additionally, it is the prevailing Java
+         style. -->
+    <module name="RightCurly">
+      <property name="option" value="same"/>
+      <property name="tokens"
+                value="LITERAL_TRY, LITERAL_CATCH, LITERAL_FINALLY, LITERAL_IF,
+                       LITERAL_ELSE"/>
+      <property name="shouldStartLine" value="true"/>
+    </module>
 
     <!-- class design ====================================================== -->
     <!-- Rationale: final classes are difficult to test. Use package-private
          visibility and/or internal packages to control extension instead. -->
     <!-- <module name="DesignForExtension"/> -->
 
+    <!-- Rationale: classes with only private constructors may as well be
+         declared as final for documentation purposes (they cannot be
+         subclassed anyway.) -->
     <module name="FinalClass"/>
+
+    <!-- Rationale: there is no reason to instantiated classes with only static
+         methods; making it impossible to do so serves as a form of
+         documentation. -->
     <module name="HideUtilityClassConstructor"/>
+
     <module name="InnerTypeLast"/>
-    <module name="InterfaceIsType"/>
-    <module name="MutableException"/>
-    <module name="ThrowsCount"/>
-    <module name="VisibilityModifier"/>
+
+    <!-- Rationale: accessing constants through an interface is completely
+         unnecessary. -->
+    <module name="InterfaceIsType">
+      <property name="allowMarkerInterfaces" value="true"/>
+    </module>
+
+    <module name="MutableException">
+      <property name="format" value="^.*(Exception|Error)$"/>
+    </module>
+
+    <!-- Rationale: require client code to catch multiple exception types often
+         forces duplicated error handling and is an onerous burden. Java 8 can
+         allievate this, however. -->
+    <module name="ThrowsCount">
+      <property name="max" value="1"/>
+    </module>
+
+    <!-- Rationale: attempt to enforce encapsulation and immutability. -->
+    <module name="VisibilityModifier">
+      <property name="packageAllowed" value="false"/>
+      <property name="protectedAllowed" value="false"/>
+      <property name="publicMemberPattern" value="^serialVersionUID$"/>
+    </module>
 
     <!-- coding =========================================================== -->
-    <!-- Rationale: style preference. -->
+    <!-- Rationale: style preference; one less comma. -->
     <!-- <module name="ArrayTrailingComma"/> -->
-    
+
     <!-- Rationale: inline conditionals increase concision, but use them
          judiciously. --> 
     <!-- <module name="AvoidInlineConditionals"/> -->
 
     <module name="CovariantEquals"/>
+
+    <!-- Rationale: empty statements (;) are always unnecessary and less
+         explicit than an empty block. Additionally, empty loops are generally
+         unnecessary as well. -->
     <module name="EmptyStatement"/>
+
+    <!-- Rationale: might as well avoid dereferencing null. -->
     <module name="EqualsAvoidNull"/>
+
+    <!-- Rationale: defining only hashCode or equals but not both has
+         ill-defined semantics. -->
     <module name="EqualsHashCode"/>
-    <module name="FinalLocalVariable"/>
+
+    <!-- Rationale: stateless code is easier to reason about. -->
+    <module name="FinalLocalVariable">
+      <property name="tokens" value="PARAMETER_DEF, VARIABLE_DEF"/>
+    </module>
+
     <module name="HiddenField">
+      <property name="tokens" value="PARAMETER_DEF, VARIABLE_DEF"/>
+
+      <property name="ignoreFormat" value="^$"/>
 
       <!-- Rationale: constructor parameters should have the same name as
-           their corresponding fields. --> 
+           their corresponding fields for documentation purposes. -->
       <property name="ignoreConstructorParameter" value="true"/>
 
       <!-- Rationale: mutator parameters should have the same name as their
-           corresponding fields. --> 
+           corresponding fields documentation purposes. -->
       <property name="ignoreSetter" value="true"/>
 
-    </module>
-    <module name="IllegalInstantiation">
-      <property name="classes" value="java.lang.Boolean,java.lang.Character,java.lang.Byte,java.lang.Double,java.lang.Float,java.lang.Integer,java.lang.Long,java.util.StringBuffer"/>
+      <property name="ignoreAbstractMethods" value="false"/>
     </module>
 
-    <!-- Rationale: There aren't tokens in the language that are universally 
-         bad (thankfully). -->
-    <!--
-      <module name="IllegalToken"/>
-      <module name="IllegalTokenText"/>
-    -->
-    <module name="InnerAssignment"/>
-    
+    <module name="IllegalInstantiation">
+      <property name="classes"
+                value="java.lang.Boolean, java.lang.Character, java.lang.Byte,
+                       java.lang.Double, java.lang.Float, java.lang.Integer,
+                       java.lang.Long, java.lang.String,
+                       java.util.StringBuffer"/>
+    </module>
+
+    <module name="IllegalToken">
+      <property name="tokens" value="LITERAL_NATIVE"/>
+    </module>
+
+    <!-- Rational: Octal literals are not particularly useful. -->
+    <module name="IllegalTokenText">
+      <property name="tokens" value="NUM_INT, NUM_LONG"/>
+      <property name="format" value="^0[^lx]"/>
+      <property name="ignoreCase" value="true"/>
+      <property name="message" value=""/>
+    </module>
+
+    <module name="InnerAssignment">
+      <property name="tokens"
+                value="ASSIGN, BAND_ASSIGN, BOR_ASSIGN, BSR_ASSIGN, BXOR_ASSIGN,
+                       DIV_ASSIGN, MINUS_ASSIGN, MOD_ASSIGN, PLUS_ASSIGN,
+                       SL_ASSIGN, SR_ASSIGN, STAR_ASSIGN"/>
+    </module>
+
     <!-- Rationale: while magic numbers are bad, this rule can give very silly
          warnings. For example, "base = 16" does not need a static final
          field. -->
     <!-- <module name="MagicNumber"/> -->
 
     <module name="MissingSwitchDefault"/>
+
+    <!-- Rationale: modifing a control variable in a loop certainly violates
+         the principle of least astonishment. -->
     <module name="ModifiedControlVariable"/>
-    <module name="RedundantThrows"/>
+
+    <module name="RedundantThrows">
+      <property name="allowUnchecked" value="false"/>
+      <property name="allowSubclasses" value="false"/>
+      <property name="logLoadErrors" value="true"/>
+      <property name="suppressLoadErrors" value="false"/>
+    </module>
+
     <module name="SimplifyBooleanExpression"/>
     <module name="SimplifyBooleanReturn"/>
     <module name="StringLiteralEquality"/>
@@ -96,6 +210,13 @@
     <module name="PackageDeclaration"/>
     <module name="ReturnCount">
       <property name="severity" value="info"/>
+
+      <!-- Rationale: methods should be too short to have a large number of
+           returns anyway. -->
+      <property name="max" value="3"/>
+
+      <!-- Match all methods. -->
+      <property name="format" value="^$"/>
     </module>
     <module name="IllegalType"/>
     <module name="DeclarationOrder"/>
@@ -149,27 +270,36 @@
     <module name="ClassDataAbstractionCoupling">
       <property name="severity" value="info"/>
     </module>
+
     <module name="ClassFanOutComplexity">
       <property name="severity" value="info"/>
     </module>
+
     <module name="CyclomaticComplexity">
       <property name="severity" value="info"/>
+      <property name="max" value="20"/>
     </module>
+
     <module name="NPathComplexity">
       <property name="severity" value="info"/>
     </module>
+
     <module name="JavaNCSS">
       <property name="severity" value="info"/>
     </module>
+
     <module name="TodoComment">
       <property name="severity" value="info"/>
     </module>
+
     <module name="UpperEll"/>
     <module name="ArrayTypeStyle"/>
     <module name="FinalParameters"/>
+
     <module name="Indentation">
       <property name="caseIndent" value="0"/>
     </module>
+
     <module name="TrailingComment"/>
     <module name="OuterTypeFilename"/>
 
@@ -202,10 +332,14 @@
       <property name="severity" value="info"/>
       <property name="max" value="10"/>
     </module>
+
     <module name="ExecutableStatementCount">
       <property name="severity" value="info"/>
-      <property name="max" value="10"/>
+
+      <!-- Rationale: don't take this too seriously. -->
+      <property name="max" value="5"/>
     </module>
+
     <module name="LineLength"/>
     <module name="MethodCount"/>
     <module name="MethodLength">
@@ -215,7 +349,11 @@
     <module name="OuterTypeNumber"/>
     <module name="ParameterNumber">
       <property name="severity" value="info"/>
-      <property name="max" value="3"/>
+
+      <!-- Rationale: I'd prefer 3, but it's simply impossible to avoid long
+           parameter lists on factory methods or when implmenting a crummy
+           interface. -->
+      <property name="max" value="4"/>
 
       <!-- Rationale: constructors have as many parameters as needed to fill
            in their corresponding fields. -->
@@ -230,16 +368,28 @@
     <module name="MethodParamPad"/>
     <module name="NoWhitespaceAfter">
       <property name="allowLineBreaks" value="false"/>
-      <property name="tokens" value="BNOT,DEC,DOT,INC,LNOT,UNARY_MINUS,UNARY_PLUS"/>
+      <property name="tokens"
+                value="BNOT, DEC, DOT, INC, LNOT, UNARY_MINUS, UNARY_PLUS"/>
     </module>
     <module name="NoWhitespaceBefore"/>
     <module name="OperatorWrap"/>
     <module name="ParenPad"/>
     <module name="TypecastParenPad"/>
     <module name="WhitespaceAfter"/>
+
     <module name="WhitespaceAround">
-      <property name="tokens" value="ASSIGN,BAND,BAND_ASSIGN,BOR,BOR_ASSIGN,BSR,BSR_ASSIGN,BXOR,BXOR_ASSIGN,COLON,DIV,DIV_ASSIGN,EQUAL,GE,GT,LAND,LE,LITERAL_ASSERT,LITERAL_CATCH,LITERAL_DO,LITERAL_ELSE,LITERAL_FINALLY,LITERAL_FOR,LITERAL_IF,LITERAL_RETURN,LITERAL_SYNCHRONIZED,LITERAL_TRY,LITERAL_WHILE,LOR,LT,MINUS,MINUS_ASSIGN,MOD,MOD_ASSIGN,NOT_EQUAL,PLUS,PLUS_ASSIGN,QUESTION,SL,SLIST,SL_ASSIGN,SR,SR_ASSIGN,STAR,STAR_ASSIGN,TYPE_EXTENSION_AND"/>
+      <property name="tokens"
+                value="ASSIGN, BAND, BAND_ASSIGN, BOR, BOR_ASSIGN, BSR,
+                       BSR_ASSIGN, BXOR, BXOR_ASSIGN, COLON, DIV, DIV_ASSIGN,
+                       EQUAL, GE, GT, LAND, LE, LITERAL_ASSERT, LITERAL_CATCH,
+                       LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY, LITERAL_FOR,
+                       LITERAL_IF, LITERAL_RETURN, LITERAL_SYNCHRONIZED,
+                       LITERAL_TRY, LITERAL_WHILE, LOR, LT,MINUS, MINUS_ASSIGN,
+                       MOD, MOD_ASSIGN, NOT_EQUAL, PLUS, PLUS_ASSIGN, QUESTION,
+                       SL, SLIST, SL_ASSIGN, SR, SR_ASSIGN, STAR, STAR_ASSIGN,
+                       TYPE_EXTENSION_AND"/>
     </module>
+
   </module>
 
   <module name="NewlineAtEndOfFile">
