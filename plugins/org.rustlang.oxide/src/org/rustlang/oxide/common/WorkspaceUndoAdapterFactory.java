@@ -28,8 +28,6 @@ import org.eclipse.ui.ide.undo.WorkspaceUndoUtil;
 
 public class WorkspaceUndoAdapterFactory {
     public IAdaptable create(final Shell shell) {
-        final IAdaptable result = WorkspaceUndoUtil.getUIInfoAdapter(shell);
-        assert result != null;
-        return result;
+        return WorkspaceUndoUtil.getUIInfoAdapter(shell);
     }
 }

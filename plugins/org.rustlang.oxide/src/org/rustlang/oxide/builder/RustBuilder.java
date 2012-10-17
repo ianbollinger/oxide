@@ -24,16 +24,13 @@ package org.rustlang.oxide.builder;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.annotation.Nullable;
-
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
@@ -56,6 +53,10 @@ import org.slf4j.Logger;
 
 public class RustBuilder extends IncrementalProjectBuilder {
     public static final String ID = "org.rustlang.oxide.RustBuilder";
+    // TODO: inject
+    private static final Pattern RUSTC_ERROR_PATTERN = Pattern.compile(
+            "^([^:]+):(\\d+):(\\d+): (\\d+):(\\d+) error: (.+)$");
+
     private final EnumPreferenceStore preferenceStore;
     private final Logger logger;
 
@@ -65,87 +66,115 @@ public class RustBuilder extends IncrementalProjectBuilder {
         this.logger = OxidePlugin.getLogger();
     }
 
-    @Override
-    @Nullable
+    @Override @Nullable
     protected IProject[] build(final int kind,
             @SuppressWarnings("unused") @Nullable
             final Map<String, String> args,
-            @SuppressWarnings("null")
-            final IProgressMonitor monitor) throws CoreException {
-        if (kind == IncrementalProjectBuilder.CLEAN_BUILD) {
+            @Nullable final IProgressMonitor monitor) throws CoreException {
+        decideOnAndExecuteBuild(kind, monitor);
+        eraseProblemMarkers();
+        final IProject project = getProject();
+        rustc(getCrateFile(project), getSourceFile(project));
+        return null;
+    }
+
+    private File getSourceFile(final IProject project) {
+        return project.getProject().getLocation().toFile();
+    }
+
+    private IResource getCrateFile(final IProject project) {
+        return project.getFile(project.getName() + ".rc");
+    }
+
+    private void decideOnAndExecuteBuild(final int kind,
+            @Nullable final IProgressMonitor monitor) throws CoreException {
+        switch (kind) {
+        case IncrementalProjectBuilder.CLEAN_BUILD:
             cleanBuild(monitor);
-        } else if (kind == IncrementalProjectBuilder.FULL_BUILD) {
+            break;
+        case IncrementalProjectBuilder.FULL_BUILD:
+            fullBuild();
+            break;
+        default:
+            attemptIncrementalBuild();
+        }
+    }
+
+    private void attemptIncrementalBuild() throws CoreException {
+        final IResourceDelta delta = getDelta(getProject());
+        if (delta == null) {
             fullBuild();
         } else {
-            final IResourceDelta delta = getDelta(getProject());
-            if (delta == null) {
-                fullBuild();
-            } else {
-                incrementalBuild(delta);
-            }
+            incrementalBuild(delta);
         }
-        final IProject project = getProject();
+    }
+
+    private void eraseProblemMarkers() throws CoreException {
         final boolean includeSubtypes = true;
-        project.deleteMarkers(IMarker.PROBLEM, includeSubtypes,
+        getProject().deleteMarkers(IMarker.PROBLEM, includeSubtypes,
                 IResource.DEPTH_INFINITE);
-        final IResource crateFile = project.getFile(project.getName() + ".rc");
-        final File file = project.getProject().getLocation().toFile();
-        assert crateFile != null && file != null;
-        rustc(crateFile, file);
-        // Returning null is part of this method's contract, unfortunately.
-        return null;
     }
 
     private void rustc(final IResource resource,
             final File workingDirectory) throws CoreException {
-        final String file = resource.getProjectRelativePath().toOSString();
-        assert file != null;
-        // TODO: --warn-unused-imports
-        final String compilerPath = preferenceStore
-                .getString(RustPreferenceKey.COMPILER_PATH);
-        final String libraryPaths = preferenceStore
-                .getString(RustPreferenceKey.LIBRARY_PATHS);
-        final Iterable<String> libraryPathList = Splitter.on(';')
-                .omitEmptyStrings().split(libraryPaths);
-        final ImmutableList.Builder<String> builder = ImmutableList.builder();
-        builder.add(compilerPath);
-        // TODO: .add("--no-trans");
-        for (final String libraryPath : libraryPathList) {
-            assert libraryPath != null;
-            builder.add("-L").add(libraryPath);
-        }
-        builder.add(file);
-        final String[] commandLine = Iterables.toArray(builder.build(),
-                String.class);
+        final List<String> builder = buildCommandLine(resource);
+        final String[] commandLine = Iterables.toArray(builder, String.class);
         // TODO: eliminate static call.
         final Process process = DebugPlugin.exec(commandLine, workingDirectory);
+        interpretCompilerOutput(process);
+    }
+
+    private void interpretCompilerOutput(
+            final Process process) throws CoreException {
         try {
-            final InputStream inputStream = process.getInputStream();
             // TODO: ensure encoding is correct.
-            final Reader reader = new InputStreamReader(inputStream,
-                    Charsets.UTF_8);
+            final Reader reader = new InputStreamReader(
+                    process.getInputStream(), Charsets.UTF_8);
             parseLines(CharStreams.readLines(reader));
         } catch (final IOException e) {
             logger.error(e.getMessage(), e);
         }
     }
 
+    private List<String> buildCommandLine(final IResource resource) {
+        final String file = resource.getProjectRelativePath().toOSString();
+        // TODO: --warn-unused-imports
+        final ImmutableList.Builder<String> builder =
+                ImmutableList.<String>builder().add(getCompilerPath());
+        // TODO: .add("--no-trans");
+        for (final String libraryPath : getLibraryPaths()) {
+            builder.add("-L").add(libraryPath);
+        }
+        return builder.add(file).build();
+    }
+
+    private String getCompilerPath() {
+        return preferenceStore.getString(RustPreferenceKey.COMPILER_PATH);
+    }
+
+    private Iterable<String> getLibraryPaths() {
+        final String libraryPaths = preferenceStore
+                .getString(RustPreferenceKey.LIBRARY_PATHS);
+        return Splitter.on(';').omitEmptyStrings().split(libraryPaths);
+    }
+
+    // TODO: rename!
     private void parseLines(final List<String> lines) throws CoreException {
-        // TOD: inject
-        final Pattern p = Pattern
-                .compile("^([^:]+):(\\d+):(\\d+): (\\d+):(\\d+) error: (.+)$");
         for (final String line : lines) {
-            final Matcher m = p.matcher(line);
-            if (!m.matches()) {
-                continue;
-            }
+            parseLine(line);
+        }
+    }
+
+    // TODO: rename!
+    private void parseLine(final String line) throws CoreException {
+        final Matcher m = RUSTC_ERROR_PATTERN.matcher(line);
+        if (m.matches()) {
             final IResource resource = getProject().getFile(m.group(1));
             final int lineStart = Integer.parseInt(m.group(2));
             // final int columnStart = Integer.parseInt(m.group(3));
             // final int lineEnd = Integer.parseInt(m.group(4));
             // final int columnEnd = Integer.parseInt(m.group(5));
             final String message = m.group(6);
-            assert resource != null && message != null;
             reportError(resource, lineStart, message);
         }
     }
@@ -162,19 +191,15 @@ public class RustBuilder extends IncrementalProjectBuilder {
     }
 
     private void cleanBuild(
-            final IProgressMonitor monitor) throws CoreException {
+            @Nullable final IProgressMonitor monitor) throws CoreException {
         clean(monitor);
         fullBuild();
     }
 
-    private void fullBuild() {
+    private void fullBuild() throws CoreException {
         final IProject project = getProject();
-        try {
-            for (final IResourceVisitor visitor : getVisitors()) {
-                project.accept(visitor);
-            }
-        } catch (final CoreException e) {
-            logger.error(e.getMessage(), e);
+        for (final IResourceVisitor visitor : getVisitors()) {
+            project.accept(visitor);
         }
     }
 
@@ -182,13 +207,10 @@ public class RustBuilder extends IncrementalProjectBuilder {
         return ImmutableList.of(new RustCompilerVisitor());
     }
 
-    private void incrementalBuild(final IResourceDelta delta) {
-        try {
-            for (final IResourceDeltaVisitor visitor : getVisitors()) {
-                delta.accept(visitor);
-            }
-        } catch (final CoreException e) {
-            logger.error(e.getMessage(), e);
+    private void incrementalBuild(
+            final IResourceDelta delta) throws CoreException {
+        for (final IResourceDeltaVisitor visitor : getVisitors()) {
+            delta.accept(visitor);
         }
     }
 }

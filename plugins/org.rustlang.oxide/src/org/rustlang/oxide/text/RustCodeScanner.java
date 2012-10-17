@@ -33,6 +33,7 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.RGB;
 
 public class RustCodeScanner extends BufferedRuleBasedScanner {
     private static final String[] KEYWORDS = {
@@ -42,33 +43,47 @@ public class RustCodeScanner extends BufferedRuleBasedScanner {
         "return", "self", "static", "struct", "trait", "type", "unsafe", "use",
         "while"
     };
+    private static final String SINGLE_QUOTE = "'";
+    private static final String DOUBLE_QUOTE = "\"";
 
     public RustCodeScanner(final RustColorManager manager) {
-        final IToken numberRuleToken = new Token(new TextAttribute(
-                manager.getColor(RustColorConstants.NUMBER)));
-        final IToken stringToken = new Token(new TextAttribute(
-                manager.getColor(RustColorConstants.STRING)));
-        final IToken commentToken = new Token(new TextAttribute(
-                manager.getColor(RustColorConstants.SINGLE_LINE_COMMENT)));
+        setRules(createRules(manager));
+    }
+
+    private IRule[] createRules(final RustColorManager manager) {
+        final IToken numberRuleToken = createToken(manager,
+                RustColorConstants.NUMBER);
+        final IToken stringToken = createToken(manager,
+                RustColorConstants.STRING);
+        final IToken commentToken = createToken(manager,
+                RustColorConstants.SINGLE_LINE_COMMENT);
+        final IToken identToken = createToken(manager,
+                RustColorConstants.DEFAULT);
+        final IRule[] rules = new IRule[] {
+            new WhitespaceRule(new RustWhitespaceDetector()),
+            new RustNumberRule(numberRuleToken),
+            createWordRules(manager),
+            new WordRule(new RustWordDetector(), identToken),
+            new SingleLineRule(DOUBLE_QUOTE, DOUBLE_QUOTE, stringToken, '\\',
+                    true, true),
+            new SingleLineRule(SINGLE_QUOTE, SINGLE_QUOTE, stringToken, '\\'),
+            new EndOfLineRule("//", commentToken),
+            new MultiLineRule("/*", "*/", commentToken)
+        };
+        return rules;
+    }
+
+    private WordRule createWordRules(final RustColorManager manager) {
         final IToken wordToken = new Token(new TextAttribute(
                 manager.getColor(RustColorConstants.KEYWORD), null, SWT.BOLD));
-        final IToken identToken = new Token(new TextAttribute(
-                manager.getColor(RustColorConstants.DEFAULT)));
-
         final WordRule wordRule = new WordRule(new RustWordDetector());
         for (final String word : KEYWORDS) {
             wordRule.addWord(word, wordToken);
         }
+        return wordRule;
+    }
 
-        final IRule[] rules = new IRule[] {
-            new WhitespaceRule(new RustWhitespaceDetector()),
-            new RustNumberRule(numberRuleToken), wordRule,
-            new WordRule(new RustWordDetector(), identToken),
-            new SingleLineRule("\"", "\"", stringToken, '\\', true, true),
-            new SingleLineRule("'", "'", stringToken, '\\'),
-            new EndOfLineRule("//", commentToken),
-            new MultiLineRule("/*", "*/", commentToken)
-        };
-        setRules(rules);
+    private Token createToken(final RustColorManager manager, final RGB color) {
+        return new Token(new TextAttribute(manager.getColor(color)));
     }
 }

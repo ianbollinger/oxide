@@ -44,6 +44,7 @@ public class BasicTemplateContext extends TemplateContext {
 
     @Override
     public TemplateBuffer evaluate(
+            @SuppressWarnings("null")
             final Template template) throws TemplateException {
         final TemplateBuffer buffer = translator.translate(template);
         try {
@@ -51,7 +52,6 @@ public class BasicTemplateContext extends TemplateContext {
         } catch (final BadLocationException e) {
             throw new TemplateException(e);
         }
-        assert buffer != null;
         return buffer;
     }
 

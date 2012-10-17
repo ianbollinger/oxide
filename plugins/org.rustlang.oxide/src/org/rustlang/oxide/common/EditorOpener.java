@@ -39,16 +39,19 @@ public class EditorOpener {
 
     public void open(final IFile file,
             final IWorkbench workbench) throws PartInitException {
-        final IWorkbenchWindow window1 = workbench.getActiveWorkbenchWindow();
-        assert window1 != null;
-        reveal(file, window1);
+        reveal(file, workbench.getActiveWorkbenchWindow());
         final IWorkbenchWindow window2 = workbench.getActiveWorkbenchWindow();
         if (window2 != null) {
-            final IWorkbenchPage page = window2.getActivePage();
-            if (page != null) {
-                final boolean activate = true;
-                open(page, file, activate);
-            }
+            attemptToOpenActivePage(file, window2);
+        }
+    }
+
+    private void attemptToOpenActivePage(final IFile file,
+            final IWorkbenchWindow window2) throws PartInitException {
+        final IWorkbenchPage page = window2.getActivePage();
+        if (page != null) {
+            final boolean activate = true;
+            open(page, file, activate);
         }
     }
 

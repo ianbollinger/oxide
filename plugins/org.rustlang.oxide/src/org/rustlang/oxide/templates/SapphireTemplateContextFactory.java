@@ -54,7 +54,6 @@ public class SapphireTemplateContextFactory {
         getTemplateContext().setVariable(property.getName(), stringValue);
     }
 
-    @SuppressWarnings("null")
     TemplateContext getTemplateContext() {
         return templateContext;
     }

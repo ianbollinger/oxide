@@ -57,17 +57,25 @@ public class RustNewProjectOperationFactory {
 
     public RustNewProjectOperation create(final RustProject element,
             final IConfigurationElement configuration) {
-        final TemplateContext templateContext = templateContextFactory
-                .create(RustProject.TYPE, element);
-        // TODO: remove LoD violation.
-        final String projectName = element.getProjectName().getContent();
+        final String projectName = getProjectName(element);
         final IProject project = workspaceRoot.getProject(projectName);
-        final IProjectDescription description = workspace
-                .newProjectDescription(projectName);
-        assert project != null && description != null;
         final TemplateFileWriter templateFileFactory =
-                templateFileWriterFactory.create(templateContext);
+                templateFileWriterFactory.create(
+                        createTemplateContext(element));
         return factory.create(configuration, project, templateFileFactory,
-                description);
+                createProjectDescription(projectName));
+    }
+
+    private TemplateContext createTemplateContext(final RustProject element) {
+        return templateContextFactory.create(RustProject.TYPE, element);
+    }
+
+    private String getProjectName(final RustProject element) {
+        return element.getProjectName().getContent();
+    }
+
+    private IProjectDescription createProjectDescription(
+            final String projectName) {
+        return workspace.newProjectDescription(projectName);
     }
 }

@@ -22,6 +22,7 @@
 
 package org.rustlang.oxide;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import javax.annotation.Nullable;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -51,17 +52,13 @@ public class OxidePlugin extends AbstractUIPlugin {
         super.stop(context);
     }
 
-    @Nullable
     public static OxidePlugin getDefault() {
-        return plugin;
+        return checkNotNull(plugin);
     }
 
     public static ImageDescriptor getImageDescriptor(
             final String imageFilePath) {
-        final ImageDescriptor result = imageDescriptorFromPlugin(
-                ID, imageFilePath);
-        assert result != null;
-        return result;
+        return imageDescriptorFromPlugin(ID, imageFilePath);
     }
 
     public static Logger getLogger() {
@@ -73,8 +70,6 @@ public class OxidePlugin extends AbstractUIPlugin {
     }
 
     public static <T> T getInstance(final Class<T> clazz) {
-        final T instance = plugin.injector.getInstance(clazz);
-        assert instance != null;
-        return instance;
+        return plugin.injector.getInstance(clazz);
     }
 }

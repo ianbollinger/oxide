@@ -73,9 +73,7 @@ public class EnumPreferenceStore {
     }
 
     public String getDefaultString(final PreferenceKey key) {
-        final String result = store.getDefaultString(key.toString());
-        assert result != null;
-        return result;
+        return store.getDefaultString(key.toString());
     }
 
     public double getDouble(final PreferenceKey key) {
@@ -95,9 +93,7 @@ public class EnumPreferenceStore {
     }
 
     public String getString(final PreferenceKey key) {
-        final String result = store.getString(key.toString());
-        assert result != null;
-        return result;
+        return store.getString(key.toString());
     }
 
     public boolean isDefault(final PreferenceKey key) {

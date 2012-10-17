@@ -39,11 +39,8 @@ public class RustNature implements IProjectNature {
     public void configure() throws CoreException {
         final IProjectDescription description = project.getDescription();
         final ICommand[] commands = description.getBuildSpec();
-        assert commands != null;
         if (findBuilder(commands) == -1) {
-            final ICommand command = description.newCommand();
-            command.setBuilderName(RustBuilder.ID);
-            setBuildSpec(description, ObjectArrays.concat(commands, command));
+            addBuilderToSpec(description, commands);
         }
     }
 
@@ -51,11 +48,29 @@ public class RustNature implements IProjectNature {
     public void deconfigure() throws CoreException {
         final IProjectDescription description = project.getDescription();
         final ICommand[] commands = description.getBuildSpec();
-        assert commands != null;
         final int index = findBuilder(commands);
         if (index != -1) {
             setBuildSpec(description, ObjectArrays2.remove(commands, index));
         }
+    }
+
+    @Override
+    public IProject getProject() {
+        return project;
+    }
+
+    @Override
+    public void setProject(@SuppressWarnings("null") final IProject project) {
+        synchronized (this) {
+            this.project = project;
+        }
+    }
+
+    private void addBuilderToSpec(final IProjectDescription description,
+            final ICommand[] commands) throws CoreException {
+        final ICommand command = description.newCommand();
+        command.setBuilderName(RustBuilder.ID);
+        setBuildSpec(description, ObjectArrays.concat(commands, command));
     }
 
     private int findBuilder(final ICommand[] commands) {
@@ -71,19 +86,5 @@ public class RustNature implements IProjectNature {
             final ICommand[] buildSpec) throws CoreException {
         description.setBuildSpec(buildSpec);
         project.setDescription(description, null);
-    }
-
-    @SuppressWarnings("null")
-    @Override
-    public IProject getProject() {
-        return project;
-    }
-
-    @SuppressWarnings("null")
-    @Override
-    public void setProject(final IProject project) {
-        synchronized (this) {
-            this.project = project;
-        }
     }
 }

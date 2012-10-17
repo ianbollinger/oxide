@@ -43,17 +43,12 @@ public class RustModelModule extends AbstractModule {
 
     @Provides
     RustSourceFile provideRustSourceFile() {
-        final RustSourceFile file = RustSourceFile.TYPE.instantiate();
-        assert file != null;
-        return file;
+        return RustSourceFile.TYPE.instantiate();
     }
 
     @Provides
     RustProjectOperationModel provideRustProjectOperation() {
-        final RustProjectOperationModel model =
-                RustProjectOperationModel.TYPE.instantiate();
-        assert model != null;
-        return model;
+        return RustProjectOperationModel.TYPE.instantiate();
     }
 
     @BindingAnnotation @Target({FIELD, METHOD, PARAMETER}) @Retention(RUNTIME)

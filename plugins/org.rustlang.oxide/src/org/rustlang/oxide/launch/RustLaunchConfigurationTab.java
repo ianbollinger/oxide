@@ -56,7 +56,6 @@ public class RustLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
         }
     }
 
-    @SuppressWarnings("null")
     @Override
     public Control getControl() {
         return control;
@@ -78,22 +77,40 @@ public class RustLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
             @SuppressWarnings("null")
             final ILaunchConfiguration configuration) {
         try {
-            // TODO: this is a bit hacky. Should we wrap the
-            // ILaunchConfigration?
-            final String projectName = configuration.getAttribute(
-                    RustLaunchAttribute.PROJECT.toString(), "");
-            final String executable = configuration.getAttribute(
-                    RustLaunchAttribute.EXECUTABLE.toString(), "");
-            final String programArguments = configuration.getAttribute(
-                    RustLaunchAttribute.ARGUMENTS.toString(), "");
-            assert projectName != null && executable != null
-                    && programArguments != null;
-            control.setProject(projectName);
-            control.setExecutable(executable);
-            control.setProgramArguments(programArguments);
+            configure(configuration);
         } catch (final CoreException e) {
             logger.error(e.getMessage(), e);
         }
+    }
+
+    private void configure(
+            final ILaunchConfiguration configuration) throws CoreException {
+        setProject(configuration);
+        setExecutable(configuration);
+        setProgramArguments(configuration);
+    }
+
+    private void setProject(
+            final ILaunchConfiguration configuration) throws CoreException {
+        // TODO: this is a bit hacky. Should we wrap the
+        // ILaunchConfigration?
+        final String projectName = configuration.getAttribute(
+                RustLaunchAttribute.PROJECT.toString(), "");
+        control.setProject(projectName);
+    }
+
+    private void setExecutable(
+            final ILaunchConfiguration configuration) throws CoreException {
+        final String executable = configuration.getAttribute(
+                RustLaunchAttribute.EXECUTABLE.toString(), "");
+        control.setExecutable(executable);
+    }
+
+    private void setProgramArguments(
+            final ILaunchConfiguration configuration) throws CoreException {
+        final String programArguments = configuration.getAttribute(
+                RustLaunchAttribute.ARGUMENTS.toString(), "");
+        control.setProgramArguments(programArguments);
     }
 
     @Override
@@ -116,7 +133,6 @@ public class RustLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
 
     public void update() {
         // validate();
-        // TODO: LoD violation.
         final ILaunchConfigurationDialog dialog =
                 getLaunchConfigurationDialog();
         dialog.updateButtons();

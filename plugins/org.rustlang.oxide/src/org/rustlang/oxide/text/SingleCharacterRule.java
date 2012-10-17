@@ -46,7 +46,6 @@ public abstract class SingleCharacterRule implements IRule {
 
     protected abstract boolean isRuleCharacter(int c);
 
-    @SuppressWarnings("null")
     public IToken getToken() {
         return token;
     }

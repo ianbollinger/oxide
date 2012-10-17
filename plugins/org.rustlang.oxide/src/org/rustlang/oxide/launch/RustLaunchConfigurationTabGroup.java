@@ -48,7 +48,6 @@ public class RustLaunchConfigurationTabGroup extends
                 ILaunchConfigurationTab.class));
     }
 
-    @SuppressWarnings("null")
     List<ILaunchConfigurationTab> getConfigurationTabs() {
         return tabs;
     }

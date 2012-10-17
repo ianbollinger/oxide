@@ -22,10 +22,12 @@
 
 package org.rustlang.oxide.launch;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.File;
 import java.util.List;
 import javax.annotation.Nullable;
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.eclipse.core.resources.IProject;
@@ -63,10 +65,10 @@ public class RustApplicationLauncher implements ILaunchConfigurationDelegate2 {
             @SuppressWarnings("unused") @Nullable final String mode,
             @SuppressWarnings("unused") @Nullable
             final IProgressMonitor monitor) throws CoreException {
-        final String project = configuration.getAttribute(
-                RustLaunchAttribute.PROJECT.toString(), "");
-        final String executable = configuration.getAttribute(
-                RustLaunchAttribute.EXECUTABLE.toString(), "");
+        final String project = getAttribute(configuration,
+                RustLaunchAttribute.PROJECT);
+        final String executable = getAttribute(configuration,
+                RustLaunchAttribute.EXECUTABLE);
         return !project.isEmpty() && !executable.isEmpty();
     }
 
@@ -109,66 +111,91 @@ public class RustApplicationLauncher implements ILaunchConfigurationDelegate2 {
     }
 
     private Optional<IProject> getProject(
-            final String projectName) throws CoreException {
-        final IResource resource = workspaceRoot.findMember(projectName);
-        if (resource instanceof IProject) {
-            final IProject project = (IProject) resource;
-            if (isOpenRustProject(project)) {
-                return Optional.of(project);
-            }
-        }
-        return Optional.absent();
+            final ILaunchConfiguration configuration) throws CoreException {
+        final IResource resource = workspaceRoot.findMember(
+                getProjectName(configuration));
+        return isOpenRustProject(resource)
+                ? Optional.of((IProject) resource)
+                : Optional.<IProject>absent();
+    }
+
+    private String getProjectName(
+            final ILaunchConfiguration configuration) throws CoreException {
+        return getAttribute(configuration, RustLaunchAttribute.PROJECT);
     }
 
     private boolean isOpenRustProject(
-            final IProject project) throws CoreException {
-        return project.isOpen() && project.hasNature(RustNature.ID);
+            final IResource resource) throws CoreException {
+        if (resource instanceof IProject) {
+            final IProject project = (IProject) resource;
+            return project.isOpen() && project.hasNature(RustNature.ID);
+        }
+        return false;
     }
 
     private void execute(final ILaunchConfiguration configuration,
             final ILaunch launch) throws CoreException {
-        final String projectName = configuration.getAttribute(
-                RustLaunchAttribute.PROJECT.toString(), "");
-        assert projectName != null;
-        final Optional<IProject> possibleProject = getProject(projectName);
-        if (!possibleProject.isPresent()) {
-            return;
+        final Optional<IProject> possibleProject = getProject(configuration);
+        if (possibleProject.isPresent()) {
+            spawnProcess(configuration, launch, possibleProject.get());
         }
-        final IProject project = possibleProject.get();
-        final String executable = configuration.getAttribute(
-                RustLaunchAttribute.EXECUTABLE.toString(), "");
-        final String programArguments = configuration.getAttribute(
-                RustLaunchAttribute.ARGUMENTS.toString(), "");
-        final IPath relativeExecutablePath = Path.fromOSString(executable);
+    }
+
+    private void spawnProcess(final ILaunchConfiguration configuration,
+            final ILaunch launch,
+            final IProject project) throws CoreException {
+        final String executableName = getExecutableName(configuration);
         final IPath projectPath = project.getLocation();
-        final String executableName = relativeExecutablePath.lastSegment();
-        assert executableName != null;
+        final List<String> arguments = getArguments(configuration,
+                executableName, projectPath);
+        spawnProcess(launch, executableName, getWorkingDirectory(projectPath),
+                arguments);
+    }
+
+    private File getWorkingDirectory(final IPath projectPath) {
+        return new File(projectPath.toOSString());
+    }
+
+    private List<String> getArguments(final ILaunchConfiguration configuration,
+            final String executableName,
+            final IPath projectPath) throws CoreException {
+        final String programArguments = getAttribute(configuration,
+                RustLaunchAttribute.ARGUMENTS);
         final IPath executablePath = getExecutablePath(executableName);
-        final File workingDirectory = new File(projectPath.toOSString());
-        final String commandLine = projectPath.append(executablePath)
-                .toOSString();
-        final List<String> arguments = Lists.newArrayList();
-        arguments.add(commandLine);
-        arguments.addAll(argumentsAsList(programArguments));
-        final String[] array = Iterables.toArray(arguments,
-                String.class);
-        spawnProcess(launch, executableName, workingDirectory, array);
+        final String commandLine = checkNotNull(
+                projectPath.append(executablePath).toOSString());
+        return ImmutableList.<String>builder()
+                .add(commandLine)
+                .addAll(argumentsAsList(programArguments))
+                .build();
+    }
+
+    private String getExecutableName(
+            final ILaunchConfiguration configuration) throws CoreException {
+        final String executable = getAttribute(configuration,
+                RustLaunchAttribute.EXECUTABLE);
+        final IPath relativeExecutablePath = Path.fromOSString(executable);
+        return relativeExecutablePath.lastSegment();
+    }
+
+    private static String getAttribute(final ILaunchConfiguration configuration,
+            final RustLaunchAttribute attribute) throws CoreException {
+        return configuration.getAttribute(attribute.toString(), "");
     }
 
     // TODO: create a strategy for this.
     void spawnProcess(final ILaunch launch, final String executableName,
             final File workingDirectory,
-            final String[] array) throws CoreException {
+            final Iterable<String> arguments) throws CoreException {
+        final String[] array = Iterables.toArray(arguments, String.class);
         final Process process = DebugPlugin.exec(array, workingDirectory);
         DebugPlugin.newProcess(launch, process, executableName);
     }
 
     private IPath getExecutablePath(final String executableName) {
-        final IPath path = Util.isWindows()
+        return Util.isWindows()
                 ? Path.fromOSString(executableName)
                 : Path.fromOSString(".").append(executableName);
-        assert path != null;
-        return path;
     }
 
     public MessageConsole findMessageConsole(final String name) {

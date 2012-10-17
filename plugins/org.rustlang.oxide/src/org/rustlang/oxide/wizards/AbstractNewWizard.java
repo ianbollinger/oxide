@@ -58,12 +58,10 @@ public class AbstractNewWizard<M extends IExecutableModelElement>
         this.configuration = config;
     }
 
-    @SuppressWarnings("null")
     protected IConfigurationElement getConfiguration() {
         return configuration;
     }
 
-    @SuppressWarnings("null")
     protected IWorkbench getWorkbench() {
         return workbench;
     }

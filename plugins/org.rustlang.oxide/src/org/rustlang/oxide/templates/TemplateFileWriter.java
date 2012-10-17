@@ -32,57 +32,59 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateBuffer;
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateException;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import org.rustlang.oxide.common.SubProgressMonitorFactory;
-import org.slf4j.Logger;
 
 public class TemplateFileWriter {
     private final TemplateStore templateStore;
     private final SubProgressMonitorFactory subProgressMonitorFactory;
     private final Charset charset;
-    private final Logger logger;
     private final TemplateContext templateContext;
 
     @Inject
     TemplateFileWriter(final TemplateStore templateStore,
             final SubProgressMonitorFactory subProgressMonitorFactory,
             final Charset charset,
-            final Logger logger,
             @Assisted final TemplateContext templateContext) {
         this.templateStore = templateStore;
         this.subProgressMonitorFactory = subProgressMonitorFactory;
         this.charset = charset;
-        this.logger = logger;
         this.templateContext = templateContext;
     }
 
     public void createFile(final IFile file, final String templateName,
             final IProgressMonitor monitor) throws CoreException {
         final boolean force = false;
-        file.create(getInputStream(templateName), force,
+        file.create(getTemplateAsStream(templateName), force,
                 subProgressMonitorFactory.create(monitor));
         if (monitor.isCanceled()) {
             throw new OperationCanceledException();
         }
     }
 
-    private InputStream getInputStream(final String name) {
+    private InputStream getTemplateAsStream(final String name) {
         // TODO: replace with findTeplateById
-        final Template template = templateStore.findTemplate(name);
         try {
-            final TemplateBuffer buffer = templateContext.evaluate(template);
-            // TODO: remove LoD violation.
-            final byte[] bytes = buffer.getString().getBytes(charset);
-            return new ByteArrayInputStream(bytes);
-        } catch (final BadLocationException e) {
-            logger.error(e.getMessage(), e);
+            final TemplateBuffer buffer = evaluateTemplate(name);
+            return new ByteArrayInputStream(getTemplateBytes(buffer));
         } catch (final TemplateException e) {
-            logger.error(e.getMessage(), e);
+            return new ByteArrayInputStream(new byte[] {});
         }
-        return new ByteArrayInputStream(new byte[] {});
+    }
+
+    private byte[] getTemplateBytes(final TemplateBuffer buffer) {
+        return buffer.getString().getBytes(charset);
+    }
+
+    private TemplateBuffer evaluateTemplate(
+            final String name) throws TemplateException {
+        try {
+            return templateContext.evaluate(templateStore.findTemplate(name));
+        } catch (final BadLocationException e) {
+            throw new TemplateException(e);
+        }
     }
 }

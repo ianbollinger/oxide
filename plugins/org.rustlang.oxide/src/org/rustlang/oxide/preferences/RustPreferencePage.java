@@ -65,9 +65,8 @@ public class RustPreferencePage extends FieldEditorPreferencePage implements
 
     // TODO: make this a factory.
     LaxFileFieldEditor provideCompilerEditor() {
-        final Composite parent = getFieldEditorParent();
         final String string = RustPreferenceKey.COMPILER_PATH.toString();
-        assert string != null && parent != null;
+        final Composite parent = getFieldEditorParent();
         return new LaxFileFieldEditor(string, "Rust &compiler path", parent);
     }
 

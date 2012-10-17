@@ -22,7 +22,7 @@
 
 package org.rustlang.oxide.launch;
 
-import javax.annotation.Nullable;
+import com.google.common.base.Optional;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -53,86 +53,130 @@ public class RustLaunchShortcut implements ILaunchShortcut {
     }
 
     @Override
-    public void launch(@Nullable final ISelection selection,
+    public void launch(@SuppressWarnings("null") final ISelection selection,
             @SuppressWarnings("null") final String mode) {
-        if (!(selection instanceof TreeSelection)) {
-            return;
+        final Optional<IFile> file = getSelectedFile(selection);
+        if (file.isPresent()) {
+            try {
+                launch(getProjectName(file.get()), mode);
+            } catch (final CoreException e) {
+                logger.error(e.getMessage(), e);
+            }
         }
-        final TreeSelection treeSelection = (TreeSelection) selection;
-        final Object element = treeSelection.getFirstElement();
-        if (!(element instanceof IFile)) {
-            return;
+    }
+
+    private Optional<IFile> getSelectedFile(final ISelection selection) {
+        if (selection instanceof TreeSelection) {
+            final Object element =
+                    ((TreeSelection) selection).getFirstElement();
+            if (element instanceof IFile) {
+                return Optional.of((IFile) element);
+            }
         }
-        final IFile file = (IFile) element;
-        final String projectName = file.getProject().getName();
-        assert projectName != null;
-        try {
-            launch(projectName, mode);
-        } catch (final CoreException e) {
-            logger.error(e.getMessage(), e);
-        }
+        return Optional.absent();
+    }
+
+    private String getProjectName(final IFile file) {
+        return file.getProject().getName();
     }
 
     @Override
     public void launch(@SuppressWarnings("null") final IEditorPart editor,
             @SuppressWarnings("null") final String mode) {
         final IEditorInput editorInput = editor.getEditorInput();
-        if (!(editorInput instanceof FileEditorInput)) {
-            return;
+        if (editorInput instanceof FileEditorInput) {
+            try {
+                launch(getProjectName(getFile(editorInput)), mode);
+            } catch (final CoreException e) {
+                logger.error(e.getMessage(), e);
+            }
         }
-        final FileEditorInput fileEditorInput = (FileEditorInput) editorInput;
-        final IFile file = fileEditorInput.getFile();
-        final String projectName = file.getProject().getName();
-        assert projectName != null;
-        try {
-            launch(projectName, mode);
-        } catch (final CoreException e) {
-            logger.error(e.getMessage(), e);
-        }
+    }
+
+    private IFile getFile(final IEditorInput editorInput) {
+        return ((FileEditorInput) editorInput).getFile();
     }
 
     private void launch(final String projectName,
             final String mode) throws CoreException {
-        ILaunchConfiguration found = null;
-        final ILaunchConfigurationType type = launchManager
-                .getLaunchConfigurationType(RustApplicationLauncher.ID);
-        final ILaunchConfiguration[] configurations = launchManager
-                .getLaunchConfigurations(type);
-        final IPath projectPath = Path.fromOSString(projectName);
-        // TODO: implement equality method.
-        for (final ILaunchConfiguration configuration : configurations) {
-            final String project = configuration.getAttribute(
-                    RustLaunchAttribute.PROJECT.toString(), "");
-            final String executable = configuration.getAttribute(
-                    RustLaunchAttribute.EXECUTABLE.toString(), "");
-            final String arguments = configuration.getAttribute(
-                    RustLaunchAttribute.ARGUMENTS.toString(), "");
-            if (arguments.isEmpty()
-                    && project.equalsIgnoreCase(projectName)
-                    && projectPath.equals(Path.fromOSString(executable))) {
-                found = configuration;
-                break;
-            }
-        }
-        if (found == null) {
-            final String configurationName = launchManager
-                    .generateLaunchConfigurationName(projectPath.lastSegment());
-            final ILaunchConfigurationWorkingCopy workingCopy = type
-                    .newInstance(null, configurationName);
-            workingCopy.setAttribute(RustLaunchAttribute.PROJECT.toString(),
-                    projectName);
-            workingCopy.setAttribute(RustLaunchAttribute.EXECUTABLE.toString(),
-                    projectName);
-            workingCopy.setAttribute(RustLaunchAttribute.ARGUMENTS.toString(),
-                    "");
-            workingCopy.setAttribute(DebugPlugin.ATTR_CONSOLE_ENCODING,
-                    "UTF-8");
-            found = workingCopy.doSave();
-        }
         // TODO: use new progress monitor.
         final IProgressMonitor monitor = null;
         final boolean build = true;
         final boolean register = true;
-        found.launch(mode, monitor, build, register);
+        getLaunchConfiguration(projectName).launch(mode, monitor, build,
+                register);
+    }
+
+    private ILaunchConfiguration getLaunchConfiguration(
+            final String projectName) throws CoreException {
+        final ILaunchConfigurationType type =
+                launchManager.getLaunchConfigurationType(
+                        RustApplicationLauncher.ID);
+        final IPath projectPath = Path.fromOSString(projectName);
+        return findLaunchConfiguration(projectName, type, projectPath)
+                .or(createConfiguration(projectName, type, projectPath));
+    }
+
+    private ILaunchConfiguration[] getLaunchConfigurations(
+            final ILaunchConfigurationType type) throws CoreException {
+        return launchManager.getLaunchConfigurations(type);
+    }
+
+    private ILaunchConfiguration createConfiguration(final String projectName,
+            final ILaunchConfigurationType type,
+            final IPath projectPath) throws CoreException {
+        final ILaunchConfigurationWorkingCopy workingCopy =
+                type.newInstance(null, getConfigurationName(projectPath));
+        setConfigurationAttributes(projectName, workingCopy);
+        return workingCopy.doSave();
+    }
+
+    private void setConfigurationAttributes(final String projectName,
+            final ILaunchConfigurationWorkingCopy workingCopy) {
+        workingCopy.setAttribute(RustLaunchAttribute.PROJECT.toString(),
+                projectName);
+        workingCopy.setAttribute(RustLaunchAttribute.EXECUTABLE.toString(),
+                projectName);
+        workingCopy.setAttribute(RustLaunchAttribute.ARGUMENTS.toString(),
+                "");
+        workingCopy.setAttribute(DebugPlugin.ATTR_CONSOLE_ENCODING,
+                "UTF-8");
+    }
+
+    private String getConfigurationName(final IPath projectPath) {
+        return launchManager.generateLaunchConfigurationName(
+                projectPath.lastSegment());
+    }
+
+    private Optional<ILaunchConfiguration> findLaunchConfiguration(
+            final String projectName, final ILaunchConfigurationType type,
+            final IPath projectPath) throws CoreException {
+        for (final ILaunchConfiguration configuration
+                : getLaunchConfigurations(type)) {
+            if (configurationMatches(projectName, projectPath, configuration)) {
+                return Optional.of(configuration);
+            }
+        }
+        return Optional.absent();
+    }
+
+    private boolean configurationMatches(final String projectName,
+            final IPath projectPath,
+            final ILaunchConfiguration configuration) throws CoreException {
+        // TODO: implement equality method.
+        final String arguments = getAttribute(configuration,
+                RustLaunchAttribute.ARGUMENTS);
+        final String project = getAttribute(configuration,
+                RustLaunchAttribute.PROJECT);
+        final String executable = getAttribute(configuration,
+                RustLaunchAttribute.EXECUTABLE);
+        return arguments.isEmpty()
+                && project.equalsIgnoreCase(projectName)
+                && projectPath.equals(Path.fromOSString(executable));
+    }
+
+    private static String getAttribute(final ILaunchConfiguration configuration,
+            final RustLaunchAttribute attribute) throws CoreException {
+        return configuration.getAttribute(attribute.toString(), "");
     }
 }

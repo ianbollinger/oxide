@@ -27,9 +27,15 @@ public final class LexicalUtil {
     }
 
     public static boolean isRustIdentifier(final String string) {
-        if (string.isEmpty() || !isRustIdentifierStart(string.charAt(0))) {
-            return false;
-        }
+        return hasValidIdentifierStart(string)
+                && hasValidIdentifierBody(string);
+    }
+
+    private static boolean hasValidIdentifierStart(final String string) {
+        return !string.isEmpty() && isRustIdentifierStart(string.charAt(0));
+    }
+
+    private static boolean hasValidIdentifierBody(final String string) {
         for (int i = 1; i < string.length(); ++i) {
             if (!isRustIdentifierPart(string.charAt(i))) {
                 return false;

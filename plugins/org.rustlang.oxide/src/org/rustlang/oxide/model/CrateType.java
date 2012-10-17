@@ -38,7 +38,6 @@ public enum CrateType {
         this.value = value;
     }
 
-    @SuppressWarnings("null")
     @Override
     public String toString() {
         return value;

@@ -42,10 +42,14 @@ public class RustNumberRule implements IRule {
             scanner.unread();
             return getUndefinedToken();
         }
-        final int base = scanPrefix(scanner, c);
-        final int n = scanDigits(scanner, base);
-        scanSuffix(scanner, n);
+        scanNumber(scanner, c);
         return getToken();
+    }
+
+    private void scanNumber(final ICharacterScanner scanner, final int c) {
+        final int base = scanPrefix(scanner, c);
+        final int digits = scanDigits(scanner, base);
+        scanSuffix(scanner, digits);
     }
 
     private void scanSuffix(final ICharacterScanner scanner,
@@ -86,7 +90,12 @@ public class RustNumberRule implements IRule {
         final int c = scanner.read();
         final int n = scanner.read();
         if ((c != '3' || n == '2') && (c != '6' || n != '4')) {
-            scanner.unread();
+            unread(scanner, 2);
+        }
+    }
+
+    private void unread(final ICharacterScanner scanner, final int n) {
+        for (int i = 0; i < n; ++i) {
             scanner.unread();
         }
     }
@@ -106,8 +115,7 @@ public class RustNumberRule implements IRule {
             final int n = scanner.read();
             if ((c != '1' || n != '6') && (c != '3' || n != '2')
                     && (c != '6' || n != '4')) {
-                scanner.unread();
-                scanner.unread();
+                unread(scanner, 2);
             }
         }
     }
@@ -138,12 +146,10 @@ public class RustNumberRule implements IRule {
         return inRange(c, 'a', 'z') || inRange(c, 'A', 'Z');
     }
 
-    @SuppressWarnings("null")
     private IToken getToken() {
         return token;
     }
 
-    @SuppressWarnings("null")
     private IToken getUndefinedToken() {
         return Token.UNDEFINED;
     }

@@ -22,6 +22,7 @@
 
 package org.rustlang.oxide.launch;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.List;
 import javax.annotation.Nullable;
 import com.google.common.collect.Iterables;
@@ -40,10 +41,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ResourceListSelectionDialog;
+import org.eclipse.ui.dialogs.SelectionDialog;
 import org.rustlang.oxide.OxidePlugin;
 import org.rustlang.oxide.nature.RustNature;
 
 public class RustLaunchConfigurationTabComposite extends Composite {
+    private static final String BROWSE_MESSAGE = "Browse...";
     // TODO: eliminate circular dependency if possible.
     private final RustLaunchConfigurationTab tab;
     private final Group projectGroup;
@@ -53,6 +56,8 @@ public class RustLaunchConfigurationTabComposite extends Composite {
     private final Group programArgumentsGroup;
     private final Text programArgumentsTextArea;
 
+    // TODO: work should never be done in the constructor; especially not this
+    // much.
     public RustLaunchConfigurationTabComposite(final Composite parent,
             final RustLaunchConfigurationTab tab) {
         super(parent, SWT.NULL);
@@ -122,7 +127,7 @@ public class RustLaunchConfigurationTabComposite extends Composite {
 
     private Button createExecutableBrowseButton() {
         final Button button = new Button(mainGroup, SWT.NONE);
-        button.setText("Browse...");
+        button.setText(BROWSE_MESSAGE);
         button.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(
@@ -136,39 +141,8 @@ public class RustLaunchConfigurationTabComposite extends Composite {
 
     private Button createProjectBrowseButton() {
         final Button button = new Button(projectGroup, SWT.NONE);
-        button.setText("Browse...");
-        button.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(
-                    @SuppressWarnings("unused") @Nullable
-                    final SelectionEvent event) {
-                try {
-                    final IProject[] projects = ResourcesPlugin.getWorkspace()
-                            .getRoot().getProjects();
-                    final List<IProject> rustProjects = Lists.newArrayList();
-                    for (final IProject project : projects) {
-                        if (project.isOpen()
-                                && project.hasNature(RustNature.ID)) {
-                            rustProjects.add(project);
-                        }
-                    }
-                    final IProject[] array = Iterables.toArray(rustProjects,
-                            IProject.class);
-                    // TODO: use a factory.
-                    final ResourceListSelectionDialog dialog =
-                            new ResourceListSelectionDialog(getShell(), array);
-                    dialog.setTitle("Project Selection");
-                    dialog.open();
-                    final Object[] objects = dialog.getResult();
-                    if (objects != null && objects.length > 0) {
-                        projectField.setText(((IProject) objects[0]).getName());
-                    }
-                } catch (final CoreException e) {
-                    // TODO: inject logger
-                    OxidePlugin.getLogger().error(e.getMessage(), e);
-                }
-            }
-        });
+        button.setText(BROWSE_MESSAGE);
+        button.addSelectionListener(new ProjectSelectionAdapter());
         return button;
     }
 
@@ -194,19 +168,16 @@ public class RustLaunchConfigurationTabComposite extends Composite {
 
     // domain logic -----------------------------------------------------------
 
-    @SuppressWarnings("null")
     public Text getProjectField() {
         return projectField;
     }
 
-    public void setProject(final String projectname) {
-        projectField.setText(projectname);
+    public void setProject(final String projectName) {
+        projectField.setText(projectName);
     }
 
     public String getProject() {
-        final String text = projectField.getText();
-        assert text != null;
-        return text;
+        return projectField.getText();
     }
 
     public void setExecutable(final String file) {
@@ -214,9 +185,7 @@ public class RustLaunchConfigurationTabComposite extends Composite {
     }
 
     public String getExecutable() {
-        final String text = executableField.getText();
-        assert text != null;
-        return text;
+        return executableField.getText();
     }
 
     public void setProgramArguments(final String args) {
@@ -224,13 +193,67 @@ public class RustLaunchConfigurationTabComposite extends Composite {
     }
 
     public String getProgramArguments() {
+        final String space = " ";
+        // TODO: this certainly is wrong.
         final String result = programArgumentsTextArea.getText().replace("\n",
-                " ").replace("\r", " ");
-        assert result != null;
-        return result;
+                space).replace("\r", space);
+        return checkNotNull(result);
     }
 
     final void updateState() {
         tab.update();
+    }
+
+    private final class ProjectSelectionAdapter extends SelectionAdapter {
+        @Override
+        public void widgetSelected(
+                @SuppressWarnings("unused") @Nullable
+                final SelectionEvent event) {
+            try {
+                displayDialog();
+            } catch (final CoreException e) {
+                // TODO: inject logger
+                OxidePlugin.getLogger().error(e.getMessage(), e);
+            }
+        }
+
+        private void displayDialog() throws CoreException {
+            // TODO: use a factory.
+            final SelectionDialog dialog = createDialog();
+            dialog.open();
+            final Object[] objects = dialog.getResult();
+            if (objects != null && objects.length > 0) {
+                projectField.setText(((IProject) objects[0]).getName());
+            }
+        }
+
+        private SelectionDialog createDialog() throws CoreException {
+            final IProject[] array = Iterables.toArray(getRustProjects(),
+                    IProject.class);
+            final SelectionDialog dialog = new ResourceListSelectionDialog(
+                    getShell(), array);
+            dialog.setTitle("Project Selection");
+            return dialog;
+        }
+
+        private List<IProject> getRustProjects() throws CoreException {
+            final List<IProject> rustProjects = Lists.newArrayList();
+            for (final IProject project : getAllProjects()) {
+                if (isOpenRustProject(project)) {
+                    rustProjects.add(project);
+                }
+            }
+            return rustProjects;
+        }
+
+        private IProject[] getAllProjects() {
+            // TODO: Inject this.
+            return ResourcesPlugin.getWorkspace().getRoot().getProjects();
+        }
+
+        private boolean isOpenRustProject(
+                final IProject project) throws CoreException {
+            return project.isOpen() && project.hasNature(RustNature.ID);
+        }
     }
 }

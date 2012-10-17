@@ -28,7 +28,6 @@ import com.google.inject.assistedinject.Assisted;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.jface.operation.IRunnableContext;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.sapphire.modeling.Path;
 import org.eclipse.sapphire.modeling.ProgressMonitor;
 import org.eclipse.sapphire.modeling.Status;
@@ -66,47 +65,40 @@ public class RustNewFileOperation {
 
     public Status run() {
         try {
-            final IFile file = getFileHandle();
-            final IRunnableWithProgress op = operationFactory.create(file,
-                    getShell());
             // FIXME: thread containment violation.
-            runnableContext.run(true, true, op);
-            editorOpener.open(file, getWorkbench());
-            final Status status = Status.createOkStatus();
-            assert status != null;
-            return status;
+            runnableContext.run(true, true, createOperation());
+            editorOpener.open(getFileHandle(), getWorkbench());
+            return Status.createOkStatus();
         } catch (final InterruptedException | InvocationTargetException |
                 PartInitException e) {
-            final Status status = Status.createErrorStatus(e);
-            assert status != null;
-            return status;
+            return Status.createErrorStatus(e);
         }
     }
 
+    private UndoableOperationWithProgress createOperation() {
+        return operationFactory.create(getFileHandle(), getShell());
+    }
+
     private IFile getFileHandle() {
-        final Path folderName = model.getFolder().getContent();
         final String fileName = model.getName().getContent();
-        final Path newFilePath = folderName.append(fileName + ".rs");
-        final IFile file = workspaceRoot.getFile(
-                PathBridge.create(newFilePath));
-        assert file != null;
-        return file;
+        final Path newFilePath = getFolderName().append(fileName + ".rs");
+        return workspaceRoot.getFile(PathBridge.create(newFilePath));
+    }
+
+    private Path getFolderName() {
+        return model.getFolder().getContent();
     }
 
     public static Status execute(
             @SuppressWarnings("unused") final RustSourceFile model,
             @SuppressWarnings("unused") final ProgressMonitor monitor) {
-        final Status status = Status.createOkStatus();
-        assert status != null;
-        return status;
+        return Status.createOkStatus();
     }
 
-    @SuppressWarnings("null")
     private Shell getShell() {
         return shell;
     }
 
-    @SuppressWarnings("null")
     private IWorkbench getWorkbench() {
         return workbench;
     }

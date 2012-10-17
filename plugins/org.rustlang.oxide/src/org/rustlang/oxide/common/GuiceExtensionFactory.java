@@ -22,6 +22,7 @@
 
 package org.rustlang.oxide.common;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -36,7 +37,6 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IContributor;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IExecutableExtensionFactory;
-import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.RegistryFactory;
@@ -58,9 +58,10 @@ public final class GuiceExtensionFactory implements IExecutableExtension,
     private String className;
 
     @Override
-    public void setInitializationData(final IConfigurationElement config,
+    public void setInitializationData(
+            @SuppressWarnings("null") final IConfigurationElement config,
             @SuppressWarnings("unused") @Nullable final String name,
-            final Object data) {
+            @SuppressWarnings("null") final Object data) {
         configuration = config;
         contributor = config.getContributor();
         className = data instanceof String
@@ -74,22 +75,33 @@ public final class GuiceExtensionFactory implements IExecutableExtension,
             throw newCoreException(
                     "Configuration is missing class information.");
         }
-        final Class<?> clazz;
+        final Object o = getInstance();
+        return (o instanceof IExecutableExtension)
+                ? setInitializationData((IExecutableExtension) o)
+                : o;
+    }
+
+    private IExecutableExtension setInitializationData(
+            final IExecutableExtension extension) throws CoreException {
+        extension.setInitializationData(configuration, null, null);
+        return extension;
+    }
+
+    private Object getInstance() throws CoreException {
+        return checkNotNull(getInjector().getInstance(loadClass()));
+    }
+
+    private Class<?> loadClass() throws CoreException {
         try {
-            final Bundle bundle = ContributorFactoryOSGi.resolve(contributor);
-            clazz = bundle.loadClass(className);
-        } catch (final InvalidRegistryObjectException e) {
-            throw newCoreException(e);
-        } catch (final ClassNotFoundException e) {
+            return getBundle().loadClass(className);
+        } catch (final ClassNotFoundException |
+                InvalidRegistryObjectException e) {
             throw newCoreException(e);
         }
-        final Object o = getInjector().getInstance(clazz);
-        assert o != null;
-        if (o instanceof IExecutableExtension) {
-            final IExecutableExtension extension = (IExecutableExtension) o;
-            extension.setInitializationData(configuration, null, null);
-        }
-        return o;
+    }
+
+    private Bundle getBundle() {
+        return ContributorFactoryOSGi.resolve(contributor);
     }
 
     // TODO: call
@@ -105,42 +117,47 @@ public final class GuiceExtensionFactory implements IExecutableExtension,
 
     private Injector getInjector() throws CoreException {
         synchronized (INJECTORS) {
-            Injector injector = INJECTORS.get(contributor);
-            if (injector == null) {
-                final ImmutableList.Builder<Module> modules = ImmutableList
-                        .builder();
-                modules.add(getOSGiServiceRegistry());
-                modules.addAll(getModulesContributedByProject());
-                injector = Guice.createInjector(modules.build());
-                assert injector != null;
-                INJECTORS.put(contributor, injector);
-            }
-            return injector;
+            final Injector injector = INJECTORS.get(contributor);
+            return (injector == null)
+                    ? createInjector()
+                    : injector;
         }
     }
 
+    private Injector createInjector() throws CoreException {
+        final List<Module> modules = ImmutableList
+                .<Module>builder()
+                .add(getOSGiServiceRegistry())
+                .addAll(getModulesContributedByProject())
+                .build();
+        final Injector injector = Guice.createInjector(modules);
+        INJECTORS.put(contributor, injector);
+        return injector;
+    }
+
     private Module getOSGiServiceRegistry() {
-        final Bundle bundle = ContributorFactoryOSGi.resolve(contributor);
-        final BundleContext bundleContext = bundle.getBundleContext();
+        final BundleContext bundleContext = getBundle().getBundleContext();
         final ServiceRegistry registry = EclipseRegistry.eclipseRegistry();
-        final Module result = Peaberry.osgiModule(bundleContext, registry);
-        assert result != null;
-        return result;
+        return Peaberry.osgiModule(bundleContext, registry);
     }
 
     private List<Module> getModulesContributedByProject() throws CoreException {
         final ImmutableList.Builder<Module> modules = ImmutableList.builder();
-        final IExtensionRegistry registry = RegistryFactory.getRegistry();
-        final IConfigurationElement[] elements = registry
-                .getConfigurationElementsFor(ID);
-        for (final IConfigurationElement e : elements) {
+        for (final IConfigurationElement e : getConfigurationElements()) {
             if (contributor.equals(e.getContributor())) {
-                final Object extension = e.createExecutableExtension("class");
-                assert extension != null;
-                modules.add((Module) extension);
+                modules.add(createModule(e));
             }
         }
         return modules.build();
+    }
+
+    private IConfigurationElement[] getConfigurationElements() {
+        return RegistryFactory.getRegistry().getConfigurationElementsFor(ID);
+    }
+
+    private Module createModule(
+            final IConfigurationElement e) throws CoreException {
+        return (Module) e.createExecutableExtension("class");
     }
 
     CoreException newCoreException(final Throwable throwable) {

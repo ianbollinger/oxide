@@ -54,36 +54,26 @@ public class CommonModule extends AbstractModule {
 
     @Provides
     IWorkspace provideWorkspace() {
-        final IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        assert workspace != null;
-        return workspace;
+        return ResourcesPlugin.getWorkspace();
     }
 
     @Provides
     IWorkspaceRoot provideWorkspaceRoot(final IWorkspace workspace) {
-        final IWorkspaceRoot root = workspace.getRoot();
-        assert root != null;
-        return root;
+        return workspace.getRoot();
     }
 
     @Provides
     ILog provideLog(final Plugin plugin) {
-        final ILog log = plugin.getLog();
-        assert log != null;
-        return log;
+        return plugin.getLog();
     }
 
     @Provides
     IPreferenceStore providePreferenceStore(final AbstractUIPlugin plugin) {
-        final IPreferenceStore preferenceStore = plugin.getPreferenceStore();
-        assert preferenceStore != null;
-        return preferenceStore;
+        return plugin.getPreferenceStore();
     }
 
     @Provides
     StatusManager provideStatusManager() {
-        final StatusManager manager = StatusManager.getManager();
-        assert manager != null;
-        return manager;
+        return StatusManager.getManager();
     }
 }

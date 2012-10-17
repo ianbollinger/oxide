@@ -23,8 +23,6 @@
 package org.rustlang.oxide.wizards;
 
 import com.google.inject.Inject;
-import org.eclipse.jface.operation.IRunnableContext;
-import org.eclipse.swt.widgets.Shell;
 import org.rustlang.oxide.command.RustNewFileOperationFactory;
 import org.rustlang.oxide.model.RustModelModule.SourceFileDefinition;
 import org.rustlang.oxide.model.RustSourceFile;
@@ -43,11 +41,7 @@ public class RustFileWizard extends AbstractNewWizard<RustSourceFile> {
     @Override
     protected void performPostFinish() {
         // TODO: handle status appropriately.
-        final RustSourceFile sourceFile = getModelElement();
-        final Shell shell = getShell();
-        final IRunnableContext context = getContainer();
-        assert sourceFile != null && shell != null && context != null;
-        operation.create(sourceFile, getWorkbench(), shell,
-                context).run();
+        operation.create(getModelElement(), getWorkbench(), getShell(),
+                getContainer()).run();
     }
 }

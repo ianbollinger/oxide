@@ -22,6 +22,7 @@
 
 package org.rustlang.oxide.command;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import java.lang.reflect.InvocationTargetException;
 import com.google.common.collect.ObjectArrays;
 import com.google.inject.Inject;
@@ -81,17 +82,13 @@ public class RustNewProjectOperation extends WorkspaceModifyOperation {
     public static final Status execute(
             @SuppressWarnings("unused") final RustProjectOperationModel context,
             @SuppressWarnings("unused") final ProgressMonitor monitor) {
-        final Status status = Status.createOkStatus();
-        assert status != null;
-        return status;
+        return Status.createOkStatus();
     }
 
     public void run(final ProgressMonitor monitor) {
         try {
             run(ProgressMonitorBridge.create(monitor));
-        } catch (final InvocationTargetException e) {
-            logger.error(e.getMessage(), e);
-        } catch (final InterruptedException e) {
+        } catch (final InvocationTargetException | InterruptedException e) {
             logger.error(e.getMessage(), e);
         }
     }
@@ -103,20 +100,21 @@ public class RustNewProjectOperation extends WorkspaceModifyOperation {
         try {
             monitor.beginTask("Creating Rust project",
                     subProgressMonitorFactory.getWorkScale() * NUMBER_OF_TASKS);
-            configureDescription();
-            createAndOpenProject(monitor);
-            final String name = description.getName();
-            assert name != null;
-            createFiles(name, monitor);
-            perspectiveUpdater.update(getConfiguration());
+            task(monitor);
         } finally {
             monitor.done();
         }
     }
 
+    private void task(final IProgressMonitor monitor) throws CoreException {
+        configureDescription();
+        createAndOpenProject(monitor);
+        createFiles(monitor);
+        perspectiveUpdater.update(configuration);
+    }
+
     private void configureDescription() {
         final String[] natureIds = description.getNatureIds();
-        assert natureIds != null;
         final String[] newNatureIds = ObjectArrays.concat(natureIds,
                 RustNature.ID);
         description.setNatureIds(newNatureIds);
@@ -124,11 +122,26 @@ public class RustNewProjectOperation extends WorkspaceModifyOperation {
 
     private void createAndOpenProject(
             final IProgressMonitor monitor) throws CoreException {
+        createProject(monitor);
+        openProject(monitor);
+        setProjectDescription(monitor);
+    }
+
+    private void createProject(
+            final IProgressMonitor monitor) throws CoreException {
         project.create(subProgressMonitorFactory.create(monitor));
         ensureNotCanceled(monitor);
+    }
+
+    private void openProject(
+            final IProgressMonitor monitor) throws CoreException {
         project.open(IResource.BACKGROUND_REFRESH,
                 subProgressMonitorFactory.create(monitor));
         ensureNotCanceled(monitor);
+    }
+
+    private void setProjectDescription(
+            final IProgressMonitor monitor) throws CoreException {
         project.setDescription(description,
                 subProgressMonitorFactory.create(monitor));
         ensureNotCanceled(monitor);
@@ -140,24 +153,23 @@ public class RustNewProjectOperation extends WorkspaceModifyOperation {
         }
     }
 
-    private void createFiles(final String projectName,
+    private void createFiles(
             final IProgressMonitor monitor) throws CoreException {
         createFile("README.md", "readme", monitor);
         createFile("LICENSE.txt", "license", monitor);
         // createFile(".gitignore", "gitignore", monitor);
+        final String projectName = getProjectName();
         createFile(projectName + ".rc", "crate", monitor);
         createFile(projectName + ".rs", "sourcefile", monitor);
     }
 
-    private void createFile(final String fileName, final String templateName,
-            final IProgressMonitor monitor) throws CoreException {
-        final IFile file = project.getFile(fileName);
-        assert file != null;
-        fileWriter.createFile(file, templateName, monitor);
+    private String getProjectName() {
+        return checkNotNull(description.getName());
     }
 
-    @SuppressWarnings("null")
-    IConfigurationElement getConfiguration() {
-        return configuration;
+    private void createFile(final String fileName, final String templateName,
+            final IProgressMonitor monitor) throws CoreException {
+        final IFile file = checkNotNull(project.getFile(fileName));
+        fileWriter.createFile(file, templateName, monitor);
     }
 }

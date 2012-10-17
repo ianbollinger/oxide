@@ -59,6 +59,7 @@ public class RustSourceViewerConfiguration extends
     @Override
     public IPresentationReconciler getPresentationReconciler(
             @SuppressWarnings("null") final ISourceViewer sourceViewer) {
+        // TODO: inject.
         final PresentationReconciler reconciler = new PresentationReconciler();
         reconciler.setDocumentPartitioning(getConfiguredDocumentPartitioning(
                 sourceViewer));

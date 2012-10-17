@@ -37,18 +37,13 @@ public class RustLaunchModule extends AbstractModule {
     protected void configure() {
     }
 
-    @Provides
     ConsolePlugin provideConsolePlugin() {
-        final ConsolePlugin plugin = ConsolePlugin.getDefault();
-        assert plugin != null;
-        return plugin;
+        return ConsolePlugin.getDefault();
     }
 
     @Provides
     IConsoleManager provideConsoleManager(final ConsolePlugin plugin) {
-        final IConsoleManager consoleManager = plugin.getConsoleManager();
-        assert consoleManager != null;
-        return consoleManager;
+        return plugin.getConsoleManager();
     }
 
     @Provides

@@ -47,8 +47,6 @@ public class RustProjectWizard extends
         // TODO: return real status.
         projectOperationFactory.create(getModelElement().getProject(),
                 getConfiguration()).run(monitor);
-        final Status status = super.performFinish(monitor);
-        assert status != null;
-        return status;
+        return super.performFinish(monitor);
     }
 }

@@ -35,8 +35,6 @@ public class OxideModule extends AbstractModule {
 
     @Provides
     AbstractUIPlugin providePlugin() {
-        final OxidePlugin plugin = OxidePlugin.getDefault();
-        assert plugin != null;
-        return plugin;
+        return OxidePlugin.getDefault();
     }
 }
