@@ -33,6 +33,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.dialogs.WizardNewProjectReferencePage;
 import org.rustlang.oxide.command.RustNewProjectOperationFactory;
 import org.rustlang.oxide.common.EclipseLogger;
+import org.rustlang.oxide.common.Loggers;
 
 public class RustProjectWizard extends AbstractNewWizard {
     public static final String ID =
@@ -86,7 +87,7 @@ public class RustProjectWizard extends AbstractNewWizard {
             projectOperationFactory.create(projectPage.provideModel(),
                     getConfiguration()).run(monitor);
         } catch (final InterruptedException | InvocationTargetException e) {
-            logger.error(e.getMessage(), e);
+            Loggers.logThrowable(logger, e);
         }
         return true;
     }
