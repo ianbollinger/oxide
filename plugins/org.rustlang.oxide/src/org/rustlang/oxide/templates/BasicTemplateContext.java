@@ -44,7 +44,6 @@ public class BasicTemplateContext extends TemplateContext {
 
     @Override
     public TemplateBuffer evaluate(
-            @SuppressWarnings("null")
             final Template template) throws TemplateException {
         final TemplateBuffer buffer = translator.translate(template);
         try {
@@ -56,8 +55,7 @@ public class BasicTemplateContext extends TemplateContext {
     }
 
     @Override
-    public boolean canEvaluate(
-            @SuppressWarnings("unused") @Nullable final Template template) {
+    public boolean canEvaluate(@Nullable final Template template) {
         return true;
     }
 }

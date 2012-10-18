@@ -20,11 +20,10 @@
  * THE SOFTWARE.
  */
 
-/**
- * TODO: Document package.
- */
+package org.rustlang.oxide.wizards;
 
-@ParametersAreNonnullByDefault
-package org.rustlang.oxide.model.service;
+import org.eclipse.jface.viewers.IStructuredSelection;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+public interface RustProjectWizardPageFactory {
+    RustProjectWizardPage create(IStructuredSelection selection);
+}

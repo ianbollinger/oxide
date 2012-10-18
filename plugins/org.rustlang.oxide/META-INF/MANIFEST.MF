@@ -3,6 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Oxide - Rust Development Environment
 Bundle-SymbolicName: org.rustlang.oxide;singleton:=true
 Bundle-Version: 0.0.1.qualifier
+Bundle-Vendor: Oxide
 Bundle-Activator: org.rustlang.oxide.OxidePlugin
 Require-Bundle: org.rustlang.oxide.thirdparty,
  org.eclipse.core.runtime,
@@ -16,10 +17,6 @@ Require-Bundle: org.rustlang.oxide.thirdparty,
  org.eclipse.ui.ide,
  org.eclipse.jface.databinding,
  org.eclipse.jface.text,
- org.eclipse.sapphire.modeling,
- org.eclipse.sapphire.platform,
- org.eclipse.sapphire.workspace,
- org.eclipse.sapphire.ui,
  org.slf4j.api,
  com.google.guava
 Bundle-ActivationPolicy: lazy

@@ -23,7 +23,6 @@
 package org.rustlang.oxide.command;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import java.lang.reflect.InvocationTargetException;
 import com.google.common.collect.ObjectArrays;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
@@ -36,23 +35,17 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.sapphire.modeling.ProgressMonitor;
-import org.eclipse.sapphire.modeling.Status;
-import org.eclipse.sapphire.platform.ProgressMonitorBridge;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.rustlang.oxide.common.PerspectiveUpdater;
 import org.rustlang.oxide.common.SubProgressMonitorFactory;
-import org.rustlang.oxide.model.RustProjectOperationModel;
 import org.rustlang.oxide.nature.RustNature;
 import org.rustlang.oxide.templates.TemplateFileWriter;
-import org.slf4j.Logger;
 
 public class RustNewProjectOperation extends WorkspaceModifyOperation {
     // TODO: provide way of keeping this number in sync.
     private static final int NUMBER_OF_TASKS = 7;
     private final SubProgressMonitorFactory subProgressMonitorFactory;
     private final PerspectiveUpdater perspectiveUpdater;
-    private final Logger logger;
     private final IConfigurationElement configuration;
     private final IProject project;
     private final TemplateFileWriter fileWriter;
@@ -61,7 +54,7 @@ public class RustNewProjectOperation extends WorkspaceModifyOperation {
     @Inject
     RustNewProjectOperation(final IWorkspaceRoot root,
             final SubProgressMonitorFactory subProgressMonitorFactory,
-            final PerspectiveUpdater perspectiveUpdater, final Logger logger,
+            final PerspectiveUpdater perspectiveUpdater,
             @Assisted final IConfigurationElement configuration,
             @Assisted final IProject project,
             @Assisted final TemplateFileWriter fileWriter,
@@ -69,33 +62,14 @@ public class RustNewProjectOperation extends WorkspaceModifyOperation {
         super(root);
         this.subProgressMonitorFactory = subProgressMonitorFactory;
         this.perspectiveUpdater = perspectiveUpdater;
-        this.logger = logger;
         this.configuration = configuration;
         this.project = project;
         this.fileWriter = fileWriter;
         this.description = description;
     }
 
-    /*
-     * HACK: this method does nothing and exists to keep Sapphire happy.
-     */
-    public static final Status execute(
-            @SuppressWarnings("unused") final RustProjectOperationModel context,
-            @SuppressWarnings("unused") final ProgressMonitor monitor) {
-        return Status.createOkStatus();
-    }
-
-    public void run(final ProgressMonitor monitor) {
-        try {
-            run(ProgressMonitorBridge.create(monitor));
-        } catch (final InvocationTargetException | InterruptedException e) {
-            logger.error(e.getMessage(), e);
-        }
-    }
-
     @Override
     protected void execute(
-            @SuppressWarnings("null")
             final IProgressMonitor monitor) throws CoreException {
         try {
             monitor.beginTask("Creating Rust project",

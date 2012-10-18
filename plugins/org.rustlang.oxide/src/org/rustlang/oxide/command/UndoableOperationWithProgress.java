@@ -44,7 +44,6 @@ public class UndoableOperationWithProgress implements IRunnableWithProgress {
 
     @Override
     public void run(
-            @SuppressWarnings("null")
             final IProgressMonitor monitor) throws InvocationTargetException {
         try {
             operation.execute(monitor, adaptable);

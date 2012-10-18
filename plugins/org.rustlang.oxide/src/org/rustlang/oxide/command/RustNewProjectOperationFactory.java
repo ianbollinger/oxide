@@ -30,13 +30,13 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.rustlang.oxide.model.RustProject;
-import org.rustlang.oxide.templates.SapphireTemplateContextFactory;
+import org.rustlang.oxide.templates.ProjectTemplateContextFactory;
 import org.rustlang.oxide.templates.TemplateFileWriter;
 import org.rustlang.oxide.templates.TemplateFileWriterFactory;
 
 public class RustNewProjectOperationFactory {
     private final RustNewProjectOperationInnerFactory factory;
-    private final SapphireTemplateContextFactory templateContextFactory;
+    private final ProjectTemplateContextFactory templateContextFactory;
     private final IWorkspace workspace;
     private final IWorkspaceRoot workspaceRoot;
     private final TemplateFileWriterFactory templateFileWriterFactory;
@@ -44,7 +44,7 @@ public class RustNewProjectOperationFactory {
     @Inject
     RustNewProjectOperationFactory(
             final RustNewProjectOperationInnerFactory factory,
-            final SapphireTemplateContextFactory templateContextFactory,
+            final ProjectTemplateContextFactory templateContextFactory,
             final IWorkspace workspace,
             final IWorkspaceRoot workspaceRoot,
             final TemplateFileWriterFactory templateFileWriterFactory) {
@@ -55,23 +55,19 @@ public class RustNewProjectOperationFactory {
         this.templateFileWriterFactory = templateFileWriterFactory;
     }
 
-    public RustNewProjectOperation create(final RustProject element,
+    public RustNewProjectOperation create(final RustProject rustProject,
             final IConfigurationElement configuration) {
-        final String projectName = getProjectName(element);
+        final String projectName = rustProject.getProjectName();
         final IProject project = workspaceRoot.getProject(projectName);
         final TemplateFileWriter templateFileFactory =
                 templateFileWriterFactory.create(
-                        createTemplateContext(element));
+                        createTemplateContext(rustProject));
         return factory.create(configuration, project, templateFileFactory,
                 createProjectDescription(projectName));
     }
 
-    private TemplateContext createTemplateContext(final RustProject element) {
-        return templateContextFactory.create(RustProject.TYPE, element);
-    }
-
-    private String getProjectName(final RustProject element) {
-        return element.getProjectName().getContent();
+    private TemplateContext createTemplateContext(final RustProject project) {
+        return templateContextFactory.create(project);
     }
 
     private IProjectDescription createProjectDescription(

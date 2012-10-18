@@ -20,15 +20,10 @@
  * THE SOFTWARE.
  */
 
-package org.rustlang.oxide.model.service;
+package org.rustlang.oxide.wizards;
 
-import java.util.UUID;
-import org.eclipse.sapphire.services.InitialValueService;
-import org.eclipse.sapphire.services.InitialValueServiceData;
+import org.eclipse.swt.widgets.Composite;
 
-public class UuidInitialValueService extends InitialValueService {
-    @Override
-    protected InitialValueServiceData compute() {
-        return new InitialValueServiceData(UUID.randomUUID().toString());
-    }
+public interface RustProjectPropertiesGroupFactory {
+    RustProjectPropertiesGroup create(Composite parent);
 }

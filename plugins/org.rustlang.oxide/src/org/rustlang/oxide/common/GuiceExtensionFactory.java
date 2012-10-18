@@ -58,10 +58,8 @@ public final class GuiceExtensionFactory implements IExecutableExtension,
     private String className;
 
     @Override
-    public void setInitializationData(
-            @SuppressWarnings("null") final IConfigurationElement config,
-            @SuppressWarnings("unused") @Nullable final String name,
-            @SuppressWarnings("null") final Object data) {
+    public void setInitializationData(final IConfigurationElement config,
+            @Nullable final String name, final Object data) {
         configuration = config;
         contributor = config.getContributor();
         className = data instanceof String

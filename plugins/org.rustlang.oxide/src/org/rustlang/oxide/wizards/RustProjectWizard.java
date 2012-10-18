@@ -22,31 +22,72 @@
 
 package org.rustlang.oxide.wizards;
 
+import java.lang.reflect.InvocationTargetException;
+import javax.annotation.Nullable;
 import com.google.inject.Inject;
-import org.eclipse.sapphire.modeling.ProgressMonitor;
-import org.eclipse.sapphire.modeling.Status;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.dialogs.WizardNewProjectReferencePage;
 import org.rustlang.oxide.command.RustNewProjectOperationFactory;
-import org.rustlang.oxide.model.RustModelModule.ProjectDefinition;
-import org.rustlang.oxide.model.RustProjectOperationModel;
+import org.rustlang.oxide.common.EclipseLogger;
 
-public class RustProjectWizard extends
-        AbstractNewWizard<RustProjectOperationModel> {
+public class RustProjectWizard extends AbstractNewWizard {
+    public static final String ID =
+            "org.rustlang.oxide.wizards.RustProjectWizard";
+    private RustProjectWizardPage projectPage;
+    private final IWorkspaceRoot workspaceRoot;
+    private final WizardNewProjectReferencePage referencePage;
+    private final RustProjectWizardPageFactory projectPageFactory;
+    private final ImageDescriptor imageDescriptor;
     private final RustNewProjectOperationFactory projectOperationFactory;
+    private final EclipseLogger logger;
 
     @Inject
-    RustProjectWizard(final RustProjectOperationModel element,
+    RustProjectWizard(final WizardNewProjectReferencePage referencePage,
+            final RustProjectWizardPageFactory projectPageFactory,
+            final IWorkspaceRoot workspaceRoot,
+            @Nullable final ImageDescriptor imageDescriptor,
             final RustNewProjectOperationFactory projectOperationFactory,
-            @ProjectDefinition final String definition) {
-        super(element, definition);
+            final EclipseLogger logger) {
+        this.referencePage = referencePage;
+        this.projectPageFactory = projectPageFactory;
+        this.workspaceRoot = workspaceRoot;
+        this.imageDescriptor = imageDescriptor;
         this.projectOperationFactory = projectOperationFactory;
+        this.logger = logger;
     }
 
     @Override
-    protected Status performFinish(
-            @SuppressWarnings("null") final ProgressMonitor monitor) {
-        // TODO: return real status.
-        projectOperationFactory.create(getModelElement().getProject(),
-                getConfiguration()).run(monitor);
-        return super.performFinish(monitor);
+    public void init(final IWorkbench workbench,
+            final IStructuredSelection selection) {
+        this.projectPage = projectPageFactory.create(selection);
+        setDefaultPageImageDescriptor(imageDescriptor);
+    }
+
+    @Override
+    public void addPages() {
+        addPage(projectPage);
+        if (projectsInWorkspace()) {
+            addPage(referencePage);
+        }
+    }
+
+    private boolean projectsInWorkspace() {
+        return workspaceRoot.getProjects().length > 0;
+    }
+
+    @Override
+    public boolean performFinish() {
+        final IProgressMonitor monitor = null;
+        try {
+            projectOperationFactory.create(projectPage.provideModel(),
+                    getConfiguration()).run(monitor);
+        } catch (final InterruptedException | InvocationTargetException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return true;
     }
 }

@@ -33,11 +33,6 @@
       <url>http://download.eclipse.org/releases/juno</url>
     </repository>
     <repository>
-      <id>eclipse-sapphire</id>
-      <layout>p2</layout>
-      <url>http://download.eclipse.org/sapphire/0.5.3/repository</url>
-    </repository>
-    <repository>
       <id>guava-osgi</id>
       <layout>p2</layout>
       <url>http://guava-osgi.googlecode.com/svn/trunk/repository/</url>
@@ -115,6 +110,20 @@
     </pluginManagement>
 
     <plugins>
+      <!-- Disable unused resources plugin. -->
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-resources</id>
+            <phase>none</phase>
+          </execution>
+          <execution>
+            <id>default-testResources</id>
+            <phase>none</phase>
+          </execution>
+        </executions>
+      </plugin>
 
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
@@ -127,6 +136,10 @@
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-compiler-plugin</artifactId>
         <version>${tycho-version}</version>
+        <configuration>
+          <showDeprecation>true</showDeprecation>
+          <showWarnings>true</showWarnings>
+        </configuration>
       </plugin>
 
       <plugin>
@@ -192,6 +205,7 @@
         <version>${tycho-version}</version>
       </plugin>
 
+      <!-- Disable the exec plugin enabled for parent. -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
@@ -204,14 +218,9 @@
             <id>build-oxide</id>
             <phase>none</phase>
           </execution>
-          <execution>
-            <id>build-assembly</id>
-            <phase>none</phase>
-          </execution>
         </executions>
       </plugin>
 
     </plugins>
   </build>
 </project>
-

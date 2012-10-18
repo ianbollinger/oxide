@@ -23,38 +23,28 @@
 package org.rustlang.oxide.wizards;
 
 import javax.annotation.Nullable;
-import com.google.inject.Inject;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.sapphire.modeling.IExecutableModelElement;
-import org.eclipse.sapphire.ui.swt.SapphireWizard;
+import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
-public class AbstractNewWizard<M extends IExecutableModelElement>
-        extends SapphireWizard<M> implements INewWizard, IExecutableExtension {
+public abstract class AbstractNewWizard extends Wizard
+        implements INewWizard, IExecutableExtension {
     private IConfigurationElement configuration;
     private IWorkbench workbench;
 
-    @Inject
-    AbstractNewWizard(final M element, final String definition) {
-        super(element, definition);
-    }
-
     @Override
-    public void init(@SuppressWarnings("null") final IWorkbench initWorkbench,
-            @SuppressWarnings("unused") @Nullable
-            final IStructuredSelection selection) {
+    public void init(final IWorkbench initWorkbench,
+            @Nullable final IStructuredSelection selection) {
         this.workbench = initWorkbench;
         setNeedsProgressMonitor(true);
     }
 
     @Override
-    public void setInitializationData(
-            @SuppressWarnings("null") final IConfigurationElement config,
-            @SuppressWarnings("unused") @Nullable final String propertyName,
-            @SuppressWarnings("unused") @Nullable final Object data) {
+    public void setInitializationData(final IConfigurationElement config,
+            @Nullable final String propertyName, @Nullable final Object data) {
         this.configuration = config;
     }
 

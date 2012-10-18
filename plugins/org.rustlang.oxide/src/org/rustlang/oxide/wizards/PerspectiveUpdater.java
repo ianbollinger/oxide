@@ -20,27 +20,18 @@
  * THE SOFTWARE.
  */
 
-package org.rustlang.oxide.model.service;
+package org.rustlang.oxide.wizards;
 
-import com.google.common.base.Strings;
-import org.eclipse.sapphire.modeling.IModelElement;
-import org.eclipse.sapphire.modeling.Status;
-import org.eclipse.sapphire.modeling.Value;
-import org.eclipse.sapphire.modeling.ValueProperty;
-import org.eclipse.sapphire.services.ValidationService;
-import org.rustlang.oxide.text.LexicalUtil;
+import com.google.inject.Inject;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 
-public class RustIdentifierValidationService extends ValidationService {
-    @Override
-    public Status validate() {
-        final Value<?> value = context(IModelElement.class).read(
-                context(ValueProperty.class));
-        final String string = Strings.nullToEmpty((String) value.getContent());
-        final Status status = LexicalUtil.isRustIdentifier(string)
-                ? Status.createOkStatus()
-                : Status.createErrorStatus(string
-                        + " is not a valid rust identifier.");
-        assert status != null;
-        return status;
+public class PerspectiveUpdater {
+    @Inject
+    PerspectiveUpdater() {
+    }
+
+    public void update(final IConfigurationElement configuration) {
+        BasicNewProjectResourceWizard.updatePerspective(configuration);
     }
 }

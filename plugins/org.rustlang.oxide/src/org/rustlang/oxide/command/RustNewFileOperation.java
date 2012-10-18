@@ -27,11 +27,8 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.operation.IRunnableContext;
-import org.eclipse.sapphire.modeling.Path;
-import org.eclipse.sapphire.modeling.ProgressMonitor;
-import org.eclipse.sapphire.modeling.Status;
-import org.eclipse.sapphire.platform.PathBridge;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PartInitException;
@@ -63,15 +60,15 @@ public class RustNewFileOperation {
         this.runnableContext = runnableContext;
     }
 
-    public Status run() {
+    public boolean run() {
         try {
             // FIXME: thread containment violation.
             runnableContext.run(true, true, createOperation());
             editorOpener.open(getFileHandle(), getWorkbench());
-            return Status.createOkStatus();
+            return true;
         } catch (final InterruptedException | InvocationTargetException |
                 PartInitException e) {
-            return Status.createErrorStatus(e);
+            return false;
         }
     }
 
@@ -80,19 +77,13 @@ public class RustNewFileOperation {
     }
 
     private IFile getFileHandle() {
-        final String fileName = model.getName().getContent();
-        final Path newFilePath = getFolderName().append(fileName + ".rs");
-        return workspaceRoot.getFile(PathBridge.create(newFilePath));
+        final String fileName = model.getName();
+        final IPath newFilePath = getFolderName().append(fileName + ".rs");
+        return workspaceRoot.getFile(newFilePath);
     }
 
-    private Path getFolderName() {
-        return model.getFolder().getContent();
-    }
-
-    public static Status execute(
-            @SuppressWarnings("unused") final RustSourceFile model,
-            @SuppressWarnings("unused") final ProgressMonitor monitor) {
-        return Status.createOkStatus();
+    private IPath getFolderName() {
+        return model.getFolder();
     }
 
     private Shell getShell() {

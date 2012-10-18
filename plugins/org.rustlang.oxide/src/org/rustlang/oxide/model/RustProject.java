@@ -23,184 +23,178 @@
 package org.rustlang.oxide.model;
 
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.UUID;
-import org.eclipse.sapphire.modeling.IModelElement;
-import org.eclipse.sapphire.modeling.ModelElementType;
-import org.eclipse.sapphire.modeling.Path;
-import org.eclipse.sapphire.modeling.Value;
-import org.eclipse.sapphire.modeling.ValueProperty;
-import org.eclipse.sapphire.modeling.annotations.AbsolutePath;
-import org.eclipse.sapphire.modeling.annotations.ClearOnDisable;
-import org.eclipse.sapphire.modeling.annotations.DefaultValue;
-import org.eclipse.sapphire.modeling.annotations.Enablement;
-import org.eclipse.sapphire.modeling.annotations.FileSystemResourceType;
-import org.eclipse.sapphire.modeling.annotations.GenerateImpl;
-import org.eclipse.sapphire.modeling.annotations.InitialValue;
-import org.eclipse.sapphire.modeling.annotations.Label;
-import org.eclipse.sapphire.modeling.annotations.LongString;
-import org.eclipse.sapphire.modeling.annotations.MustExist;
-import org.eclipse.sapphire.modeling.annotations.PossibleValues;
-import org.eclipse.sapphire.modeling.annotations.Required;
-import org.eclipse.sapphire.modeling.annotations.Service;
-import org.eclipse.sapphire.modeling.annotations.Services;
-import org.eclipse.sapphire.modeling.annotations.Type;
-import org.eclipse.sapphire.modeling.annotations.ValidFileSystemResourceType;
-import org.rustlang.oxide.model.service.AuthorInitialValueService;
-import org.rustlang.oxide.model.service.CrateNameDefaultValueService;
-import org.rustlang.oxide.model.service.RustIdentifierValidationService;
-import org.rustlang.oxide.model.service.UuidInitialValueService;
 
 // TODO: standard formatting rules make this interface harder to maintain.
 // TODO: extract crate model?
 // TODO: fix formatting of capitalized type names.
-@GenerateImpl
-public interface RustProject extends IModelElement {
-    ModelElementType TYPE = new ModelElementType(RustProject.class);
 
-    @Label(standard = "&project name")
-    @Required
-    ValueProperty PROP_PROJECT_NAME = new ValueProperty(TYPE, "ProjectName");
+/*
+ @Label(standard = "&project name")
+ @Required
+ ValueProperty PROP_PROJECT_NAME = new ValueProperty(TYPE, "ProjectName");
 
-    @Type(base = Boolean.class)
-    @Label(standard = "use &default location")
-    @DefaultValue(text = "true")
-    ValueProperty PROP_USE_DEFAULT_LOCATION = new ValueProperty(TYPE,
-            "UseDefaultLocation");
+ @Type(base = Boolean.class)
+ @Label(standard = "use &default location")
+ @DefaultValue(text = "true")
+ ValueProperty PROP_USE_DEFAULT_LOCATION = new ValueProperty(TYPE,
+ "UseDefaultLocation");
 
-    // TODO: browse should start in workspace.
-    @Label(standard = "&location", full = "project &location directory")
-    @Type(base = Path.class)
-    @AbsolutePath
-    @ValidFileSystemResourceType(FileSystemResourceType.FOLDER)
-    @MustExist
-    @Enablement(expr = "${!UseDefaultLocation}")
-    @ClearOnDisable
-    @Required
-    ValueProperty PROP_PROJECT_LOCATION = new ValueProperty(TYPE,
-            "ProjectLocation");
+ // TODO: browse should start in workspace.
+ @Label(standard = "&location", full = "project &location directory")
+ @Type(base = Path.class)
+ @AbsolutePath
+ @ValidFileSystemResourceType(FileSystemResourceType.FOLDER)
+ @MustExist
+ @Enablement(expr = "${!UseDefaultLocation}")
+ @ClearOnDisable
+ @Required
+ ValueProperty PROP_PROJECT_LOCATION = new ValueProperty(TYPE,
+ "ProjectLocation");
 
-    @Type(base = Boolean.class)
-    @Label(standard = "add projec&t to working sets")
-    ValueProperty PROP_ADD_PROJECT_TO_WORKING_SETS = new ValueProperty(TYPE,
-            "AddProjectToWorkingSets");
+ @Type(base = Boolean.class)
+ @Label(standard = "add projec&t to working sets")
+ ValueProperty PROP_ADD_PROJECT_TO_WORKING_SETS = new ValueProperty(TYPE,
+ "AddProjectToWorkingSets");
 
-    @Label(standard = "w&orking sets")
-    @Enablement(expr = "false")
-    ValueProperty PROP_WORKING_SETS = new ValueProperty(TYPE, "WorkingSets");
+ @Label(standard = "w&orking sets")
+ @Enablement(expr = "false")
+ ValueProperty PROP_WORKING_SETS = new ValueProperty(TYPE, "WorkingSets");
 
-    @Services({ @Service(impl = CrateNameDefaultValueService.class),
-            @Service(impl = RustIdentifierValidationService.class) })
-    @Label(standard = "&crate name")
-    @Required
-    ValueProperty PROP_CRATE_NAME = new ValueProperty(TYPE, "CrateName");
+ @Services({ @Service(impl = CrateNameDefaultValueService.class),
+ @Service(impl = RustIdentifierValidationService.class) })
+ @Label(standard = "&crate name")
+ @Required
+ ValueProperty PROP_CRATE_NAME = new ValueProperty(TYPE, "CrateName");
 
-    @Type(base = CrateType.class)
-    @Label(standard = "t&ype", full = "crate t&ype")
-    @InitialValue(text = "BINARY")
-    @Required
-    ValueProperty PROP_TYPE = new ValueProperty(TYPE, "Type");
+ @Type(base = CrateType.class)
+ @Label(standard = "t&ype", full = "crate t&ype")
+ @InitialValue(text = "BINARY")
+ @Required
+ ValueProperty PROP_TYPE = new ValueProperty(TYPE, "Type");
 
-    @Label(standard = "&version")
-    @InitialValue(text = "0.0.1")
-    @Required
-    ValueProperty PROP_VERSION = new ValueProperty(TYPE, "Version");
+ @Label(standard = "&version")
+ @InitialValue(text = "0.0.1")
+ @Required
+ ValueProperty PROP_VERSION = new ValueProperty(TYPE, "Version");
 
-    // TODO: add action for re-generating UUID.
-    @Type(base = UUID.class)
-    @Label(standard = "&UUID")
-    @Service(impl = UuidInitialValueService.class)
-    @Required
-    ValueProperty PROP_UUID = new ValueProperty(TYPE, "Uuid");
+ // TODO: add action for re-generating UUID.
+ @Type(base = UUID.class)
+ @Label(standard = "&UUID")
+ @Service(impl = UuidInitialValueService.class)
+ @Required
+ ValueProperty PROP_UUID = new ValueProperty(TYPE, "Uuid");
 
-    @Type(base = URL.class)
-    @Label(standard = "U&RL")
-    @Required
-    ValueProperty PROP_URL = new ValueProperty(TYPE, "Url");
+ @Type(base = URL.class)
+ @Label(standard = "U&RL")
+ @Required
+ ValueProperty PROP_URL = new ValueProperty(TYPE, "Url");
 
-    @Label(standard = "&author")
-    @Service(impl = AuthorInitialValueService.class)
-    ValueProperty PROP_AUTHOR = new ValueProperty(TYPE, "Author");
+ @Label(standard = "&author")
+ @Service(impl = AuthorInitialValueService.class)
+ ValueProperty PROP_AUTHOR = new ValueProperty(TYPE, "Author");
 
-    @Label(standard = "l&icense")
-    // TODO: get licenses from appropriate location.
-    @PossibleValues(values = {"Apache-2.0", "BSD-2-clause", "MIT", "GPL-3.0",
-            "LGPL-3.0", "OTHER"})
-    @InitialValue(text = "MIT")
-    ValueProperty PROP_LICENSE = new ValueProperty(TYPE, "License");
+ @Label(standard = "l&icense")
+ // TODO: get licenses from appropriate location.
+ @PossibleValues(values = {"Apache-2.0", "BSD-2-clause", "MIT", "GPL-3.0",
+ "LGPL-3.0", "OTHER"})
+ @InitialValue(text = "MIT")
+ ValueProperty PROP_LICENSE = new ValueProperty(TYPE, "License");
 
-    @Label(standard = "bri&ef", full = "bri&ef description")
-    ValueProperty PROP_BRIEF = new ValueProperty(TYPE, "Brief");
+ @Label(standard = "bri&ef", full = "bri&ef description")
+ ValueProperty PROP_BRIEF = new ValueProperty(TYPE, "Brief");
 
-    // TODO: fix vertical scaling.
-    @Label(standard = "lo&ng", full = "lo&ng description")
-    @LongString
-    ValueProperty PROP_DESCRIPTION = new ValueProperty(TYPE, "Description");
+ // TODO: fix vertical scaling.
+ @Label(standard = "lo&ng", full = "lo&ng description")
+ @LongString
+ ValueProperty PROP_DESCRIPTION = new ValueProperty(TYPE, "Description");
+ */
 
-    Value<String> getProjectName();
+public class RustProject {
+    private final String author;
+    private final String brief;
+    private String crateName;
+    private final String description;
+    private final String license;
+    private Path projectLocation;
+    private final String projectName;
+    private final CrateType type;
+    private final String url;
+    private final UUID uuid;
+    private final String version;
+    private boolean addProjectToWorkingSets;
+    private boolean useDefaultLocation;
+    private String workingSets;
 
-    void setProjectName(String name);
+    public RustProject(final String projectName, final CrateType type,
+            final String version, final UUID uuid, final String url,
+            final String author, final String license, final String brief,
+            final String description) {
+        this.projectName = projectName;
+        this.type = type;
+        this.version = version;
+        this.uuid = uuid;
+        this.url = url;
+        this.author = author;
+        this.license = license;
+        this.brief = brief;
+        this.description = description;
+    }
 
-    Value<Boolean> getUseDefaultLocation();
+    public boolean getAddProjectToWorkingSets() {
+        return addProjectToWorkingSets;
+    }
 
-    void setUseDefaultLocation(Boolean useDefaultLocation);
+    public String getAuthor() {
+        return author;
+    }
 
-    void setUseDefaultLocation(String useDefaultLocation);
+    public String getBrief() {
+        return brief;
+    }
 
-    Value<Path> getProjectLocation();
+    public String getCrateName() {
+        return crateName;
+    }
 
-    void setProjectLocation(Path location);
+    public String getDescription() {
+        return description;
+    }
 
-    void setProjectLocation(String location);
+    public String getLicense() {
+        return license;
+    }
 
-    Value<Boolean> getAddProjectToWorkingSets();
+    public Path getProjectLocation() {
+        return projectLocation;
+    }
 
-    void setAddProjectToWorkingSets(Boolean addProjectToWorkingSets);
+    public String getProjectName() {
+        return projectName;
+    }
 
-    void setAddProjectToWorkingSets(String addProjectToWorkingSets);
+    public CrateType getType() {
+        return type;
+    }
 
-    Value<String> getWorkingSets();
+    public String getUrl() {
+        return url;
+    }
 
-    void setWorkingSets(String workingSets);
+    public boolean getUseDefaultLocation() {
+        return useDefaultLocation;
+    }
 
-    Value<String> getCrateName();
+    public UUID getUuid() {
+        return uuid;
+    }
 
-    void setCrateName(String name);
+    public String getVersion() {
+        return version;
+    }
 
-    Value<CrateType> getType();
-
-    void setType(String type);
-
-    void setType(CrateType type);
-
-    Value<String> getVersion();
-
-    void setVersion(String version);
-
-    Value<UUID> getUuid();
-
-    void setUuid(UUID uuid);
-
-    void setUuid(String uuid);
-
-    Value<URL> getUrl();
-
-    void setUrl(String url);
-
-    void setUrl(URL url);
-
-    Value<String> getAuthor();
-
-    void setAuthor(String author);
-
-    Value<String> getLicense();
-
-    void setLicense(String license);
-
-    Value<String> getBrief();
-
-    void setBrief(String brief);
-
-    Value<String> getDescription();
-
-    void setDescription(String author);
+    public String getWorkingSets() {
+        return workingSets;
+    }
 }

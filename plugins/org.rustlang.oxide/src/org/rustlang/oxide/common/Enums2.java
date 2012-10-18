@@ -20,14 +20,26 @@
  * THE SOFTWARE.
  */
 
-package org.rustlang.oxide.model.service;
+package org.rustlang.oxide.common;
 
-import org.eclipse.sapphire.services.InitialValueService;
-import org.eclipse.sapphire.services.InitialValueServiceData;
+import java.util.List;
+import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableList;
 
-public class AuthorInitialValueService extends InitialValueService {
-    @Override
-    protected InitialValueServiceData compute() {
-        return new InitialValueServiceData(System.getProperty("user.name"));
+public final class Enums2 {
+    private Enums2() {
+    }
+
+    public static <T extends Enum<T>> List<T> values(
+            final Class<T> enumeration) {
+        final Object result;
+        try {
+            result = enumeration.getMethod("values").invoke(enumeration);
+        } catch (final Exception e) {
+            throw Throwables.propagate(e);
+        }
+        @SuppressWarnings("unchecked")
+        final T[] items = (T[]) result;
+        return ImmutableList.copyOf(items);
     }
 }

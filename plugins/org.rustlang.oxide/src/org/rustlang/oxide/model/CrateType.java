@@ -22,24 +22,25 @@
 
 package org.rustlang.oxide.model;
 
-import org.eclipse.sapphire.modeling.annotations.Label;
-
-@Label(standard = "type", full = "crate type")
+//@Label(standard = "type", full = "crate type")
 public enum CrateType {
-    @Label(standard = "library")
-    LIBRARY("lib"),
-
-    @Label(standard = "binary")
-    BINARY("bin");
+    LIBRARY("lib", "library"),
+    BINARY("bin", "binary");
 
     private final String value;
+    private final String name;
 
-    private CrateType(final String value) {
+    private CrateType(final String value, final String name) {
         this.value = value;
+        this.name = name;
     }
 
     @Override
     public String toString() {
         return value;
+    }
+
+    public String getName() {
+        return name;
     }
 }
