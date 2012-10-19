@@ -6,6 +6,7 @@ Bundle-Version: 0.0.1.qualifier
 Bundle-Vendor: Oxide
 Bundle-Activator: org.rustlang.oxide.OxidePlugin
 Require-Bundle: org.rustlang.oxide.thirdparty,
+ org.rustlang.oxide.common,
  org.eclipse.core.runtime,
  org.eclipse.core.databinding,
  org.eclipse.core.databinding.beans,

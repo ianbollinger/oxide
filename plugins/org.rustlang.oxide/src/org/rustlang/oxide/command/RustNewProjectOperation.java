@@ -22,11 +22,9 @@
 
 package org.rustlang.oxide.command;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ObjectArrays;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
@@ -36,11 +34,14 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
-import org.rustlang.oxide.common.PerspectiveUpdater;
 import org.rustlang.oxide.common.SubProgressMonitorFactory;
+import org.rustlang.oxide.common.template.TemplateFileWriter;
+import org.rustlang.oxide.common.wizard.PerspectiveUpdater;
 import org.rustlang.oxide.nature.RustNature;
-import org.rustlang.oxide.templates.TemplateFileWriter;
 
+/**
+ * TODO: Document class.
+ */
 public class RustNewProjectOperation extends WorkspaceModifyOperation {
     // TODO: provide way of keeping this number in sync.
     private static final int NUMBER_OF_TASKS = 7;
@@ -72,12 +73,15 @@ public class RustNewProjectOperation extends WorkspaceModifyOperation {
     protected void execute(
             final IProgressMonitor monitor) throws CoreException {
         try {
-            monitor.beginTask("Creating Rust project",
-                    subProgressMonitorFactory.getWorkScale() * NUMBER_OF_TASKS);
+            monitor.beginTask("Creating Rust project", calculateTotalWork());
             task(monitor);
         } finally {
             monitor.done();
         }
+    }
+
+    private int calculateTotalWork() {
+        return subProgressMonitorFactory.getWorkScale() * NUMBER_OF_TASKS;
     }
 
     private void task(final IProgressMonitor monitor) throws CoreException {
@@ -88,10 +92,11 @@ public class RustNewProjectOperation extends WorkspaceModifyOperation {
     }
 
     private void configureDescription() {
-        final String[] natureIds = description.getNatureIds();
-        final String[] newNatureIds = ObjectArrays.concat(natureIds,
-                RustNature.ID);
-        description.setNatureIds(newNatureIds);
+        description.setNatureIds(getNatureIds());
+    }
+
+    private String[] getNatureIds() {
+        return ObjectArrays.concat(description.getNatureIds(), RustNature.ID);
     }
 
     private void createAndOpenProject(
@@ -121,6 +126,7 @@ public class RustNewProjectOperation extends WorkspaceModifyOperation {
         ensureNotCanceled(monitor);
     }
 
+    // TODO: move into common as static method.
     private void ensureNotCanceled(final IProgressMonitor monitor) {
         if (monitor.isCanceled()) {
             throw new OperationCanceledException();
@@ -132,18 +138,13 @@ public class RustNewProjectOperation extends WorkspaceModifyOperation {
         createFile("README.md", "readme", monitor);
         createFile("LICENSE.txt", "license", monitor);
         // createFile(".gitignore", "gitignore", monitor);
-        final String projectName = getProjectName();
+        final String projectName = description.getName();
         createFile(projectName + ".rc", "crate", monitor);
         createFile(projectName + ".rs", "sourcefile", monitor);
     }
 
-    private String getProjectName() {
-        return checkNotNull(description.getName());
-    }
-
     private void createFile(final String fileName, final String templateName,
             final IProgressMonitor monitor) throws CoreException {
-        final IFile file = checkNotNull(project.getFile(fileName));
-        fileWriter.createFile(file, templateName, monitor);
+        fileWriter.createFile(project.getFile(fileName), templateName, monitor);
     }
 }

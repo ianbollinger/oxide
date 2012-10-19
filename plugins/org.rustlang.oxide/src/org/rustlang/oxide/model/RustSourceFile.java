@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.IPath;
  @Label(standard = "&name")
  @Required
  @Service(impl = RustIdentifierValidationService.class)
- ValueProperty PROP_NAME = new ValueProperty(TYPE, "Name");
 
  @Type(base = Path.class)
  @Label(standard = "&folder")
@@ -36,9 +35,9 @@ import org.eclipse.core.runtime.IPath;
  @ValidFileSystemResourceType(FileSystemResourceType.FOLDER)
  @MustExist
  @WorkspaceRelativePath
- ValueProperty PROP_FOLDER = new ValueProperty(TYPE, "FOLDER");
  */
 
+// TODO: eliminate class.
 public class RustSourceFile {
     private IPath folder;
     private String name;

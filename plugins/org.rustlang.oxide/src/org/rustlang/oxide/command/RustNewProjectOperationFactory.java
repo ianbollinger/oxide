@@ -29,11 +29,14 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.jface.text.templates.TemplateContext;
+import org.rustlang.oxide.common.template.TemplateFileWriter;
+import org.rustlang.oxide.common.template.TemplateFileWriterFactory;
 import org.rustlang.oxide.model.RustProject;
-import org.rustlang.oxide.templates.ProjectTemplateContextFactory;
-import org.rustlang.oxide.templates.TemplateFileWriter;
-import org.rustlang.oxide.templates.TemplateFileWriterFactory;
+import org.rustlang.oxide.template.ProjectTemplateContextFactory;
 
+/**
+ * TODO: Document class.
+ */
 public class RustNewProjectOperationFactory {
     private final RustNewProjectOperationInnerFactory factory;
     private final ProjectTemplateContextFactory templateContextFactory;
@@ -45,8 +48,7 @@ public class RustNewProjectOperationFactory {
     RustNewProjectOperationFactory(
             final RustNewProjectOperationInnerFactory factory,
             final ProjectTemplateContextFactory templateContextFactory,
-            final IWorkspace workspace,
-            final IWorkspaceRoot workspaceRoot,
+            final IWorkspace workspace, final IWorkspaceRoot workspaceRoot,
             final TemplateFileWriterFactory templateFileWriterFactory) {
         this.factory = factory;
         this.templateContextFactory = templateContextFactory;
@@ -55,6 +57,13 @@ public class RustNewProjectOperationFactory {
         this.templateFileWriterFactory = templateFileWriterFactory;
     }
 
+    /**
+     * TODO: Document method.
+     *
+     * @param rustProject
+     * @param configuration
+     * @return
+     */
     public RustNewProjectOperation create(final RustProject rustProject,
             final IConfigurationElement configuration) {
         final String projectName = rustProject.getProjectName();

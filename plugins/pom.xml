@@ -19,6 +19,7 @@
   <modules>
     <module>org.rustlang.oxide.thirdparty</module>
     <module>org.rustlang.oxide</module>
+    <module>org.rustlang.oxide.common</module>
     <module>../assembly</module>
     <!-- TODO: Re-enable tests when I figure out how to get tycho-surefire to
          set up the class path correctly. -->

@@ -25,11 +25,11 @@ package org.rustlang.oxide.text;
 import javax.annotation.Nullable;
 import com.google.inject.Inject;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
-import org.eclipse.jface.text.rules.Token;
+import org.eclipse.jface.text.rules.ITokenScanner;
+import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 
@@ -45,10 +45,11 @@ public class RustSourceViewerConfiguration extends
 
     @Override
     public String[] getConfiguredContentTypes(
-            @SuppressWarnings("unused") @Nullable
-            final ISourceViewer sourceViewer) {
+            @Nullable final ISourceViewer sourceViewer) {
+        // TODO: inject.
         return new String[] {
             IDocument.DEFAULT_CONTENT_TYPE,
+            RustPartitions.RUST_DOC,
             RustPartitions.RUST_SINGLE_LINE_COMMENT,
             RustPartitions.RUST_MULTI_LINE_COMMENT,
             RustPartitions.RUST_STRING,
@@ -58,39 +59,71 @@ public class RustSourceViewerConfiguration extends
 
     @Override
     public IPresentationReconciler getPresentationReconciler(
-            @SuppressWarnings("null") final ISourceViewer sourceViewer) {
+            final ISourceViewer sourceViewer) {
         // TODO: inject.
         final PresentationReconciler reconciler = new PresentationReconciler();
         reconciler.setDocumentPartitioning(getConfiguredDocumentPartitioning(
                 sourceViewer));
-        final DefaultDamagerRepairer dr = new DefaultDamagerRepairer(
-                getCodeScanner());
-        reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
-        reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
+        createDamagerRepairers(reconciler);
         return reconciler;
     }
 
-    /*
-    @Override
-    public IAutoEditStrategy[] getAutoEditStrategies(
-            final ISourceViewer sourceViewer, final String contentType) {
-        return new IAutoEditStrategy[] { getAutoIndentStrategy() };
+    private void createDamagerRepairers(
+            final PresentationReconciler reconciler) {
+        // TODO: extract into a list.
+        createDamagerRepairer(reconciler, getCodeScanner(),
+                IDocument.DEFAULT_CONTENT_TYPE);
+        createDamagerRepairer(reconciler, getRustDocScanner(),
+                RustPartitions.RUST_DOC);
+        createDamagerRepairer(reconciler, getMultilineCommentScanner(),
+                RustPartitions.RUST_MULTI_LINE_COMMENT);
+        createDamagerRepairer(reconciler, getSinglelineCommentScanner(),
+                RustPartitions.RUST_SINGLE_LINE_COMMENT);
+        createDamagerRepairer(reconciler, getStringScanner(),
+                RustPartitions.RUST_STRING);
+        createDamagerRepairer(reconciler, getStringScanner(),
+                RustPartitions.RUST_CHARACTER);
     }
 
-    public IAutoEditStrategy getAutoIndentStrategy() {
-        if (autoIndentStrategy == null) {
-            autoIndentStrategy = new RustAutoIndentStrategy();
-        }
-        return autoIndentStrategy;
+    private void createDamagerRepairer(
+            final PresentationReconciler reconciler,
+            final ITokenScanner scanner, final String partition) {
+        // TODO: create factory.
+        final DefaultDamagerRepairer dr = new DefaultDamagerRepairer(
+                scanner);
+        reconciler.setDamager(dr, partition);
+        reconciler.setRepairer(dr, partition);
     }
-    */
 
     private RustCodeScanner getCodeScanner() {
+        // TODO: esnure thread safety.
         if (codeScanner == null) {
+            // TODO: inject.
             codeScanner = new RustCodeScanner(colorManager);
-            codeScanner.setDefaultReturnToken(new Token(new TextAttribute(
-                    colorManager.getColor(RustColorConstants.DEFAULT))));
         }
         return codeScanner;
+    }
+
+    private RuleBasedScanner getMultilineCommentScanner() {
+        // TODO: inject.
+        return new RustCommentScanner(colorManager,
+                RustColorConstants.MULTI_LINE_COMMENT);
+    }
+
+    private RuleBasedScanner getSinglelineCommentScanner() {
+        // TODO: inject.
+        return new RustCommentScanner(colorManager,
+                RustColorConstants.SINGLE_LINE_COMMENT);
+    }
+
+    private RuleBasedScanner getStringScanner() {
+        // TODO: inject.
+        return new SingleTokenRustScanner(colorManager,
+                RustColorConstants.STRING);
+    }
+
+    private RuleBasedScanner getRustDocScanner() {
+        // TODO: inject.
+        return new RustDocScanner(colorManager);
     }
 }

@@ -23,12 +23,17 @@
 package org.rustlang.oxide.text;
 
 import org.eclipse.jface.text.rules.IToken;
+import org.rustlang.oxide.common.text.SingleCharacterRule;
 
+/**
+ * TODO: Document class.
+ */
 public class RustOperatorRule extends SingleCharacterRule {
-    public RustOperatorRule(final IToken token) {
+    RustOperatorRule(final IToken token) {
         super(token);
     }
 
+    // TODO: make more accurate.
     @Override
     public boolean isRuleCharacter(final int c) {
         return c == '!' ||  c == '#' || c == '$' || c == '*' || c == '+'

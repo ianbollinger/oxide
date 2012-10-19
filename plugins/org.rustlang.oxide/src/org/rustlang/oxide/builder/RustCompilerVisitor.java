@@ -26,16 +26,20 @@ import javax.annotation.Nullable;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 
+/**
+ * TODO: Document class.
+ */
 public class RustCompilerVisitor implements RustBuilderVisitor {
+    RustCompilerVisitor() {
+    }
+
     @Override
-    public boolean visit(
-            @SuppressWarnings("unused") @Nullable final IResource resource) {
+    public boolean visit(@Nullable final IResource resource) {
         return true;
     }
 
     @Override
-    public boolean visit(
-            @SuppressWarnings("unused") @Nullable final IResourceDelta delta) {
+    public boolean visit(@Nullable final IResourceDelta delta) {
         return true;
     }
 }

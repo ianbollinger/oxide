@@ -28,26 +28,26 @@
 
   <extension point="org.rustlang.oxide.modules">
     <module class="org.rustlang.oxide.common.CommonModule"/>
-    <module class="org.rustlang.oxide.templates.RustTemplateModule"/>
+    <module class="org.rustlang.oxide.template.RustTemplateModule"/>
     <module class="org.rustlang.oxide.command.RustCommandModule"/>
     <module class="org.rustlang.oxide.model.RustModelModule"/>
-    <module class="org.rustlang.oxide.wizards.WizardModule"/>
+    <module class="org.rustlang.oxide.wizard.WizardModule"/>
     <module class="org.rustlang.oxide.OxideModule"/>
   </extension>
 
   <extension point="org.eclipse.ui.perspectives">
     <perspective id="org.rustlang.oxide.perspective.RustPerspective"
-        class="org.rustlang.oxide.common.GuiceExtensionFactory"
-        name="Rust"
-        icon="icons/rust-logo-16x16.png"/>
+        class="org.rustlang.oxide.GuiceExtensionFactory"
+        icon="icons/rust-logo-16x16.png"
+        name="Rust"/>
   </extension>
 
   <extension point="org.eclipse.ui.perspectiveExtensions">
     <perspectiveExtension
           targetID="org.rustlang.oxide.perspective.RustPerspective">
       <actionSet id="org.eclipse.debug.ui.launchActionSet"/>
-      <newWizardShortcut id="org.rustlang.oxide.wizards.RustProjectWizard"/>
-      <newWizardShortcut id="org.rustlang.oxide.wizards.RustFileWizard"/>
+      <newWizardShortcut id="org.rustlang.oxide.wizard.RustProjectWizard"/>
+      <newWizardShortcut id="org.rustlang.oxide.wizard.RustFileWizard"/>
       <newWizardShortcut id="org.eclipse.ui.wizards.new.folder"/>
       <newWizardShortcut id="org.eclipse.ui.wizards.new.file"/>
       <newWizardShortcut
@@ -79,7 +79,7 @@
 
    <extension point="org.eclipse.ui.editors">
      <editor id="org.rustlang.oxide.editor.RustEditor"   
-         class="org.rustlang.oxide.common.GuiceExtensionFactory"
+         class="org.rustlang.oxide.GuiceExtensionFactory"
          contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
          default="true"
          extensions="rs,rc"
@@ -97,33 +97,33 @@
 
   <extension point="org.eclipse.ui.editors.documentProviders">
     <provider id="org.rustlang.oxide.editor.RustDocumentProvider"
-        class="org.rustlang.oxide.common.GuiceExtensionFactory"
+        class="org.rustlang.oxide.GuiceExtensionFactory"
         extensions=".rs,.rc"/>
   </extension>
 
   <extension point="org.eclipse.ui.newWizards">
     <category id="org.rustlang.eclipse.RustCategory"
         name="Rust Wizards"/>
-    <wizard id="org.rustlang.oxide.wizards.RustProjectWizard"
-        class="org.rustlang.oxide.common.GuiceExtensionFactory"
+    <wizard id="org.rustlang.oxide.wizard.RustProjectWizard"
+        class="org.rustlang.oxide.GuiceExtensionFactory"
         canFinishEarly="false"
         category="org.rustlang.eclipse.RustCategory"
         finalPerspective="org.rustlang.oxide.perspective.RustPerspective"
         hasPages="true"
-        icon="icons/rust-logo-16x16.png"
         name="Rust Project"
+        icon="icons/rust-logo-16x16.png"
         preferredPerspectives="org.rustlang.oxide.perspective.RustPerspective"
         project="true">
       <description>Create a new Rust project</description>
     </wizard>
-    <wizard id="org.rustlang.oxide.wizards.RustFileWizard"
-        class="org.rustlang.oxide.common.GuiceExtensionFactory"
+    <wizard id="org.rustlang.oxide.wizard.RustFileWizard"
+        class="org.rustlang.oxide.GuiceExtensionFactory"
         canFinishEarly="false"
         category="org.rustlang.eclipse.RustCategory"
         finalPerspective="org.rustlang.oxide.perspective.RustPerspective"
         hasPages="true"
-        icon="icons/rust-logo-16x16.png"
         name="Rust Source File"
+        icon="icons/rust-logo-16x16.png"
         preferredPerspectives="org.rustlang.oxide.perspective.RustPerspective"
         project="false">
       <description>Create a new Rust source file</description>
@@ -131,30 +131,30 @@
   </extension>
 
   <extension point="org.eclipse.ui.preferencePages">
-    <page id="org.rustlang.oxide.preferences.RustPreferencePage"
-        class="org.rustlang.oxide.common.GuiceExtensionFactory"
+    <page id="org.rustlang.oxide.preference.RustPreferencePage"
+        class="org.rustlang.oxide.GuiceExtensionFactory"
         name="Rust"/>
-    <page id="org.rustlang.oxide.preferences.RustCompilerPreferencePage"
-        class="org.rustlang.oxide.common.GuiceExtensionFactory"
-        category="org.rustlang.oxide.preferences.RustPreferencePage"
+    <page id="org.rustlang.oxide.preference.RustCompilerPreferencePage"
+        class="org.rustlang.oxide.GuiceExtensionFactory"
+        category="org.rustlang.oxide.preference.RustPreferencePage"
         name="Compiler"/>
-    <page id="org.rustlang.oxide.preferences.RustProjectDefaultsPreferencePage"
-        class="org.rustlang.oxide.common.GuiceExtensionFactory"
-        category="org.rustlang.oxide.preferences.RustPreferencePage"
+    <page id="org.rustlang.oxide.preference.RustProjectDefaultsPreferencePage"
+        class="org.rustlang.oxide.GuiceExtensionFactory"
+        category="org.rustlang.oxide.preference.RustPreferencePage"
         name="Project Defaults"/>
-    <page id="org.rustlang.oxide.preferences.RustEditorPreferencePage"
-        class="org.rustlang.oxide.common.GuiceExtensionFactory"
-        category="org.rustlang.oxide.preferences.RustPreferencePage"
+    <page id="org.rustlang.oxide.preference.RustEditorPreferencePage"
+        class="org.rustlang.oxide.GuiceExtensionFactory"
+        category="org.rustlang.oxide.preference.RustPreferencePage"
         name="Editor"/>
-    <page id="org.rustlang.oxide.preferences.RustSyntaxColoringPreferencePage"
-        class="org.rustlang.oxide.common.GuiceExtensionFactory"
-        category="org.rustlang.oxide.preferences.RustEditorPreferencePage"
+    <page id="org.rustlang.oxide.preference.RustSyntaxColoringPreferencePage"
+        class="org.rustlang.oxide.GuiceExtensionFactory"
+        category="org.rustlang.oxide.preference.RustEditorPreferencePage"
         name="Syntax Coloring"/>
   </extension>
 
   <extension point="org.eclipse.core.runtime.preferences">
     <initializer
-        class="org.rustlang.oxide.common.GuiceExtensionFactory:org.rustlang.oxide.preferences.RustPreferencesInitializer"/>
+        class="org.rustlang.oxide.GuiceExtensionFactory:org.rustlang.oxide.preference.RustPreferencesInitializer"/>
   </extension>
 
   <extension point="org.eclipse.core.contenttype.contentTypes">
@@ -200,15 +200,15 @@
   <extension point="org.eclipse.debug.ui.launchConfigurationTabGroups">
     <launchConfigurationTabGroup
         id="org.rustlang.oxide.launch.RustLaunchConfigurationTabGroup"
-        class="org.rustlang.oxide.common.GuiceExtensionFactory"
+        class="org.rustlang.oxide.GuiceExtensionFactory"
         type="org.rustlang.oxide.launch.configuration"/>
   </extension>
 
   <extension point="org.eclipse.debug.ui.launchShortcuts">
     <shortcut id="org.rustlang.oxide.launch.RustLaunchShortcut"
-        class="org.rustlang.oxide.common.GuiceExtensionFactory"
-        icon="icons/rust-logo-16x16.png"
+        class="org.rustlang.oxide.GuiceExtensionFactory"
         label="Rust Application"
+        icon="icons/rust-logo-16x16.png"
         modes="run,debug">
       <description mode="run"
           description="Runs a Rust application"/>
@@ -239,30 +239,30 @@
   </extension>
 
   <extension point="org.eclipse.ui.editors.templates">
-    <contextType id="org.rustlang.oxide.templates.RustTemplateContextType"
-        class="org.rustlang.oxide.common.GuiceExtensionFactory"/>
+    <contextType id="org.rustlang.oxide.template.RustTemplateContextType"
+        class="org.rustlang.oxide.GuiceExtensionFactory"/>
     <template id="org.rustlang.oxide.templates.crate"
-        contextTypeId="org.rustlang.oxide.templates.RustTemplateContextType"
+        contextTypeId="org.rustlang.oxide.template.RustTemplateContextType"
         autoinsert="false"
         name="crate">
-      <pattern>#[link(name = "${CrateName}",
-       vers = "${Version}",
-       uuid = "${Uuid}",
-       url = "${Url}")];
+      <pattern>#[link(name = "${crate_name}",
+       vers = "${version}",
+       uuid = "${uuid}",
+       url = "${url}")];
 
-#[author = "${Author}"];
-#[license = "${License}"];
-#[crate_type = "${Type}"];
+#[author = "${author}"];
+#[license = "${license}"];
+#[crate_type = "${crate_type}"];
 
-#[doc(brief = "${Brief}",
-      desc = "${Description}")];
+#[doc(brief = "${brief}",
+      desc = "${desc}")];
 </pattern>
     </template>
     <template id="org.rustlang.oxide.templates.gitignore"
         autoinsert="false"
         name="gitignore"
-        contextTypeId="org.rustlang.oxide.templates.RustTemplateContextType">
-      <pattern>${CrateName}
+        contextTypeId="org.rustlang.oxide.template.RustTemplateContextType">
+      <pattern>${crate_name}
 *.a
 *.dSYM
 *.dll
@@ -279,8 +279,8 @@
     <template id="org.rustlang.oxide.editor.templates.readme"
         autoinsert="false"
         name="readme"
-        contextTypeId="org.rustlang.oxide.templates.RustTemplateContextType">
-      <pattern># ${ProjectName} - ${Brief}
+        contextTypeId="org.rustlang.oxide.template.RustTemplateContextType">
+      <pattern># ${project_name} - ${brief}
 
 ${Description}
 </pattern>
@@ -289,7 +289,7 @@ ${Description}
     <template id="org.rustlang.oxide.editor.templates.sourcefile"
         autoinsert="false"
         name="sourcefile"
-        contextTypeId="org.rustlang.oxide.templates.RustTemplateContextType">
+        contextTypeId="org.rustlang.oxide.template.RustTemplateContextType">
       <pattern>// TODO: write
 </pattern>
     </template>
@@ -297,7 +297,7 @@ ${Description}
     <template id="org.rustlang.oxide.editor.templates.license"
         autoinsert="false"
         name="license"
-        contextTypeId="org.rustlang.oxide.templates.RustTemplateContextType">
+        contextTypeId="org.rustlang.oxide.template.RustTemplateContextType">
       <pattern>TODO: write
 </pattern>
     </template>
@@ -305,8 +305,8 @@ ${Description}
     <template id="org.rustlang.oxide.editor.templates.license.mit"
         autoinsert="false"
         name="MIT License"
-        contextTypeId="org.rustlang.oxide.templates.RustTemplateContextType">
-      <pattern>Copyright (c) ${Year} ${Author}
+        contextTypeId="org.rustlang.oxide.template.RustTemplateContextType">
+      <pattern>Copyright ${year} ${author}
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

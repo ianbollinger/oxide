@@ -25,6 +25,9 @@ package org.rustlang.oxide.model;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 
+/**
+ * TODO: Document class.
+ */
 public class RustModelModule extends AbstractModule {
     @Override
     protected void configure() {

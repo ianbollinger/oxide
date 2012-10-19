@@ -22,14 +22,34 @@
 
 package org.rustlang.oxide.text;
 
+/**
+ * TODO: Document class.
+ */
 public final class RustPartitions {
+    /**
+     * TODO: Document field.
+     */
     public static final String RUST_PARTITIONING = "__rust_partitioning";
-    public static final String RUST_SINGLE_LINE_COMMENT =
+
+    // TODO: make a list.
+    /**
+     * TODO: Document field.
+     */
+    public static final String[] CONTENT_TYPES = new String[] {
+        RustPartitions.RUST_DOC,
+        RustPartitions.RUST_MULTI_LINE_COMMENT,
+        RustPartitions.RUST_SINGLE_LINE_COMMENT,
+        RustPartitions.RUST_STRING,
+        RustPartitions.RUST_CHARACTER
+    };
+
+    static final String RUST_DOC = "__rust_doc";
+    static final String RUST_SINGLE_LINE_COMMENT =
             "__rust_singleline_comment";
-    public static final String RUST_MULTI_LINE_COMMENT =
+    static final String RUST_MULTI_LINE_COMMENT =
             "__rust_multiline_comment";
-    public static final String RUST_STRING = "__rust_string";
-    public static final String RUST_CHARACTER = "__rust_character";
+    static final String RUST_STRING = "__rust_string";
+    static final String RUST_CHARACTER = "__rust_character";
 
     private RustPartitions() {
     }

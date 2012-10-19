@@ -27,9 +27,12 @@ import org.eclipse.ui.editors.text.TextEditor;
 import org.rustlang.oxide.text.RustColorManager;
 import org.rustlang.oxide.text.RustSourceViewerConfiguration;
 
+/**
+ * TODO: Document class.
+ */
 public class RustEditor extends TextEditor {
-    public static final String ID =
-            "org.rustlang.oxide.editor.RustEditor";
+    // TODO: this isn't used anywhere.
+    static final String ID = "org.rustlang.oxide.editor.RustEditor";
     private final RustColorManager colorManager;
 
     @Inject

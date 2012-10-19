@@ -34,7 +34,6 @@ import javax.annotation.Nullable;
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.google.common.io.CharStreams;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -45,36 +44,47 @@ import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.debug.core.DebugPlugin;
 import org.rustlang.oxide.OxidePlugin;
 import org.rustlang.oxide.common.EnumPreferenceStore;
-import org.rustlang.oxide.preferences.RustPreferenceKey;
+import org.rustlang.oxide.common.launch.ProcessExecutor;
+import org.rustlang.oxide.preference.RustPreferenceKey;
 import org.slf4j.Logger;
 
+/**
+ * TODO: Document class.
+ */
 public class RustBuilder extends IncrementalProjectBuilder {
+    /**
+     * TODO: Document field.
+     */
     public static final String ID = "org.rustlang.oxide.RustBuilder";
-    // TODO: inject
-    private static final Pattern RUSTC_ERROR_PATTERN = Pattern.compile(
-            "^([^:]+):(\\d+):(\\d+): (\\d+):(\\d+) error: (.+)$");
 
     private final EnumPreferenceStore preferenceStore;
+    private final Pattern errorPattern;
     private final Logger logger;
+    private final ProcessExecutor processExecutor;
 
+    /**
+     * The constructor is an implementation detail and should not be invoked
+     * directly.
+     */
     public RustBuilder() {
-        // TODO: inject.
+        // TODO: inject fields.
         this.preferenceStore = OxidePlugin.getEnumPreferenceStore();
+        this.errorPattern = Pattern.compile(
+                "^([^:]+):(\\d+):(\\d+): (\\d+):(\\d+) error: (.+)$");
         this.logger = OxidePlugin.getLogger();
+        this.processExecutor = new ProcessExecutor();
     }
 
     @Override @Nullable
     protected IProject[] build(final int kind,
-            @SuppressWarnings("unused") @Nullable
-            final Map<String, String> args,
+            @Nullable final Map<String, String> args,
             @Nullable final IProgressMonitor monitor) throws CoreException {
         decideOnAndExecuteBuild(kind, monitor);
         eraseProblemMarkers();
         final IProject project = getProject();
-        rustc(getCrateFile(project), getSourceFile(project));
+        executeRustCompiler(getCrateFile(project), getSourceFile(project));
         return null;
     }
 
@@ -115,12 +125,10 @@ public class RustBuilder extends IncrementalProjectBuilder {
                 IResource.DEPTH_INFINITE);
     }
 
-    private void rustc(final IResource resource,
+    private void executeRustCompiler(final IResource resource,
             final File workingDirectory) throws CoreException {
-        final List<String> builder = buildCommandLine(resource);
-        final String[] commandLine = Iterables.toArray(builder, String.class);
-        // TODO: eliminate static call.
-        final Process process = DebugPlugin.exec(commandLine, workingDirectory);
+        final Process process = processExecutor.execute(
+                buildCommandLine(resource), workingDirectory);
         interpretCompilerOutput(process);
     }
 
@@ -167,7 +175,7 @@ public class RustBuilder extends IncrementalProjectBuilder {
 
     // TODO: rename!
     private void parseLine(final String line) throws CoreException {
-        final Matcher m = RUSTC_ERROR_PATTERN.matcher(line);
+        final Matcher m = errorPattern.matcher(line);
         if (m.matches()) {
             final IResource resource = getProject().getFile(m.group(1));
             final int lineStart = Integer.parseInt(m.group(2));
@@ -181,6 +189,7 @@ public class RustBuilder extends IncrementalProjectBuilder {
 
     private void reportError(final IResource resource, final int line,
             final String msg) throws CoreException {
+        // TODO: inject factory.
         final IMarker marker = resource.createMarker(IMarker.PROBLEM);
         marker.setAttribute(IMarker.LINE_NUMBER, line);
         // marker.setAttribute(IMarker.CHAR_START, start);
@@ -204,6 +213,7 @@ public class RustBuilder extends IncrementalProjectBuilder {
     }
 
     private List<? extends RustBuilderVisitor> getVisitors() {
+        // TODO: inject.
         return ImmutableList.of(new RustCompilerVisitor());
     }
 

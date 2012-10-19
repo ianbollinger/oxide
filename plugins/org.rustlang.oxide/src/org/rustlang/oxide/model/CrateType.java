@@ -22,9 +22,21 @@
 
 package org.rustlang.oxide.model;
 
-//@Label(standard = "type", full = "crate type")
+import javax.annotation.concurrent.Immutable;
+
+/**
+ * TODO: Document class.
+ */
+@Immutable
 public enum CrateType {
+    /**
+     * TODO: Document constant.
+     */
     LIBRARY("lib", "library"),
+
+    /**
+     * TODO: Document constant.
+     */
     BINARY("bin", "binary");
 
     private final String value;
@@ -40,6 +52,9 @@ public enum CrateType {
         return value;
     }
 
+    /**
+     * TODO: Document method.
+     */
     public String getName() {
         return name;
     }

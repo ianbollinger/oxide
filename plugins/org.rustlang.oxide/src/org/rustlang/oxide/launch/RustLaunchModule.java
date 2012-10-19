@@ -32,6 +32,14 @@ import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsoleManager;
 
+/**
+ * Default Guice {@link com.google.inject.Module} for Rust launcher
+ * implementations.
+ *
+ * Provides the following bindings:
+ *
+ * TODO: list bindings.
+ */
 public class RustLaunchModule extends AbstractModule {
     @Override
     protected void configure() {

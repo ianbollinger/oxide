@@ -24,7 +24,13 @@ package org.rustlang.oxide.text;
 
 import org.eclipse.jface.text.rules.IWordDetector;
 
+/**
+ * TODO: Document.
+ */
 public class RustWordDetector implements IWordDetector {
+    RustWordDetector() {
+    }
+
     @Override
     public boolean isWordStart(final char c) {
         return LexicalUtil.isRustIdentifierStart(c);

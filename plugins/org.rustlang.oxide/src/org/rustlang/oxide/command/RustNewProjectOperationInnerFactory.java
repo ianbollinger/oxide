@@ -25,9 +25,22 @@ package org.rustlang.oxide.command;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.rustlang.oxide.templates.TemplateFileWriter;
+import org.rustlang.oxide.common.template.TemplateFileWriter;
 
+// TODO: give class less stupid name.
+/**
+ * TODO: Document interface.
+ */
 public interface RustNewProjectOperationInnerFactory {
+    /**
+     * TODO: Document method.
+     *
+     * @param configuration
+     * @param project
+     * @param writer
+     * @param description
+     * @return
+     */
     RustNewProjectOperation create(
             IConfigurationElement configuration, IProject project,
             TemplateFileWriter writer, IProjectDescription description);

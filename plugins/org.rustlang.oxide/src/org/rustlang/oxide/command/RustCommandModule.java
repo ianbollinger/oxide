@@ -25,6 +25,9 @@ package org.rustlang.oxide.command;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 
+/**
+ * Guice {@link com.google.inject.Module} for commands.
+ */
 public class RustCommandModule extends AbstractModule {
     @Override
     protected void configure() {

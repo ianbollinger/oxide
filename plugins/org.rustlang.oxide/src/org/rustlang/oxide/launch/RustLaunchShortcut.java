@@ -40,25 +40,43 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.part.FileEditorInput;
 import org.rustlang.oxide.OxidePlugin;
+import org.rustlang.oxide.common.Loggers;
 import org.slf4j.Logger;
 
+/**
+ * Launch shortcut for Rust applications.
+ */
 public class RustLaunchShortcut implements ILaunchShortcut {
     private final Logger logger;
     private final ILaunchManager launchManager;
 
+    /**
+     * This constructor is an implementation detail; do not invoke.
+     */
     public RustLaunchShortcut() {
-        // TODO: inject.
+        // TODO: inject fields and make constructor package-private.
         this.logger = OxidePlugin.getLogger();
         this.launchManager = DebugPlugin.getDefault().getLaunchManager();
     }
 
     @Override
-    public void launch(@SuppressWarnings("null") final ISelection selection,
-            @SuppressWarnings("null") final String mode) {
+    public void launch(final ISelection selection, final String mode) {
         final Optional<IFile> file = getSelectedFile(selection);
         if (file.isPresent()) {
             try {
                 launch(getProjectName(file.get()), mode);
+            } catch (final CoreException e) {
+                Loggers.logThrowable(logger, e);
+            }
+        }
+    }
+
+    @Override
+    public void launch(final IEditorPart editor, final String mode) {
+        final IEditorInput editorInput = editor.getEditorInput();
+        if (editorInput instanceof FileEditorInput) {
+            try {
+                launch(getProjectName(getFile(editorInput)), mode);
             } catch (final CoreException e) {
                 logger.error(e.getMessage(), e);
             }
@@ -78,19 +96,6 @@ public class RustLaunchShortcut implements ILaunchShortcut {
 
     private String getProjectName(final IFile file) {
         return file.getProject().getName();
-    }
-
-    @Override
-    public void launch(@SuppressWarnings("null") final IEditorPart editor,
-            @SuppressWarnings("null") final String mode) {
-        final IEditorInput editorInput = editor.getEditorInput();
-        if (editorInput instanceof FileEditorInput) {
-            try {
-                launch(getProjectName(getFile(editorInput)), mode);
-            } catch (final CoreException e) {
-                logger.error(e.getMessage(), e);
-            }
-        }
     }
 
     private IFile getFile(final IEditorInput editorInput) {
@@ -175,7 +180,7 @@ public class RustLaunchShortcut implements ILaunchShortcut {
                 && projectPath.equals(Path.fromOSString(executable));
     }
 
-    private static String getAttribute(final ILaunchConfiguration configuration,
+    private String getAttribute(final ILaunchConfiguration configuration,
             final RustLaunchAttribute attribute) throws CoreException {
         return configuration.getAttribute(attribute.toString(), "");
     }

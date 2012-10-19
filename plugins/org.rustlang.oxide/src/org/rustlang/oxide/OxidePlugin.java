@@ -34,10 +34,19 @@ import org.rustlang.oxide.common.EnumPreferenceStore;
 import org.slf4j.Logger;
 
 // TODO: eliminate circular dependencies.
+/**
+ * TODO: Document class.
+ */
 public class OxidePlugin extends AbstractUIPlugin {
     public static final String ID = "org.rustlang.oxide";
     private static OxidePlugin plugin;
     private Injector injector;
+
+    /**
+     * Internal-use only.  Do not instantiate directly.
+     */
+    public OxidePlugin() {
+    }
 
     @Override
     public void start(@Nullable final BundleContext context) throws Exception {
@@ -52,23 +61,33 @@ public class OxidePlugin extends AbstractUIPlugin {
         super.stop(context);
     }
 
-    public static OxidePlugin getDefault() {
-        return checkNotNull(plugin);
-    }
-
+    /**
+     * TODO: Document method.
+     *
+     * @param imageFilePath
+     * @return
+     */
     public static ImageDescriptor getImageDescriptor(
             final String imageFilePath) {
         return imageDescriptorFromPlugin(ID, imageFilePath);
     }
 
+    // TODO: make package-private.
+    public static OxidePlugin getDefault() {
+        return checkNotNull(plugin);
+    }
+
+    // TODO: eliminate.
     public static Logger getLogger() {
         return getInstance(Logger.class);
     }
 
+    // TODO: eliminate.
     public static EnumPreferenceStore getEnumPreferenceStore() {
         return getInstance(EnumPreferenceStore.class);
     }
 
+    // TODO: make package-private.
     public static <T> T getInstance(final Class<T> clazz) {
         return plugin.injector.getInstance(clazz);
     }

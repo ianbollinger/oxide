@@ -27,42 +27,58 @@ import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 
+/**
+ * TODO: Document class.
+ */
 public class RustNumberRule implements IRule {
     private final IToken token;
 
-    public RustNumberRule(final IToken token) {
+    RustNumberRule(final IToken token) {
         this.token = token;
     }
 
     @Override
-    public IToken evaluate(
-            @SuppressWarnings("null") final ICharacterScanner scanner) {
-        final int c = scanner.read();
-        if (!isDecimalDigit(c)) {
-            scanner.unread();
+    public IToken evaluate(final ICharacterScanner scanner) {
+        if (!LexicalUtil.isDecimalDigit(peek(scanner))) {
             return getUndefinedToken();
         }
-        scanNumber(scanner, c);
+        scanNumber(scanner);
         return getToken();
     }
 
-    private void scanNumber(final ICharacterScanner scanner, final int c) {
-        final int base = scanPrefix(scanner, c);
-        final int digits = scanDigits(scanner, base);
-        scanSuffix(scanner, digits);
+    private void scanNumber(final ICharacterScanner scanner) {
+        final int base = scanPrefix(scanner);
+        scanDigits(scanner, base);
+        scanSuffix(scanner);
     }
 
-    private void scanSuffix(final ICharacterScanner scanner,
-            final int previous) {
-        int c = previous;
+    private int scanPrefix(final ICharacterScanner scanner) {
+        final int c = scanner.read();
+        if (c == '0') {
+            final int n = scanner.read();
+            if (n == 'b') {
+                return 2;
+            }
+            if (n == 'x') {
+                return 16;
+            }
+            scanner.unread();
+        }
+        return 10;
+    }
+
+    private void scanSuffix(final ICharacterScanner scanner) {
+        int c = scanner.read();
         if (c == 'u' || c == 'i') {
             scanIntegerSuffix(scanner);
         } else {
             if (c == '.') {
-                c = scanDigits(scanner, 10);
+                scanDigits(scanner, 10);
+                c = scanner.read();
             }
             if (c == 'e' || c == 'E') {
-                c = scanExponent(scanner);
+                scanExponent(scanner);
+                c = scanner.read();
             }
             if (c == 'f') {
                 scanFloatSuffix(scanner);
@@ -70,20 +86,6 @@ public class RustNumberRule implements IRule {
                 scanner.unread();
             }
         }
-    }
-
-    private int scanPrefix(final ICharacterScanner scanner, final int c) {
-        final int n = scanner.read();
-        final int base;
-        if (c == '0' && n == 'x') {
-            base = 16;
-        } else if (c == '0' && n == 'b') {
-            base = 2;
-        } else {
-            scanner.unread();
-            base = 10;
-        }
-        return base;
     }
 
     private void scanFloatSuffix(final ICharacterScanner scanner) {
@@ -94,19 +96,17 @@ public class RustNumberRule implements IRule {
         }
     }
 
-    private void unread(final ICharacterScanner scanner, final int n) {
-        for (int i = 0; i < n; ++i) {
-            scanner.unread();
-        }
-    }
-
-    private int scanDigits(final ICharacterScanner scanner, final int radix) {
+    private void scanDigits(final ICharacterScanner scanner, final int radix) {
         int c;
         do {
             c = scanner.read();
-        } while (c == '_'
-                || (isHexadecimalDigit(c) && Character.digit(c, radix) != -1));
-        return c;
+        } while (validDigit(c, radix));
+        scanner.unread();
+    }
+
+    private boolean validDigit(final int c, final int radix) {
+        return c == '_' || (LexicalUtil.isHexadecimalDigit(c)
+                && Character.digit(c, radix) != -1);
     }
 
     private void scanIntegerSuffix(final ICharacterScanner scanner) {
@@ -120,30 +120,12 @@ public class RustNumberRule implements IRule {
         }
     }
 
-    private int scanExponent(final ICharacterScanner scanner) {
+    private void scanExponent(final ICharacterScanner scanner) {
         final int c = scanner.read();
         if (c != '-' || c != '+') {
             scanner.unread();
         }
-        return scanDigits(scanner, 10);
-    }
-
-    // TODO: move these utility methods elsewhere.
-    private static boolean inRange(final int c, final int low, final int high) {
-        return low <= c && c <= high;
-    }
-
-    private static boolean isHexadecimalDigit(final int c) {
-        return inRange(c, '0', '9') || inRange(c, 'a', 'f')
-                || inRange(c, 'A', 'F');
-    }
-
-    public static boolean isDecimalDigit(final int c) {
-        return inRange(c, '0', '9');
-    }
-
-    public static boolean isAlpha(final int c) {
-        return inRange(c, 'a', 'z') || inRange(c, 'A', 'Z');
+        scanDigits(scanner, 10);
     }
 
     private IToken getToken() {
@@ -152,5 +134,17 @@ public class RustNumberRule implements IRule {
 
     private IToken getUndefinedToken() {
         return Token.UNDEFINED;
+    }
+
+    private int peek(final ICharacterScanner scanner) {
+        final int c = scanner.read();
+        scanner.unread();
+        return c;
+    }
+
+    private void unread(final ICharacterScanner scanner, final int n) {
+        for (int i = 0; i < n; ++i) {
+            scanner.unread();
+        }
     }
 }

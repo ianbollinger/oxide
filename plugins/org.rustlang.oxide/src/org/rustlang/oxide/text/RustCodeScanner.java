@@ -24,18 +24,19 @@ package org.rustlang.oxide.text;
 
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
-import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.MultiLineRule;
-import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 
+/**
+ * TODO: Document class.
+ */
 public class RustCodeScanner extends BufferedRuleBasedScanner {
+    // TODO: Inject field.
     private static final String[] KEYWORDS = {
         "as", "assert", "bind", "break", "const", "copy", "do", "drop", "else",
         "enum", "extern", "fail", "false", "fn", "for", "if", "impl", "let",
@@ -43,39 +44,40 @@ public class RustCodeScanner extends BufferedRuleBasedScanner {
         "return", "self", "static", "struct", "trait", "type", "unsafe", "use",
         "while"
     };
-    private static final String SINGLE_QUOTE = "'";
-    private static final String DOUBLE_QUOTE = "\"";
 
-    public RustCodeScanner(final RustColorManager manager) {
-        setRules(createRules(manager));
+    private final RustColorManager colorManager;
+
+    RustCodeScanner(final RustColorManager colorManager) {
+        this.colorManager = colorManager;
+        // TODO: Don't do work in constructor.
+        initialize();
     }
 
-    private IRule[] createRules(final RustColorManager manager) {
-        final IToken numberRuleToken = createToken(manager,
-                RustColorConstants.NUMBER);
-        final IToken stringToken = createToken(manager,
-                RustColorConstants.STRING);
-        final IToken commentToken = createToken(manager,
-                RustColorConstants.SINGLE_LINE_COMMENT);
-        final IToken identToken = createToken(manager,
-                RustColorConstants.DEFAULT);
+    private void initialize() {
+        setRules(createRules());
+        setDefaultReturnToken(createToken(RustColorConstants.DEFAULT));
+    }
+
+    private IRule[] createRules() {
+        final IToken numberRuleToken = createToken(RustColorConstants.NUMBER);
+        final IToken identToken = createToken(RustColorConstants.DEFAULT);
+        final IToken operatorToken = createToken(RustColorConstants.DEFAULT);
+        final IToken braceToken = createToken(RustColorConstants.DEFAULT);
         final IRule[] rules = new IRule[] {
             new WhitespaceRule(new RustWhitespaceDetector()),
             new RustNumberRule(numberRuleToken),
-            createWordRules(manager),
+            createWordRules(),
             new WordRule(new RustWordDetector(), identToken),
-            new SingleLineRule(DOUBLE_QUOTE, DOUBLE_QUOTE, stringToken, '\\',
-                    true, true),
-            new SingleLineRule(SINGLE_QUOTE, SINGLE_QUOTE, stringToken, '\\'),
-            new EndOfLineRule("//", commentToken),
-            new MultiLineRule("/*", "*/", commentToken)
+            new RustOperatorRule(operatorToken),
+            new RustBraceRule(braceToken)
         };
         return rules;
     }
 
-    private WordRule createWordRules(final RustColorManager manager) {
+    private WordRule createWordRules() {
         final IToken wordToken = new Token(new TextAttribute(
-                manager.getColor(RustColorConstants.KEYWORD), null, SWT.BOLD));
+                colorManager.getColor(RustColorConstants.KEYWORD), null,
+                SWT.BOLD));
         final WordRule wordRule = new WordRule(new RustWordDetector());
         for (final String word : KEYWORDS) {
             wordRule.addWord(word, wordToken);
@@ -83,7 +85,7 @@ public class RustCodeScanner extends BufferedRuleBasedScanner {
         return wordRule;
     }
 
-    private Token createToken(final RustColorManager manager, final RGB color) {
-        return new Token(new TextAttribute(manager.getColor(color)));
+    private Token createToken(final RGB color) {
+        return new Token(new TextAttribute(colorManager.getColor(color)));
     }
 }

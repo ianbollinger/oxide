@@ -27,7 +27,19 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.rustlang.oxide.model.RustSourceFile;
 
+/**
+ * Factory for {@link RustNewFileOperation}.
+ */
 public interface RustNewFileOperationFactory {
+    /**
+     * TODO: Document method.
+     *
+     * @param rustSourceFile
+     * @param workbench
+     * @param shell
+     * @param runnableContext
+     * @return
+     */
     RustNewFileOperation create(RustSourceFile rustSourceFile,
             IWorkbench workbench, Shell shell,
             IRunnableContext runnableContext);

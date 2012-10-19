@@ -30,6 +30,9 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
+/**
+ *
+ */
 public class RustColorManager {
     private final Map<RGB, Color> colorTable;
 
@@ -38,6 +41,7 @@ public class RustColorManager {
         this.colorTable = new HashMap<>();
     }
 
+    // TODO: make package-private or document.
     public void dispose() {
         final Iterator<Color> e = colorTable.values().iterator();
         while (e.hasNext()) {
@@ -45,7 +49,7 @@ public class RustColorManager {
         }
     }
 
-    public Color getColor(final RGB rgb) {
+    Color getColor(final RGB rgb) {
         Color color = colorTable.get(rgb);
         if (color == null) {
             color = new Color(Display.getCurrent(), rgb);

@@ -27,6 +27,11 @@ import com.google.inject.Provides;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
+/**
+ * Main Guice {@link com.google.inject.Module} for Oxide.
+ *
+ * Provides the instance for the Oxide plugin.
+ */
 public class OxideModule extends AbstractModule {
     @Override
     protected void configure() {

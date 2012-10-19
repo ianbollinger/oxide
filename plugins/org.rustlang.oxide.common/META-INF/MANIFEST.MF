@@ -1,0 +1,25 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Oxide Common
+Bundle-SymbolicName: org.rustlang.oxide.common
+Bundle-Version: 0.0.1.qualifier
+Bundle-Vendor: Oxide
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.rustlang.oxide.thirdparty,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.ui,
+ org.eclipse.ui.ide,
+ com.google.guava,
+ org.slf4j.api,
+ org.eclipse.debug.core,
+ org.eclipse.jface.text
+Export-Package: org.rustlang.oxide.common,
+ org.rustlang.oxide.common.command,
+ org.rustlang.oxide.common.launch,
+ org.rustlang.oxide.common.preference,
+ org.rustlang.oxide.common.swt,
+ org.rustlang.oxide.common.template,
+ org.rustlang.oxide.common.text,
+ org.rustlang.oxide.common.wizard

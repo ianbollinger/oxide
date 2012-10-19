@@ -22,13 +22,11 @@
 
 package org.rustlang.oxide.launch;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.File;
 import java.util.List;
 import javax.annotation.Nullable;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -37,34 +35,34 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.Launch;
 import org.eclipse.debug.core.model.ILaunchConfigurationDelegate2;
 import org.eclipse.jface.util.Util;
-import org.eclipse.ui.console.IConsole;
-import org.eclipse.ui.console.IConsoleManager;
-import org.eclipse.ui.console.MessageConsole;
+import org.rustlang.oxide.common.launch.LaunchFactory;
+import org.rustlang.oxide.common.launch.ProcessExecutor;
 import org.rustlang.oxide.nature.RustNature;
 
+/**
+ * TODO: Document class.
+ */
 public class RustApplicationLauncher implements ILaunchConfigurationDelegate2 {
-    public static final String ID = "org.rustlang.oxide.launch.configuration";
+    static final String ID = "org.rustlang.oxide.launch.configuration";
     private final IWorkspaceRoot workspaceRoot;
-    private final IConsoleManager consoleManager;
+    private final LaunchFactory launchFactory;
+    private final ProcessExecutor processExecutor;
 
-    public RustApplicationLauncher(final IWorkspaceRoot root,
-            final IConsoleManager consoleManager) {
+    RustApplicationLauncher(final IWorkspaceRoot root) {
         this.workspaceRoot = root;
-        this.consoleManager = consoleManager;
+        // TODO: Inject fields.
+        this.launchFactory = new LaunchFactory();
+        this.processExecutor = new ProcessExecutor();
     }
 
     @Override
-    public boolean buildForLaunch(
-            @SuppressWarnings("null") final ILaunchConfiguration configuration,
-            @SuppressWarnings("unused") @Nullable final String mode,
-            @SuppressWarnings("unused") @Nullable
-            final IProgressMonitor monitor) throws CoreException {
+    public boolean buildForLaunch(final ILaunchConfiguration configuration,
+            @Nullable final String mode,
+            @Nullable final IProgressMonitor monitor) throws CoreException {
         final String project = getAttribute(configuration,
                 RustLaunchAttribute.PROJECT);
         final String executable = getAttribute(configuration,
@@ -73,41 +71,39 @@ public class RustApplicationLauncher implements ILaunchConfigurationDelegate2 {
     }
 
     @Override
-    public boolean finalLaunchCheck(
-            @SuppressWarnings("unused") @Nullable
-            final ILaunchConfiguration config,
-            @SuppressWarnings("unused") @Nullable final String mode,
-            @SuppressWarnings("unused") @Nullable
-            final IProgressMonitor monitor) {
+    public boolean finalLaunchCheck(@Nullable final ILaunchConfiguration config,
+            @Nullable final String mode,
+            @Nullable final IProgressMonitor monitor) {
         return true;
     }
 
     @Override
-    public ILaunch getLaunch(
-            @SuppressWarnings("null") final ILaunchConfiguration configuration,
-            @SuppressWarnings("null") final String mode) {
-        // TODO: make a factory.
-        return new Launch(configuration, mode, null);
+    public ILaunch getLaunch(final ILaunchConfiguration configuration,
+            final String mode) {
+        return launchFactory.create(configuration, mode);
     }
 
     @Override
     public boolean preLaunchCheck(
-            @SuppressWarnings("unused") @Nullable
-            final ILaunchConfiguration configuration,
-            @SuppressWarnings("unused") @Nullable final String mode,
-            @SuppressWarnings("unused") @Nullable
-            final IProgressMonitor monitor) {
+            @Nullable final ILaunchConfiguration configuration,
+            @Nullable final String mode,
+            @Nullable final IProgressMonitor monitor) {
         return true;
     }
 
     @Override
-    public void launch(
-            @SuppressWarnings("null") final ILaunchConfiguration configuration,
-            @SuppressWarnings("unused") @Nullable final String mode,
-            @SuppressWarnings("null") final ILaunch launch,
-            @SuppressWarnings("unused") @Nullable
-            final IProgressMonitor monitor) throws CoreException {
-        execute(configuration, launch);
+    public void launch(final ILaunchConfiguration configuration,
+            @Nullable final String mode, final ILaunch launch,
+            @Nullable final IProgressMonitor monitor) throws CoreException {
+        final Optional<IProject> possibleProject = getProject(configuration);
+        if (possibleProject.isPresent()) {
+            spawnProcess(configuration, launch, possibleProject.get());
+        }
+    }
+
+    private static String getAttribute(final ILaunchConfiguration configuration,
+            final RustLaunchAttribute attribute) throws CoreException {
+        return configuration.getAttribute(attribute.toString(), "");
     }
 
     private Optional<IProject> getProject(
@@ -133,14 +129,6 @@ public class RustApplicationLauncher implements ILaunchConfigurationDelegate2 {
         return false;
     }
 
-    private void execute(final ILaunchConfiguration configuration,
-            final ILaunch launch) throws CoreException {
-        final Optional<IProject> possibleProject = getProject(configuration);
-        if (possibleProject.isPresent()) {
-            spawnProcess(configuration, launch, possibleProject.get());
-        }
-    }
-
     private void spawnProcess(final ILaunchConfiguration configuration,
             final ILaunch launch,
             final IProject project) throws CoreException {
@@ -162,8 +150,8 @@ public class RustApplicationLauncher implements ILaunchConfigurationDelegate2 {
         final String programArguments = getAttribute(configuration,
                 RustLaunchAttribute.ARGUMENTS);
         final IPath executablePath = getExecutablePath(executableName);
-        final String commandLine = checkNotNull(
-                projectPath.append(executablePath).toOSString());
+        final String commandLine = projectPath.append(
+                executablePath).toOSString();
         return ImmutableList.<String>builder()
                 .add(commandLine)
                 .addAll(argumentsAsList(programArguments))
@@ -178,40 +166,18 @@ public class RustApplicationLauncher implements ILaunchConfigurationDelegate2 {
         return relativeExecutablePath.lastSegment();
     }
 
-    private static String getAttribute(final ILaunchConfiguration configuration,
-            final RustLaunchAttribute attribute) throws CoreException {
-        return configuration.getAttribute(attribute.toString(), "");
-    }
-
-    // TODO: create a strategy for this.
-    void spawnProcess(final ILaunch launch, final String executableName,
+    private void spawnProcess(final ILaunch launch, final String executableName,
             final File workingDirectory,
             final Iterable<String> arguments) throws CoreException {
-        final String[] array = Iterables.toArray(arguments, String.class);
-        final Process process = DebugPlugin.exec(array, workingDirectory);
-        DebugPlugin.newProcess(launch, process, executableName);
+        final Process process = processExecutor.execute(arguments,
+                workingDirectory);
+        processExecutor.newProcess(launch, process, executableName);
     }
 
     private IPath getExecutablePath(final String executableName) {
         return Util.isWindows()
                 ? Path.fromOSString(executableName)
                 : Path.fromOSString(".").append(executableName);
-    }
-
-    public MessageConsole findMessageConsole(final String name) {
-        for (final IConsole element : consoleManager.getConsoles()) {
-            if (name.equals(element.getName())) {
-                return (MessageConsole) element;
-            }
-        }
-        return createMessageConsole(name);
-    }
-
-    private MessageConsole createMessageConsole(final String name) {
-        // TODO: use factory.
-        final MessageConsole console = new MessageConsole(name, null);
-        consoleManager.addConsoles(new IConsole[] { console });
-        return console;
     }
 
     // TODO: move this somewhere appropriate.

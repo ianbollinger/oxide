@@ -33,26 +33,31 @@ import org.eclipse.swt.widgets.Control;
 import org.rustlang.oxide.OxidePlugin;
 import org.slf4j.Logger;
 
+/**
+ * TODO: Document class.
+ */
 public class RustLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
-    private RustLaunchConfigurationTabComposite control;
     private final Logger logger;
+    private final RustLaunchConfigurationTabCompositeFactory factory;
+    // TODO: ensure thread safety.
+    private volatile RustLaunchConfigurationTabComposite control;
 
     public RustLaunchConfigurationTab() {
-        // TODO: inject.
+        // TODO: inject fields.
         this.logger = OxidePlugin.getLogger();
+        this.factory = new RustLaunchConfigurationTabCompositeFactory();
     }
 
     @Override
-    public void createControl(
-            @SuppressWarnings("null") final Composite parent) {
-        // TODO: make a factory.
-        control = new RustLaunchConfigurationTabComposite(parent, this);
+    public void createControl(final Composite parent) {
+        control = factory.create(parent, this);
     }
 
     @Override
     public void dispose() {
         if (control != null) {
             control.dispose();
+            control = null;
         }
     }
 
@@ -63,7 +68,6 @@ public class RustLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
 
     @Override
     public void setDefaults(
-            @SuppressWarnings("null")
             final ILaunchConfigurationWorkingCopy configuration) {
         configuration.setAttribute(RustLaunchAttribute.PROJECT.toString(), "");
         configuration.setAttribute(RustLaunchAttribute.EXECUTABLE.toString(),
@@ -73,14 +77,37 @@ public class RustLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
     }
 
     @Override
-    public void initializeFrom(
-            @SuppressWarnings("null")
-            final ILaunchConfiguration configuration) {
+    public void initializeFrom(final ILaunchConfiguration configuration) {
         try {
             configure(configuration);
         } catch (final CoreException e) {
             logger.error(e.getMessage(), e);
         }
+    }
+
+    @Override
+    public void performApply(
+            final ILaunchConfigurationWorkingCopy configuration) {
+        configuration.setAttribute(RustLaunchAttribute.PROJECT.toString(),
+                control.getProject());
+        configuration.setAttribute(RustLaunchAttribute.EXECUTABLE.toString(),
+                control.getExecutable());
+        configuration.setAttribute(RustLaunchAttribute.ARGUMENTS.toString(),
+                control.getProgramArguments());
+        configuration.setAttribute(DebugPlugin.ATTR_CONSOLE_ENCODING, "UTF-8");
+    }
+
+    @Override
+    public String getName() {
+        return "Main";
+    }
+
+    public void update() {
+        // validate();
+        final ILaunchConfigurationDialog dialog =
+                getLaunchConfigurationDialog();
+        dialog.updateButtons();
+        dialog.updateMessage();
     }
 
     private void configure(
@@ -111,31 +138,5 @@ public class RustLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
         final String programArguments = configuration.getAttribute(
                 RustLaunchAttribute.ARGUMENTS.toString(), "");
         control.setProgramArguments(programArguments);
-    }
-
-    @Override
-    public void performApply(
-            @SuppressWarnings("null")
-            final ILaunchConfigurationWorkingCopy configuration) {
-        configuration.setAttribute(RustLaunchAttribute.PROJECT.toString(),
-                control.getProject());
-        configuration.setAttribute(RustLaunchAttribute.EXECUTABLE.toString(),
-                control.getExecutable());
-        configuration.setAttribute(RustLaunchAttribute.ARGUMENTS.toString(),
-                control.getProgramArguments());
-        configuration.setAttribute(DebugPlugin.ATTR_CONSOLE_ENCODING, "UTF-8");
-    }
-
-    @Override
-    public String getName() {
-        return "Main";
-    }
-
-    public void update() {
-        // validate();
-        final ILaunchConfigurationDialog dialog =
-                getLaunchConfigurationDialog();
-        dialog.updateButtons();
-        dialog.updateMessage();
     }
 }

@@ -22,13 +22,37 @@
 
 package org.rustlang.oxide.text;
 
+/**
+ * TODO: Document class.
+ */
 public final class LexicalUtil {
     private LexicalUtil() {
     }
 
-    public static boolean isRustIdentifier(final String string) {
+    static boolean isRustIdentifier(final String string) {
         return hasValidIdentifierStart(string)
                 && hasValidIdentifierBody(string);
+    }
+
+    static boolean isRustIdentifierStart(final char c) {
+        return Character.isUnicodeIdentifierStart(c) || c == '_';
+    }
+
+    static boolean isRustIdentifierPart(final char c) {
+        return Character.isUnicodeIdentifierPart(c) || c == '_';
+    }
+
+    static boolean isHexadecimalDigit(final int c) {
+        return inRange(c, '0', '9') || inRange(c, 'a', 'f')
+                || inRange(c, 'A', 'F');
+    }
+
+    static boolean isDecimalDigit(final int c) {
+        return inRange(c, '0', '9');
+    }
+
+    static boolean isAlpha(final int c) {
+        return inRange(c, 'a', 'z') || inRange(c, 'A', 'Z');
     }
 
     private static boolean hasValidIdentifierStart(final String string) {
@@ -44,11 +68,7 @@ public final class LexicalUtil {
         return true;
     }
 
-    public static boolean isRustIdentifierStart(final char c) {
-        return Character.isUnicodeIdentifierStart(c) || c == '_';
-    }
-
-    public static boolean isRustIdentifierPart(final char c) {
-        return Character.isUnicodeIdentifierPart(c) || c == '_';
+    private static boolean inRange(final int c, final int low, final int high) {
+        return low <= c && c <= high;
     }
 }

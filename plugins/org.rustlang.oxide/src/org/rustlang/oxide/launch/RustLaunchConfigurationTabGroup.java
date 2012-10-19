@@ -30,8 +30,11 @@ import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
 
-public class RustLaunchConfigurationTabGroup extends
-        AbstractLaunchConfigurationTabGroup {
+/**
+ * TODO: Document class.
+ */
+public class RustLaunchConfigurationTabGroup
+        extends AbstractLaunchConfigurationTabGroup {
     private final List<ILaunchConfigurationTab> tabs;
 
     @Inject
@@ -40,10 +43,8 @@ public class RustLaunchConfigurationTabGroup extends
     }
 
     @Override
-    public void createTabs(
-            @SuppressWarnings("unused") @Nullable
-            final ILaunchConfigurationDialog dialog,
-            @SuppressWarnings("unused") @Nullable final String mode) {
+    public void createTabs(@Nullable final ILaunchConfigurationDialog dialog,
+            @Nullable final String mode) {
         setTabs(Iterables.toArray(getConfigurationTabs(),
                 ILaunchConfigurationTab.class));
     }

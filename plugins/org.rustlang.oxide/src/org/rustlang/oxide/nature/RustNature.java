@@ -31,9 +31,19 @@ import org.eclipse.core.runtime.CoreException;
 import org.rustlang.oxide.builder.RustBuilder;
 import org.rustlang.oxide.common.ObjectArrays2;
 
+/**
+ * The {@link IProjectNature} implementation for Rust projects.
+ */
 public class RustNature implements IProjectNature {
+    /**
+     * The unique identifier for Rust project natures.
+     */
     public static final String ID = "org.rustlang.oxide.RustNature";
+
     private volatile IProject project;
+
+    RustNature() {
+    }
 
     @Override
     public void configure() throws CoreException {
@@ -60,7 +70,7 @@ public class RustNature implements IProjectNature {
     }
 
     @Override
-    public void setProject(@SuppressWarnings("null") final IProject project) {
+    public void setProject(final IProject project) {
         synchronized (this) {
             this.project = project;
         }

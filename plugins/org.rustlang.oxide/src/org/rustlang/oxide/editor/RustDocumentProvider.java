@@ -25,6 +25,9 @@ package org.rustlang.oxide.editor;
 import com.google.inject.Inject;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 
+/**
+ * TODO: Document class.
+ */
 public class RustDocumentProvider extends TextFileDocumentProvider {
     @Inject
     RustDocumentProvider() {

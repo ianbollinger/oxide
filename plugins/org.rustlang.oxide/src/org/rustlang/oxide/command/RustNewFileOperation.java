@@ -32,9 +32,14 @@ import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PartInitException;
+import org.rustlang.oxide.common.CreateFileOperationFactory;
 import org.rustlang.oxide.common.EditorOpener;
+import org.rustlang.oxide.common.command.UndoableOperationWithProgress;
 import org.rustlang.oxide.model.RustSourceFile;
 
+/**
+ * TODO: Document class.
+ */
 public class RustNewFileOperation {
     private final IWorkspaceRoot workspaceRoot;
     private final EditorOpener editorOpener;
@@ -60,11 +65,14 @@ public class RustNewFileOperation {
         this.runnableContext = runnableContext;
     }
 
+    /**
+     * TODO: Document method.
+     */
     public boolean run() {
         try {
             // FIXME: thread containment violation.
             runnableContext.run(true, true, createOperation());
-            editorOpener.open(getFileHandle(), getWorkbench());
+            editorOpener.open(getFileHandle(), workbench);
             return true;
         } catch (final InterruptedException | InvocationTargetException |
                 PartInitException e) {
@@ -73,24 +81,14 @@ public class RustNewFileOperation {
     }
 
     private UndoableOperationWithProgress createOperation() {
-        return operationFactory.create(getFileHandle(), getShell());
+        return operationFactory.create(getFileHandle(), shell);
     }
 
     private IFile getFileHandle() {
-        final String fileName = model.getName();
-        final IPath newFilePath = getFolderName().append(fileName + ".rs");
-        return workspaceRoot.getFile(newFilePath);
+        return workspaceRoot.getFile(getSourceFilePath());
     }
 
-    private IPath getFolderName() {
-        return model.getFolder();
-    }
-
-    private Shell getShell() {
-        return shell;
-    }
-
-    private IWorkbench getWorkbench() {
-        return workbench;
+    private IPath getSourceFilePath() {
+        return model.getFolder().append(model.getName() + ".rs");
     }
 }

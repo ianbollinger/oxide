@@ -22,8 +22,35 @@
 
 package org.rustlang.oxide.launch;
 
-public enum RustLaunchAttribute {
-    PROJECT,
-    EXECUTABLE,
-    ARGUMENTS
+import org.rustlang.oxide.common.launch.LaunchAttribute;
+
+/**
+ * TODO: Document enum.
+ */
+public enum RustLaunchAttribute implements LaunchAttribute {
+    /**
+     * TODO: Document constant.
+     */
+    PROJECT(String.class),
+
+    /**
+     * TODO: Document constant.
+     */
+    EXECUTABLE(String.class),
+
+    /**
+     * TODO: Document constant.
+     */
+    ARGUMENTS(String.class);
+
+    private final Class<?> type;
+
+    RustLaunchAttribute(final Class<?> type) {
+        this.type = type;
+    }
+
+    @Override
+    public Class<?> getType() {
+        return type;
+    }
 }
