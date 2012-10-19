@@ -7,6 +7,7 @@
     <groupId>org.rustlang.oxide</groupId>
     <artifactId>plugins</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../plugins</relativePath>
   </parent>
   <artifactId>assembly</artifactId>
   <packaging>pom</packaging>
