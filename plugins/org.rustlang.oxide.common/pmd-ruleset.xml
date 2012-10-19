@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="oxide"
+    xmlns="http://pmd.sf.net/ruleset/1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pmd.sf.net/ruleset/1.0.0 http://pmd.sf.net/ruleset_xml_schema.xsd"
+    xsi:noNamespaceSchemaLocation="http://pmd.sf.net/ruleset_xml_schema.xsd">
+
+  <description>PMD static analysis rule set for Oxide.</description>
+
+  <rule ref="rulesets/basic.xml"/>
+  <rule ref="rulesets/braces.xml"/>
+  <rule ref="rulesets/clone.xml"/>
+  <rule ref="rulesets/codesize.xml"/>
+  <rule ref="rulesets/controversial.xml">
+
+    <!-- Rationale: every local variable should be final if possible. It is
+         mutable data that is the exceptional case. -->
+    <exclude name="AvoidFinalLocalVariable"/>
+
+    <!-- Rationale: line noise. -->
+    <exclude name="CallSuperInConstructor"/>
+
+    <!-- Rationale: this rule almost always provides false positives; it is
+         of zero utility. -->
+    <exclude name="DataflowAnomalyAnalysis"/>
+
+    <!-- Rationale: package-visibility is incredibly useful and should be
+         used for every constructor when possible. -->
+    <exclude name="DefaultPackage"/>
+
+    <!-- Rationale: this actually should be avoided, but is necessary on
+         occasion to encourage garbage collection.  -->
+    <exclude name="NullAssignment"/>
+
+    <!-- Rationale: methods are often more readable with multiple return
+         statements. A good example of this are return guards. Keep methods
+         concise instead. -->      
+    <exclude name="OnlyOneReturn"/>
+
+    <!-- Rationale: volatile is a perfectly useful language feature. It
+         should be used judiciously, however, and atomic primitives and
+         references may be preferable. -->
+    <exclude name="AvoidUsingVolatile"/>
+
+  </rule>
+  <rule ref="rulesets/coupling.xml"/>
+  <rule ref="rulesets/design.xml">
+
+    <!-- Rationale: this is a good rule. A better rule: don't use arrays.
+         However, it is often part of another API's contract (e.g. the Eclipse
+         platform) that an overridden method should return null. -->
+    <exclude name="ReturnEmptyArrayRatherThanNull"/>
+
+    <!-- Rationale: switches may have returns instead of breaks. In fact, this
+         is generally preferable. -->
+    <exclude name="MissingBreakInSwitch"/>
+
+    <!-- Rationale: empty constructors should be package-private and annotated
+         with @Inject. Excluding this rule increases concision. -->
+    <exclude name="UncommentedEmptyConstructor"/>
+
+    <!-- Rationale: empty methods are common enough and commenting each one is
+         of dubious value. -->
+    <exclude name="UncommentedEmptyMethod"/>
+
+    <!-- Rationale: this is almost always a good rule, but an exception must
+         be made when putting @SuppressWarnings annotations on locals. This is
+         often done when doing an unsafe cast before returning. -->
+    <exclude name="UnnecessaryLocalBeforeReturn"/>
+
+  </rule>
+  <rule ref="rulesets/finalizers.xml"/>
+  <rule ref="rulesets/imports.xml">
+
+    <!-- Rationale: this would be good, if PMD didn't sometimes give false
+         positives. -->
+    <exclude name="UnusedImports"/>
+
+  </rule>
+  <rule ref="rulesets/javabeans.xml">
+
+    <!-- Rationale: don't the JavaBean anti-pattern. This rule set is only
+         included because of the MissingSerialVersionUID rule which is a good
+         one. Avoid Serializable though. --> 
+    <exclude name="BeanMembersShouldSerialize"/>
+   
+  </rule>
+  <rule ref="rulesets/junit.xml">
+
+    <!-- Rationale: this violates the DRY principle. There should be one
+         assertion per test method and its name should indicate what the test
+         asserts. -->
+    <exclude name="JUnitAssertionsShouldIncludeMessage"/>
+
+    <!-- Rationale: this is generally a good rule, but sometimes you want
+         abstract test cases. Jukito may obviate the need for them, though. -->
+    <!-- <exclude name="TestClassWithoutTestCases"/> -->
+
+    <!-- Rationale: this rule is useless because PMD can't tell what your
+         assertion method is actually named. -->
+    <exclude name="JUnitTestsShouldIncludeAssert"/>
+
+  </rule>
+
+  <rule ref="rulesets/logging-java.xml">
+    <!-- Rationale: Loggers should be dependency injected like everything
+         else. -->
+    <exclude name="LoggerIsNotStaticFinal"/>
+  </rule>
+
+  <!-- Rationale: this ruleset isn't supported yet. -->
+  <!-- <rule ref="rulesets/maven.xml"/>  -->
+
+  <rule ref="rulesets/migrating.xml"/>
+  <rule ref="rulesets/naming.xml">
+
+    <!-- Rationale: variable names should be as long as they need to be.
+         Generally speaking, if a variable name is too long, it probably
+         indicates that it is providing an inappropriate amount of context and
+         that the code requires refactoring. This rule simply causes too many
+         false positives. A larger issue is that PMD makes no distinction
+         between locals and fields; field names should generally be longer. -->
+    <exclude name="LongVariable"/>
+
+    <!-- Rationale: there are perfectly acceptable method names of two letters
+         in length. For instance, "of" is great for factory methods. -->
+    <exclude name="ShortMethodName"/>
+
+    <!-- Rationale: very few variables should be one-character in length, but
+         there a few. For instance, "x" is perfectly appropriate; calling it
+         something like "xCoordinate" is foolish. -->
+    <exclude name="ShortVariable"/>
+
+  </rule>
+  <rule ref="rulesets/optimizations.xml"/>
+  <rule ref="rulesets/strictexception.xml">
+    <!-- <exclude name="AvoidThrowingNullPointerException"/> -->
+  </rule>
+  <rule ref="rulesets/strings.xml">
+    <exclude name="AvoidDuplicateLiterals"/>
+  </rule>
+  <rule ref="rulesets/strings.xml/AvoidDuplicateLiterals">
+    <properties>
+      <property name="skipAnnotations" value="true"/>
+    </properties>
+  </rule>
+  <rule ref="rulesets/sunsecure.xml"/>
+  <rule ref="rulesets/typeresolution.xml">
+
+    <!-- Rationale: this would be good, if PMD didn't sometimes give false
+         positives. -->
+    <exclude name="UnusedImports"/>
+
+    <!-- Rationale: this is never recommended, but sometimes extension classes
+         must do this because their super class has no way of knowing what
+         checked exception they might throw. -->
+    <exclude name="SignatureDeclareThrowsException"/>
+
+    <!-- <exclude name="CloneMethodMustImplementCloneable"/>  -->
+    <!-- <exclude name="LooseCoupling"/>  -->
+
+  </rule>
+  <rule ref="rulesets/unusedcode.xml"/>
+
+</ruleset>
