@@ -1,4 +1,4 @@
-# Oxide
+# Oxide [![Build Status](https://secure.travis-ci.org/ianbollinger/oxide.png)](http://travis-ci.org/ianbollinger/oxide)
 Oxide is an integrated development environment for the [Rust programming language](http://rust-lang.org) that runs on the [Eclipse](http://eclipse.org) platform. This project is in its infancy, so expect things not to work properly.
 
 ## License
