@@ -1,12 +1,14 @@
 package org.rustlang.oxide.launch;
 
+import com.google.inject.Inject;
 import org.eclipse.swt.widgets.Composite;
 
 // TODO: make name less hilarious.
 /**
- * TODO: Document.
+ * TODO: Document class.
  */
 public class RustLaunchConfigurationTabCompositeFactory {
+    @Inject
     RustLaunchConfigurationTabCompositeFactory() {
     }
 

@@ -10,8 +10,7 @@ import org.eclipse.debug.core.Launch;
  */
 @Immutable
 public class LaunchFactory {
-    // TODO: make package private.
-    public LaunchFactory() {
+    LaunchFactory() {
     }
 
     /**

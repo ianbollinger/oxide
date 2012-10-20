@@ -23,6 +23,7 @@
 package org.rustlang.oxide.launch;
 
 import com.google.common.base.Optional;
+import com.google.inject.Inject;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -39,7 +40,6 @@ import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.part.FileEditorInput;
-import org.rustlang.oxide.OxidePlugin;
 import org.rustlang.oxide.common.Loggers;
 import org.slf4j.Logger;
 
@@ -47,16 +47,14 @@ import org.slf4j.Logger;
  * Launch shortcut for Rust applications.
  */
 public class RustLaunchShortcut implements ILaunchShortcut {
-    private final Logger logger;
     private final ILaunchManager launchManager;
+    private final Logger logger;
 
-    /**
-     * This constructor is an implementation detail; do not invoke.
-     */
-    public RustLaunchShortcut() {
-        // TODO: inject fields and make constructor package-private.
-        this.logger = OxidePlugin.getLogger();
-        this.launchManager = DebugPlugin.getDefault().getLaunchManager();
+    @Inject
+    RustLaunchShortcut(final ILaunchManager launchManager,
+            final Logger logger) {
+        this.launchManager = launchManager;
+        this.logger = logger;
     }
 
     @Override

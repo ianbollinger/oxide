@@ -22,6 +22,7 @@
 
 package org.rustlang.oxide.text;
 
+import com.google.inject.Inject;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
 import org.eclipse.jface.text.rules.IRule;
@@ -47,6 +48,7 @@ public class RustCodeScanner extends BufferedRuleBasedScanner {
 
     private final RustColorManager colorManager;
 
+    @Inject
     RustCodeScanner(final RustColorManager colorManager) {
         this.colorManager = colorManager;
         // TODO: Don't do work in constructor.

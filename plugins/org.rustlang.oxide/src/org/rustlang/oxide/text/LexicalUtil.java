@@ -34,11 +34,11 @@ public final class LexicalUtil {
                 && hasValidIdentifierBody(string);
     }
 
-    static boolean isRustIdentifierStart(final char c) {
+    static boolean isRustIdentifierStart(final int c) {
         return Character.isUnicodeIdentifierStart(c) || c == '_';
     }
 
-    static boolean isRustIdentifierPart(final char c) {
+    static boolean isRustIdentifierPart(final int c) {
         return Character.isUnicodeIdentifierPart(c) || c == '_';
     }
 

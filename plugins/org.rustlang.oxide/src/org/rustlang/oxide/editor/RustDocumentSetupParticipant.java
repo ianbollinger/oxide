@@ -22,21 +22,28 @@
 
 package org.rustlang.oxide.editor;
 
+import javax.annotation.concurrent.Immutable;
+import com.google.inject.Inject;
 import org.eclipse.core.filebuffers.IDocumentSetupParticipant;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentExtension3;
-import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
-import org.rustlang.oxide.text.RustPartitionScanner;
 import org.rustlang.oxide.text.RustPartitions;
 
 /**
  * TODO: Document class.
  */
+@Immutable
 public class RustDocumentSetupParticipant implements IDocumentSetupParticipant {
+    private final FastPartitioner partitioner;
+
+    @Inject
+    RustDocumentSetupParticipant(final FastPartitioner partitioner) {
+        this.partitioner = partitioner;
+    }
+
     @Override
     public void setup(final IDocument document) {
-        final IDocumentPartitioner partitioner = createDocumentPartitioner();
         if (document instanceof IDocumentExtension3) {
             ((IDocumentExtension3) document).setDocumentPartitioner(
                     RustPartitions.RUST_PARTITIONING, partitioner);
@@ -44,11 +51,5 @@ public class RustDocumentSetupParticipant implements IDocumentSetupParticipant {
             document.setDocumentPartitioner(partitioner);
         }
         partitioner.connect(document);
-    }
-
-    private FastPartitioner createDocumentPartitioner() {
-        // TODO: inject or use factory.
-        return new FastPartitioner(new RustPartitionScanner(),
-                RustPartitions.CONTENT_TYPES);
     }
 }

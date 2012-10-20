@@ -26,6 +26,8 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.CommonTab;
 import org.eclipse.debug.ui.EnvironmentTab;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
@@ -45,6 +47,12 @@ public class RustLaunchModule extends AbstractModule {
     protected void configure() {
     }
 
+    @Provides
+    ILaunchManager provideLaunchManager() {
+        return DebugPlugin.getDefault().getLaunchManager();
+    }
+
+    @Provides
     ConsolePlugin provideConsolePlugin() {
         return ConsolePlugin.getDefault();
     }
@@ -55,9 +63,10 @@ public class RustLaunchModule extends AbstractModule {
     }
 
     @Provides
-    List<ILaunchConfigurationTab> provideConfigurationTabs() {
+    List<ILaunchConfigurationTab> provideConfigurationTabs(
+            final RustLaunchConfigurationTab rustLaunchConfigurationTab) {
         return ImmutableList.of(
-            (ILaunchConfigurationTab) new RustLaunchConfigurationTab(),
+            (ILaunchConfigurationTab) rustLaunchConfigurationTab,
             (ILaunchConfigurationTab) new EnvironmentTab(),
             (ILaunchConfigurationTab) new CommonTab()
         );

@@ -22,108 +22,59 @@
 
 package org.rustlang.oxide.text;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 import javax.annotation.Nullable;
+import com.google.common.collect.Iterables;
+import com.google.inject.BindingAnnotation;
 import com.google.inject.Inject;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
-import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
-import org.eclipse.jface.text.rules.ITokenScanner;
-import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 
-public class RustSourceViewerConfiguration extends
-        TextSourceViewerConfiguration {
-    private RustCodeScanner codeScanner;
-    private final RustColorManager colorManager;
+// TODO: can we make this class completely generic?
+/**
+ * TODO: Document class.
+ */
+public class RustSourceViewerConfiguration
+        extends TextSourceViewerConfiguration {
+    private final PresentationReconciler presentationReconciler;
+    private final Iterable<String> contentTypes;
 
     @Inject
-    RustSourceViewerConfiguration(final RustColorManager colorManager) {
-        this.colorManager = colorManager;
+    RustSourceViewerConfiguration(
+            final PresentationReconciler presentationReconciler,
+            @ContentTypes final Iterable<String> contentTypes) {
+        this.presentationReconciler = presentationReconciler;
+        this.contentTypes = contentTypes;
     }
 
     @Override
     public String[] getConfiguredContentTypes(
             @Nullable final ISourceViewer sourceViewer) {
+        return Iterables.toArray(contentTypes, String.class);
+    }
+
+    @Override
+    public String getConfiguredDocumentPartitioning(
+            @Nullable final ISourceViewer sourceViewer) {
         // TODO: inject.
-        return new String[] {
-            IDocument.DEFAULT_CONTENT_TYPE,
-            RustPartitions.RUST_DOC,
-            RustPartitions.RUST_SINGLE_LINE_COMMENT,
-            RustPartitions.RUST_MULTI_LINE_COMMENT,
-            RustPartitions.RUST_STRING,
-            RustPartitions.RUST_CHARACTER
-        };
+        return RustPartitions.RUST_PARTITIONING;
     }
 
     @Override
     public IPresentationReconciler getPresentationReconciler(
-            final ISourceViewer sourceViewer) {
-        // TODO: inject.
-        final PresentationReconciler reconciler = new PresentationReconciler();
-        reconciler.setDocumentPartitioning(getConfiguredDocumentPartitioning(
-                sourceViewer));
-        createDamagerRepairers(reconciler);
-        return reconciler;
+            @Nullable final ISourceViewer sourceViewer) {
+        presentationReconciler.setDocumentPartitioning(
+                getConfiguredDocumentPartitioning(sourceViewer));
+        return presentationReconciler;
     }
 
-    private void createDamagerRepairers(
-            final PresentationReconciler reconciler) {
-        // TODO: extract into a list.
-        createDamagerRepairer(reconciler, getCodeScanner(),
-                IDocument.DEFAULT_CONTENT_TYPE);
-        createDamagerRepairer(reconciler, getRustDocScanner(),
-                RustPartitions.RUST_DOC);
-        createDamagerRepairer(reconciler, getMultilineCommentScanner(),
-                RustPartitions.RUST_MULTI_LINE_COMMENT);
-        createDamagerRepairer(reconciler, getSinglelineCommentScanner(),
-                RustPartitions.RUST_SINGLE_LINE_COMMENT);
-        createDamagerRepairer(reconciler, getStringScanner(),
-                RustPartitions.RUST_STRING);
-        createDamagerRepairer(reconciler, getStringScanner(),
-                RustPartitions.RUST_CHARACTER);
-    }
-
-    private void createDamagerRepairer(
-            final PresentationReconciler reconciler,
-            final ITokenScanner scanner, final String partition) {
-        // TODO: create factory.
-        final DefaultDamagerRepairer dr = new DefaultDamagerRepairer(
-                scanner);
-        reconciler.setDamager(dr, partition);
-        reconciler.setRepairer(dr, partition);
-    }
-
-    private RustCodeScanner getCodeScanner() {
-        // TODO: esnure thread safety.
-        if (codeScanner == null) {
-            // TODO: inject.
-            codeScanner = new RustCodeScanner(colorManager);
-        }
-        return codeScanner;
-    }
-
-    private RuleBasedScanner getMultilineCommentScanner() {
-        // TODO: inject.
-        return new RustCommentScanner(colorManager,
-                RustColorConstants.MULTI_LINE_COMMENT);
-    }
-
-    private RuleBasedScanner getSinglelineCommentScanner() {
-        // TODO: inject.
-        return new RustCommentScanner(colorManager,
-                RustColorConstants.SINGLE_LINE_COMMENT);
-    }
-
-    private RuleBasedScanner getStringScanner() {
-        // TODO: inject.
-        return new SingleTokenRustScanner(colorManager,
-                RustColorConstants.STRING);
-    }
-
-    private RuleBasedScanner getRustDocScanner() {
-        // TODO: inject.
-        return new RustDocScanner(colorManager);
-    }
+    @BindingAnnotation @Target({FIELD, METHOD, PARAMETER}) @Retention(RUNTIME)
+    public @interface ContentTypes {}
 }

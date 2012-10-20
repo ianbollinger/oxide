@@ -34,6 +34,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
+import org.rustlang.oxide.common.ProgressMonitors;
 import org.rustlang.oxide.common.SubProgressMonitorFactory;
 import org.rustlang.oxide.common.template.TemplateFileWriter;
 import org.rustlang.oxide.common.wizard.PerspectiveUpdater;
@@ -109,28 +110,21 @@ public class RustNewProjectOperation extends WorkspaceModifyOperation {
     private void createProject(
             final IProgressMonitor monitor) throws CoreException {
         project.create(subProgressMonitorFactory.create(monitor));
-        ensureNotCanceled(monitor);
+        ProgressMonitors.ensureNotCanceled(monitor);
     }
 
     private void openProject(
             final IProgressMonitor monitor) throws CoreException {
         project.open(IResource.BACKGROUND_REFRESH,
                 subProgressMonitorFactory.create(monitor));
-        ensureNotCanceled(monitor);
+        ProgressMonitors.ensureNotCanceled(monitor);
     }
 
     private void setProjectDescription(
             final IProgressMonitor monitor) throws CoreException {
         project.setDescription(description,
                 subProgressMonitorFactory.create(monitor));
-        ensureNotCanceled(monitor);
-    }
-
-    // TODO: move into common as static method.
-    private void ensureNotCanceled(final IProgressMonitor monitor) {
-        if (monitor.isCanceled()) {
-            throw new OperationCanceledException();
-        }
+        ProgressMonitors.ensureNotCanceled(monitor);
     }
 
     private void createFiles(

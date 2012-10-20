@@ -23,26 +23,29 @@
 package org.rustlang.oxide.preference;
 
 import javax.annotation.Nullable;
+import com.google.inject.Inject;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.rustlang.oxide.OxidePlugin;
 
 /**
  * TODO: Document class.
  */
 public class RustEditorPreferencePage extends FieldEditorPreferencePage
         implements IWorkbenchPreferencePage {
-    // TODO: make package-private.
-    public RustEditorPreferencePage() {
+    private final IPreferenceStore preferenceStore;
+
+    @Inject
+    RustEditorPreferencePage(final IPreferenceStore preferenceStore) {
         super(FieldEditorPreferencePage.GRID);
+        this.preferenceStore = preferenceStore;
     }
 
     @Override
     public void init(@Nullable final IWorkbench workbench) {
-        // TODO: inject preference store.
-        final OxidePlugin plugin = OxidePlugin.getDefault();
-        setPreferenceStore(plugin.getPreferenceStore());
+        setPreferenceStore(preferenceStore);
+        // TODO: inject description.
         setDescription("Rust editor preferences.");
     }
 

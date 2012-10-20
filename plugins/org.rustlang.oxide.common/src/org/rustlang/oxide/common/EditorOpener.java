@@ -34,7 +34,7 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
 /**
- * TODO: Documet class.
+ * TODO: Document class.
  */
 @Immutable
 public class EditorOpener {

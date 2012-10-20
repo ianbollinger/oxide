@@ -24,25 +24,27 @@ package org.rustlang.oxide.preference;
 
 import javax.annotation.Nullable;
 import com.google.inject.Inject;
-import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PathEditor;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.rustlang.oxide.common.swt.LaxFileFieldEditor;
 
+// TODO: make class completely generic.
 /**
  * TODO: Document class.
  */
 public class RustPreferencePage extends FieldEditorPreferencePage
         implements IWorkbenchPreferencePage {
     private final IPreferenceStore preferenceStore;
+    private final RustPreferenceFieldFactory fieldFactory;
 
     @Inject
-    RustPreferencePage(final IPreferenceStore preferenceStore) {
+    RustPreferencePage(final IPreferenceStore preferenceStore,
+            final RustPreferenceFieldFactory fieldFactory) {
         super(FieldEditorPreferencePage.GRID);
         this.preferenceStore = preferenceStore;
+        this.fieldFactory = fieldFactory;
     }
 
     @Override
@@ -54,22 +56,9 @@ public class RustPreferencePage extends FieldEditorPreferencePage
 
     @Override
     protected void createFieldEditors() {
-        addField(provideCompilerEditor());
-        addField(provideLibraryPathEditor());
-    }
-
-    // TODO: make this a factory.
-    PathEditor provideLibraryPathEditor() {
-        return new PathEditor(
-                RustPreferenceKey.LIBRARY_PATHS.toString(),
-                "Rust &library paths", "Path for Rust libraries",
-                getFieldEditorParent());
-    }
-
-    // TODO: make this a factory.
-    FieldEditor provideCompilerEditor() {
-        return new LaxFileFieldEditor(
-                RustPreferenceKey.COMPILER_PATH.toString(),
-                "Rust &compiler path", getFieldEditorParent());
+        final Composite parent = getFieldEditorParent();
+        // TODO: extract to list.
+        addField(fieldFactory.createCompilerEditor(parent));
+        addField(fieldFactory.createLibraryPathEditor(parent));
     }
 }

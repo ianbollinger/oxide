@@ -40,10 +40,10 @@ public class RustNumberRule implements IRule {
     @Override
     public IToken evaluate(final ICharacterScanner scanner) {
         if (!LexicalUtil.isDecimalDigit(peek(scanner))) {
-            return getUndefinedToken();
+            return Token.UNDEFINED;
         }
         scanNumber(scanner);
-        return getToken();
+        return token;
     }
 
     private void scanNumber(final ICharacterScanner scanner) {
@@ -64,7 +64,21 @@ public class RustNumberRule implements IRule {
             }
             scanner.unread();
         }
+        scanner.unread();
         return 10;
+    }
+
+    private void scanDigits(final ICharacterScanner scanner, final int radix) {
+        int c;
+        do {
+            c = scanner.read();
+        } while (validDigit(c, radix));
+        scanner.unread();
+    }
+
+    private boolean validDigit(final int c, final int radix) {
+        return c == '_' || (LexicalUtil.isHexadecimalDigit(c)
+                && Character.digit(c, radix) != -1);
     }
 
     private void scanSuffix(final ICharacterScanner scanner) {
@@ -96,19 +110,6 @@ public class RustNumberRule implements IRule {
         }
     }
 
-    private void scanDigits(final ICharacterScanner scanner, final int radix) {
-        int c;
-        do {
-            c = scanner.read();
-        } while (validDigit(c, radix));
-        scanner.unread();
-    }
-
-    private boolean validDigit(final int c, final int radix) {
-        return c == '_' || (LexicalUtil.isHexadecimalDigit(c)
-                && Character.digit(c, radix) != -1);
-    }
-
     private void scanIntegerSuffix(final ICharacterScanner scanner) {
         final int c = scanner.read();
         if (c != '8') {
@@ -126,14 +127,6 @@ public class RustNumberRule implements IRule {
             scanner.unread();
         }
         scanDigits(scanner, 10);
-    }
-
-    private IToken getToken() {
-        return token;
-    }
-
-    private IToken getUndefinedToken() {
-        return Token.UNDEFINED;
     }
 
     private int peek(final ICharacterScanner scanner) {

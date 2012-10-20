@@ -22,6 +22,7 @@
 
 package org.rustlang.oxide.launch;
 
+import com.google.inject.Inject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -30,22 +31,23 @@ import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.rustlang.oxide.OxidePlugin;
 import org.slf4j.Logger;
 
 /**
  * TODO: Document class.
  */
 public class RustLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
-    private final Logger logger;
     private final RustLaunchConfigurationTabCompositeFactory factory;
+    private final Logger logger;
     // TODO: ensure thread safety.
     private volatile RustLaunchConfigurationTabComposite control;
 
-    public RustLaunchConfigurationTab() {
-        // TODO: inject fields.
-        this.logger = OxidePlugin.getLogger();
-        this.factory = new RustLaunchConfigurationTabCompositeFactory();
+    @Inject
+    RustLaunchConfigurationTab(
+            final RustLaunchConfigurationTabCompositeFactory factory,
+            final Logger logger) {
+        this.factory = factory;
+        this.logger = logger;
     }
 
     @Override

@@ -25,7 +25,7 @@ package org.rustlang.oxide.text;
 import org.eclipse.jface.text.rules.IWordDetector;
 
 /**
- * TODO: Document.
+ * TODO: Document class.
  */
 public class RustWordDetector implements IWordDetector {
     RustWordDetector() {

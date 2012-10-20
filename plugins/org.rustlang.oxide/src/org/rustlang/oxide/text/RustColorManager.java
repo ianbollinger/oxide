@@ -41,7 +41,9 @@ public class RustColorManager {
         this.colorTable = new HashMap<>();
     }
 
-    // TODO: make package-private or document.
+    /**
+     * TODO: Document method.
+     */
     public void dispose() {
         final Iterator<Color> e = colorTable.values().iterator();
         while (e.hasNext()) {

@@ -30,12 +30,12 @@ import com.google.inject.assistedinject.Assisted;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.templates.TemplateBuffer;
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateException;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
+import org.rustlang.oxide.common.ProgressMonitors;
 import org.rustlang.oxide.common.SubProgressMonitorFactory;
 
 /**
@@ -69,30 +69,27 @@ public class TemplateFileWriter {
     public void createFile(final IFile file, final String templateName,
             final IProgressMonitor monitor) throws CoreException {
         final boolean force = false;
-        file.create(getTemplateAsStream(templateName), force,
+        file.create(getTemplateStream(templateName), force,
                 subProgressMonitorFactory.create(monitor));
-        if (monitor.isCanceled()) {
-            throw new OperationCanceledException();
-        }
+        ProgressMonitors.ensureNotCanceled(monitor);
     }
 
-    private InputStream getTemplateAsStream(final String name) {
-        // TODO: replace with findTeplateById
+    private InputStream getTemplateStream(final String name) {
+        return new ByteArrayInputStream(getTemplateBytes(name));
+    }
+
+    private byte[] getTemplateBytes(final String name) {
         try {
-            final TemplateBuffer buffer = evaluateTemplate(name);
-            return new ByteArrayInputStream(getTemplateBytes(buffer));
+            return evaluateTemplate(name).getString().getBytes(charset);
         } catch (final TemplateException e) {
-            return new ByteArrayInputStream(new byte[] {});
+            return new byte[] {};
         }
-    }
-
-    private byte[] getTemplateBytes(final TemplateBuffer buffer) {
-        return buffer.getString().getBytes(charset);
     }
 
     private TemplateBuffer evaluateTemplate(
             final String name) throws TemplateException {
         try {
+            // TODO: replace with findTeplateById
             return templateContext.evaluate(templateStore.findTemplate(name));
         } catch (final BadLocationException e) {
             throw new TemplateException(e);

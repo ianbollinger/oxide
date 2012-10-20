@@ -22,12 +22,14 @@
 
 package org.rustlang.oxide.text;
 
+import com.google.inject.Inject;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 
 public class RustDocScanner extends RuleBasedScanner {
     private final RustColorManager colorManager;
 
-    public RustDocScanner(final RustColorManager colorManager) {
+    @Inject
+    RustDocScanner(final RustColorManager colorManager) {
         this.colorManager = colorManager;
     }
 }

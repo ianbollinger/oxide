@@ -36,7 +36,7 @@ public final class Enums2 {
 
     /**
      * Invoke the {@link values} method on the given {@link Enum} class.
-     * 
+     *
      * @param enumeration
      *            the Enum class
      * @return

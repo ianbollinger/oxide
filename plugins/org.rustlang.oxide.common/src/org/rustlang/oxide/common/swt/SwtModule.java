@@ -20,37 +20,38 @@
  * THE SOFTWARE.
  */
 
-package org.rustlang.oxide.preference;
+package org.rustlang.oxide.common.swt;
 
-import javax.annotation.Nullable;
-import com.google.inject.Inject;
-import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPreferencePage;
+import javax.annotation.concurrent.Immutable;
+import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 
 /**
  * TODO: Document class.
+ *
+ * TODO: list bindings.
  */
-public class RustSyntaxColoringPreferencePage extends FieldEditorPreferencePage
-        implements IWorkbenchPreferencePage {
-    private final IPreferenceStore preferenceStore;
-
-    @Inject
-    RustSyntaxColoringPreferencePage(final IPreferenceStore preferenceStore) {
-        super(FieldEditorPreferencePage.GRID);
-        this.preferenceStore = preferenceStore;
+@Immutable
+public class SwtModule extends AbstractModule {
+    /**
+     * This constructor should not be invoked directly.
+     */
+    public SwtModule() {
     }
 
     @Override
-    public void init(@Nullable final IWorkbench workbench) {
-        setPreferenceStore(preferenceStore);
-        // TODO: inject description.
-        setDescription("Rust syntax coloring preferences.");
+    protected void configure() {
     }
 
-    @Override
-    protected void createFieldEditors() {
-        // TODO: implement.
+    @Provides
+    public GridLayoutFactory provideGridLayoutFactory() {
+        return GridLayoutFactory.swtDefaults();
+    }
+
+    @Provides
+    public GridDataFactory provideGridDataFactory() {
+        return GridDataFactory.swtDefaults();
     }
 }

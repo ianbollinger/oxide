@@ -46,7 +46,6 @@ import org.ops4j.peaberry.eclipse.EclipseRegistry;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.rustlang.oxide.common.Loggers;
-import org.slf4j.Logger;
 
 // TODO: replace.
 /**

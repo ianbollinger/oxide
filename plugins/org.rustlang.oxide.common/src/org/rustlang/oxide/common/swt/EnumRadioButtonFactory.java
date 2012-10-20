@@ -22,12 +22,10 @@ public class EnumRadioButtonFactory<T extends Enum<T>> {
      * @return
      */
     public Button create(final EnumRadioGroup<T> parent, final T value) {
-        // TODO: create factory.
         final Button result = new Button(parent, SWT.RADIO);
         result.setText(value.toString());
         result.setFont(parent.getFont());
         result.addSelectionListener(
-                // TODO: create factory.
                 new EnumRadioButtonSelectionAdapter<>(parent, value));
         return result;
     }

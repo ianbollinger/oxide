@@ -25,11 +25,9 @@ package org.rustlang.oxide.common.swt;
 import java.util.List;
 import java.util.Map;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.rustlang.oxide.common.Enums2;
 
 /**
  * TODO: Document class.
@@ -62,26 +60,6 @@ public class EnumRadioGroup<T extends Enum<T>> extends Composite {
         return builder.build();
     }
 
-    // TODO: make into factory.
-    public static <T extends Enum<T>> EnumRadioGroup<T> of(
-            final Composite parent, final Class<T> enumeration) {
-        final List<T> items = Enums2.values(enumeration);
-        final T first = items.get(0);
-        final EnumRadioGroup<T> group = new EnumRadioGroup<>(parent,
-                items, new EnumRadioButtonFactory<T>(), first);
-        group.setFont(parent.getFont());
-        group.select(first);
-        createLayout(group, items.size());
-        return group;
-    }
-
-    private static void createLayout(final Composite composite,
-            final int columns) {
-        // TODO: inject.
-        GridLayoutFactory.swtDefaults().numColumns(columns)
-                .generateLayout(composite);
-    }
-
     public T getSelection() {
         return selection;
     }
@@ -91,7 +69,7 @@ public class EnumRadioGroup<T extends Enum<T>> extends Composite {
         this.selection = selection;
     }
 
-    private void select(final T value) {
+    void select(final T value) {
         buttons.get(value).setSelection(true);
     }
 }

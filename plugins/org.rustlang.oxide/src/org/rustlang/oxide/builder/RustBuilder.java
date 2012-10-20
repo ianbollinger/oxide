@@ -63,18 +63,20 @@ public class RustBuilder extends IncrementalProjectBuilder {
     private final Pattern errorPattern;
     private final Logger logger;
     private final ProcessExecutor processExecutor;
+    private final ImmutableList<RustCompilerVisitor> visitors;
 
     /**
-     * The constructor is an implementation detail and should not be invoked
+     * This constructor is an implementation detail and should not be invoked
      * directly.
      */
     public RustBuilder() {
-        // TODO: inject fields.
+        // TODO: inject fields somehow.
         this.preferenceStore = OxidePlugin.getEnumPreferenceStore();
         this.errorPattern = Pattern.compile(
                 "^([^:]+):(\\d+):(\\d+): (\\d+):(\\d+) error: (.+)$");
         this.logger = OxidePlugin.getLogger();
         this.processExecutor = new ProcessExecutor();
+        this.visitors = ImmutableList.of(new RustCompilerVisitor());
     }
 
     @Override @Nullable
@@ -163,7 +165,9 @@ public class RustBuilder extends IncrementalProjectBuilder {
     private Iterable<String> getLibraryPaths() {
         final String libraryPaths = preferenceStore
                 .getString(RustPreferenceKey.LIBRARY_PATHS);
-        return Splitter.on(';').omitEmptyStrings().split(libraryPaths);
+        // TODO: inject.
+        final Splitter pathSplitter = Splitter.on(';').omitEmptyStrings();
+        return pathSplitter.split(libraryPaths);
     }
 
     // TODO: rename!
@@ -207,19 +211,14 @@ public class RustBuilder extends IncrementalProjectBuilder {
 
     private void fullBuild() throws CoreException {
         final IProject project = getProject();
-        for (final IResourceVisitor visitor : getVisitors()) {
+        for (final IResourceVisitor visitor : visitors) {
             project.accept(visitor);
         }
     }
 
-    private List<? extends RustBuilderVisitor> getVisitors() {
-        // TODO: inject.
-        return ImmutableList.of(new RustCompilerVisitor());
-    }
-
     private void incrementalBuild(
             final IResourceDelta delta) throws CoreException {
-        for (final IResourceDeltaVisitor visitor : getVisitors()) {
+        for (final IResourceDeltaVisitor visitor : visitors) {
             delta.accept(visitor);
         }
     }

@@ -22,10 +22,16 @@
 
 package org.rustlang.oxide.preference;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import com.google.inject.BindingAnnotation;
+import com.google.inject.Inject;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.rustlang.oxide.OxidePlugin;
 import org.rustlang.oxide.common.EnumPreferenceStore;
-import org.rustlang.oxide.common.PlatformUtil;
 
 /**
  * TODO: Document class.
@@ -34,10 +40,11 @@ public class RustPreferencesInitializer extends AbstractPreferenceInitializer {
     private final EnumPreferenceStore preferenceStore;
     private final String defaultCompilerName;
 
-    RustPreferencesInitializer() {
-        // TODO: Inject fields.
-        this.preferenceStore = OxidePlugin.getEnumPreferenceStore();
-        this.defaultCompilerName = PlatformUtil.getExecutableName("rustc");
+    @Inject
+    RustPreferencesInitializer(final EnumPreferenceStore preferenceStore,
+            @CompilerName final String defaultCompilerName) {
+        this.preferenceStore = preferenceStore;
+        this.defaultCompilerName = defaultCompilerName;
     }
 
     @Override
@@ -45,4 +52,7 @@ public class RustPreferencesInitializer extends AbstractPreferenceInitializer {
         preferenceStore.setDefault(RustPreferenceKey.COMPILER_PATH,
                 defaultCompilerName);
     }
+
+    @BindingAnnotation @Target({FIELD, METHOD, PARAMETER}) @Retention(RUNTIME)
+    public @interface CompilerName {}
 }

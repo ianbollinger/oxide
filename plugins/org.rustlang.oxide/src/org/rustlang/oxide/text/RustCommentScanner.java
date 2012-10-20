@@ -22,6 +22,7 @@
 
 package org.rustlang.oxide.text;
 
+import com.google.inject.Inject;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.Token;
@@ -33,6 +34,7 @@ import org.eclipse.swt.graphics.RGB;
 public class RustCommentScanner extends RuleBasedScanner {
     private final RustColorManager colorManager;
 
+    @Inject
     RustCommentScanner(final RustColorManager colorManager, final RGB color) {
         this.colorManager = colorManager;
         // TODO: don't do work in constructor.

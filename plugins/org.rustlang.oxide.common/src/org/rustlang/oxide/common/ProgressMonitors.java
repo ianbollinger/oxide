@@ -20,37 +20,28 @@
  * THE SOFTWARE.
  */
 
-package org.rustlang.oxide.preference;
+package org.rustlang.oxide.common;
 
-import javax.annotation.Nullable;
-import com.google.inject.Inject;
-import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPreferencePage;
+import javax.annotation.concurrent.Immutable;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 
 /**
- * TODO: Document class.
+ * Static utility methods pertaining to {@link IProgressMonitor} instances.
  */
-public class RustSyntaxColoringPreferencePage extends FieldEditorPreferencePage
-        implements IWorkbenchPreferencePage {
-    private final IPreferenceStore preferenceStore;
-
-    @Inject
-    RustSyntaxColoringPreferencePage(final IPreferenceStore preferenceStore) {
-        super(FieldEditorPreferencePage.GRID);
-        this.preferenceStore = preferenceStore;
+@Immutable
+public final class ProgressMonitors {
+    private ProgressMonitors() {
     }
 
-    @Override
-    public void init(@Nullable final IWorkbench workbench) {
-        setPreferenceStore(preferenceStore);
-        // TODO: inject description.
-        setDescription("Rust syntax coloring preferences.");
-    }
-
-    @Override
-    protected void createFieldEditors() {
-        // TODO: implement.
+    /**
+     * TODO: Document method.
+     *
+     * @param monitor
+     */
+    public static void ensureNotCanceled(final IProgressMonitor monitor) {
+        if (monitor.isCanceled()) {
+            throw new OperationCanceledException();
+        }
     }
 }

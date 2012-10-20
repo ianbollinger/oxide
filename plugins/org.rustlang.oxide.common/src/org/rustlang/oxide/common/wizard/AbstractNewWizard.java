@@ -22,6 +22,7 @@
 
 package org.rustlang.oxide.common.wizard;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import javax.annotation.Nullable;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
@@ -33,8 +34,8 @@ import org.eclipse.ui.IWorkbench;
 /**
  * TODO: Document class.
  */
-public abstract class AbstractNewWizard extends Wizard
-        implements INewWizard, IExecutableExtension {
+public abstract class AbstractNewWizard extends Wizard implements INewWizard,
+        IExecutableExtension {
     // FIXME: volatility is not sufficient to ensure thread-safety here.
     private volatile IConfigurationElement configuration;
     private volatile IWorkbench workbench;
@@ -56,18 +57,22 @@ public abstract class AbstractNewWizard extends Wizard
     /**
      * TODO: Document method.
      *
-     * @return
+     * @return the configuration
+     * @throws NullPointerException
+     *             if {@link init} has not been called
      */
     public IConfigurationElement getConfiguration() {
-        return configuration;
+        return checkNotNull(configuration);
     }
 
     /**
      * TODO: Document method.
      *
-     * @return
+     * @return the workbench
+     * @throws NullPointerException
+     *             if {@link init} has not been called
      */
     public IWorkbench getWorkbench() {
-        return workbench;
+        return checkNotNull(workbench);
     }
 }

@@ -23,11 +23,11 @@
 package org.rustlang.oxide.common;
 
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 
 import com.google.inject.Inject;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.slf4j.helpers.FormattingTuple;
 import org.slf4j.helpers.MarkerIgnoringBase;
 import org.slf4j.helpers.MessageFormatter;
@@ -35,13 +35,16 @@ import org.slf4j.helpers.MessageFormatter;
 /**
  * TODO: Document class.
  */
+@Immutable
 public class EclipseLogger extends MarkerIgnoringBase {
     private static final long serialVersionUID = 1L;
     private final ILog wrappedLog;
+    private final StatusFactory statusFactory;
 
     @Inject
-    EclipseLogger(final ILog wrappedLog) {
+    EclipseLogger(final ILog wrappedLog, final StatusFactory statusFactory) {
         this.wrappedLog = wrappedLog;
+        this.statusFactory = statusFactory;
     }
 
     @Override
@@ -207,7 +210,7 @@ public class EclipseLogger extends MarkerIgnoringBase {
 
     private void log(final int severity, @Nullable final String message,
             @Nullable final Throwable throwable) {
-        wrappedLog.log(provideStatus(severity, message, throwable));
+        wrappedLog.log(statusFactory.create(severity, message, throwable));
     }
 
     private void formatAndLog(final int severity, @Nullable final String format,
@@ -220,13 +223,5 @@ public class EclipseLogger extends MarkerIgnoringBase {
             @Nullable final Object[] args) {
         final FormattingTuple tp = MessageFormatter.arrayFormat(format, args);
         log(severity, tp.getMessage(), tp.getThrowable());
-    }
-
-    Status provideStatus(final int severity, @Nullable final String message,
-            @Nullable final Throwable throwable) {
-        // TODO: get this from a factory.
-        // TODO: get ID properly.
-        return new Status(severity, "org.rustlang.oxide", IStatus.OK, message,
-                throwable);
     }
 }

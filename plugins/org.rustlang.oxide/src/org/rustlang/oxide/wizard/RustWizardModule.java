@@ -22,9 +22,16 @@
 
 package org.rustlang.oxide.wizard;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import com.google.inject.AbstractModule;
+import com.google.inject.BindingAnnotation;
 import com.google.inject.Provides;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -38,7 +45,7 @@ import org.rustlang.oxide.OxidePlugin;
  * Provides bindings for:
  * TODO: list bindings.
  */
-public class WizardModule extends AbstractModule {
+public class RustWizardModule extends AbstractModule {
     @Override
     protected void configure() {
         install(new FactoryModuleBuilder()
@@ -65,7 +72,7 @@ public class WizardModule extends AbstractModule {
         return OxidePlugin.getImageDescriptor("icons/rust-logo-64x64.png");
     }
 
-    @Provides
+    @Provides @InitialAuthor
     String provideInitialAuthor() {
         return System.getProperty("user.name");
     }
@@ -74,4 +81,7 @@ public class WizardModule extends AbstractModule {
     UUID provideInitialUUID() {
         return UUID.randomUUID();
     }
+
+    @BindingAnnotation @Target({FIELD, METHOD, PARAMETER}) @Retention(RUNTIME)
+    public @interface InitialAuthor {}
 }

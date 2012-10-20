@@ -18,7 +18,7 @@ public class ProcessExecutor {
      *
      * @param commandLine
      * @param workingDirectory
-     * @return 
+     * @return
      * @throws CoreException
      */
     public Process execute(final Iterable<String> commandLine,

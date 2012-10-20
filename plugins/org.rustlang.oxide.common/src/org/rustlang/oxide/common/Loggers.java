@@ -36,7 +36,7 @@ public final class Loggers {
     /**
      * Write an exception to the given logger using the exception's message as
      * the message to log.
-     * 
+     *
      * @param logger
      *            the logger to log to
      * @param throwable

@@ -23,6 +23,7 @@
 package org.rustlang.oxide.launch;
 
 import javax.annotation.Nullable;
+import com.google.inject.Inject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -52,12 +53,12 @@ public class RustLaunchConfigurationTabComposite extends Composite {
     private final Group programArgumentsGroup;
     private final Text programArgumentsTextArea;
 
-    // TODO: work should never be done in the constructor; especially not this
-    // much.
-    public RustLaunchConfigurationTabComposite(final Composite parent,
+    @Inject
+    RustLaunchConfigurationTabComposite(final Composite parent,
             final RustLaunchConfigurationTab tab) {
         super(parent, SWT.NULL);
         this.tab = tab;
+        // TODO: inject fields, don't do work in constructor.
         this.projectGroup = createProjectGroup();
         this.mainGroup = createExecutableGroup();
         this.executableField = createExcutableField();

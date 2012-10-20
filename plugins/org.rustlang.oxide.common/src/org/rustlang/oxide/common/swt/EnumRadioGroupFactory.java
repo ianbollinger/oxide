@@ -20,37 +20,41 @@
  * THE SOFTWARE.
  */
 
-package org.rustlang.oxide.preference;
+package org.rustlang.oxide.common.swt;
 
-import javax.annotation.Nullable;
+import java.util.List;
 import com.google.inject.Inject;
-import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.swt.widgets.Composite;
+import org.rustlang.oxide.common.Enums2;
 
 /**
  * TODO: Document class.
+ *
+ * @param <T>
  */
-public class RustSyntaxColoringPreferencePage extends FieldEditorPreferencePage
-        implements IWorkbenchPreferencePage {
-    private final IPreferenceStore preferenceStore;
+public class EnumRadioGroupFactory {
+    private final GridLayoutFactory gridLayoutFactory;
 
     @Inject
-    RustSyntaxColoringPreferencePage(final IPreferenceStore preferenceStore) {
-        super(FieldEditorPreferencePage.GRID);
-        this.preferenceStore = preferenceStore;
+    EnumRadioGroupFactory() {
+        // TODO: inject field.
+        this.gridLayoutFactory = GridLayoutFactory.swtDefaults();
     }
 
-    @Override
-    public void init(@Nullable final IWorkbench workbench) {
-        setPreferenceStore(preferenceStore);
-        // TODO: inject description.
-        setDescription("Rust syntax coloring preferences.");
+    public <T extends Enum<T>> EnumRadioGroup<T> create(
+            final Composite parent, final Class<T> enumeration) {
+        final List<T> items = Enums2.values(enumeration);
+        final T first = items.get(0);
+        final EnumRadioGroup<T> group = new EnumRadioGroup<>(parent,
+                items, new EnumRadioButtonFactory<T>(), first);
+        group.setFont(parent.getFont());
+        group.select(first);
+        createLayout(group, items.size());
+        return group;
     }
 
-    @Override
-    protected void createFieldEditors() {
-        // TODO: implement.
+    private void createLayout(final Composite composite, final int columns) {
+        gridLayoutFactory.numColumns(columns).generateLayout(composite);
     }
 }

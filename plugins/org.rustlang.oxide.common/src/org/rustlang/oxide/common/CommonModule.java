@@ -36,13 +36,15 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.statushandlers.StatusManager;
+import org.rustlang.oxide.common.SubProgressMonitorFactory.WorkScale;
 import org.rustlang.oxide.common.command.UndoableOperationWithProgress;
 import org.rustlang.oxide.common.command.UndoableOperationWithProgressFactory;
-import org.rustlang.oxide.common.SubProgressMonitorFactory.WorkScale;
 import org.slf4j.Logger;
 
 /**
  * TODO: Document class.
+ *
+ * TODO: list bindings.
  */
 @Immutable
 public class CommonModule extends AbstractModule {

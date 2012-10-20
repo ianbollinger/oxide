@@ -34,6 +34,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.rustlang.oxide.common.swt.EnumRadioGroup;
+import org.rustlang.oxide.common.swt.EnumRadioGroupFactory;
 import org.rustlang.oxide.model.CrateType;
 
 /**
@@ -41,6 +42,9 @@ import org.rustlang.oxide.model.CrateType;
  */
 public class RustProjectPropertiesGroup {
     private final Composite parent;
+    private final EnumRadioGroupFactory enumRadioGroupFactory;
+    private final GridLayoutFactory gridLayoutFactory;
+    private final GridDataFactory gridDataFactory;
     private final Font font;
     private final Group propertiesGroup;
     private final Group metadataGroup;
@@ -54,8 +58,15 @@ public class RustProjectPropertiesGroup {
     private final Text longDescriptionField;
 
     @Inject
-    RustProjectPropertiesGroup(@Assisted final Composite parent) {
+    RustProjectPropertiesGroup(
+            final EnumRadioGroupFactory enumRadioGroupFactory,
+            final GridLayoutFactory gridLayoutFactory,
+            final GridDataFactory gridDataFactory,
+            @Assisted final Composite parent) {
         this.parent = parent;
+        this.enumRadioGroupFactory = enumRadioGroupFactory;
+        this.gridLayoutFactory = gridLayoutFactory;
+        this.gridDataFactory = gridDataFactory;
         this.font = parent.getFont();
         // TODO: replace with factories (ugh.)
         this.propertiesGroup = createGroup("Crate properties");
@@ -102,8 +113,8 @@ public class RustProjectPropertiesGroup {
     }
 
     private void generateLayouts() {
-        final GridLayoutFactory twoColumnLayoutFactory = GridLayoutFactory
-                .swtDefaults().numColumns(2);
+        final GridLayoutFactory twoColumnLayoutFactory =
+                gridLayoutFactory.numColumns(2);
         twoColumnLayoutFactory.generateLayout(propertiesGroup);
         twoColumnLayoutFactory.generateLayout(metadataGroup);
         twoColumnLayoutFactory.generateLayout(documentationGroup);
@@ -113,8 +124,7 @@ public class RustProjectPropertiesGroup {
         final Group result = new Group(parent, SWT.NONE);
         result.setFont(font);
         result.setText(title);
-        GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER)
-                .applyTo(result);
+        gridDataFactory.align(SWT.FILL, SWT.CENTER).applyTo(result);
         return result;
     }
 
@@ -123,18 +133,23 @@ public class RustProjectPropertiesGroup {
         final Combo combo = new Combo(metadataGroup, SWT.NONE);
         // TODO: is this the right list of licenses?
         // TODO: Store somewhere appropriate.
-        combo.add("Apache-2.0");
-        combo.add("BSD-2-clause");
-        combo.add("MIT");
-        combo.add("GPL-3.0");
-        combo.add("LGPL-3.0");
+        final String[] licenses = {
+            "Apache-2.0",
+            "BSD-2-clause",
+            "MIT",
+            "GPL-3.0",
+            "LGPL-3.0"
+        };
+        for (final String license : licenses) {
+            combo.add(license);
+        }
         combo.setFont(font);
         return combo;
     }
 
     private EnumRadioGroup<CrateType> createCrateTypeGroup() {
         createLabel(propertiesGroup, "Crate type");
-        return EnumRadioGroup.of(propertiesGroup, CrateType.class);
+        return enumRadioGroupFactory.create(propertiesGroup, CrateType.class);
     }
 
     private Text createTextField(final Group group, final String label) {
@@ -155,6 +170,7 @@ public class RustProjectPropertiesGroup {
     private Text createVersionField() {
         final Text text = createTextField(propertiesGroup, "Version");
         text.setText("0.0.1");
+        text.setFont(font);
         return text;
     }
 

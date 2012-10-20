@@ -28,6 +28,7 @@ import javax.annotation.Nullable;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.inject.Inject;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -52,11 +53,13 @@ public class RustApplicationLauncher implements ILaunchConfigurationDelegate2 {
     private final LaunchFactory launchFactory;
     private final ProcessExecutor processExecutor;
 
-    RustApplicationLauncher(final IWorkspaceRoot root) {
+    @Inject
+    RustApplicationLauncher(final IWorkspaceRoot root,
+            final LaunchFactory launchFactory,
+            final ProcessExecutor processExecutor) {
         this.workspaceRoot = root;
-        // TODO: Inject fields.
-        this.launchFactory = new LaunchFactory();
-        this.processExecutor = new ProcessExecutor();
+        this.launchFactory = launchFactory;
+        this.processExecutor = processExecutor;
     }
 
     @Override

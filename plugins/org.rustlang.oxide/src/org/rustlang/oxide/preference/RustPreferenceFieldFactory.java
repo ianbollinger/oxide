@@ -22,35 +22,44 @@
 
 package org.rustlang.oxide.preference;
 
-import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 import com.google.inject.Inject;
-import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.jface.preference.FieldEditor;
+import org.eclipse.jface.preference.PathEditor;
+import org.eclipse.swt.widgets.Composite;
+import org.rustlang.oxide.common.swt.LaxFileFieldEditor;
 
 /**
  * TODO: Document class.
  */
-public class RustSyntaxColoringPreferencePage extends FieldEditorPreferencePage
-        implements IWorkbenchPreferencePage {
-    private final IPreferenceStore preferenceStore;
-
+@Immutable
+public class RustPreferenceFieldFactory {
     @Inject
-    RustSyntaxColoringPreferencePage(final IPreferenceStore preferenceStore) {
-        super(FieldEditorPreferencePage.GRID);
-        this.preferenceStore = preferenceStore;
+    RustPreferenceFieldFactory() {
     }
 
-    @Override
-    public void init(@Nullable final IWorkbench workbench) {
-        setPreferenceStore(preferenceStore);
-        // TODO: inject description.
-        setDescription("Rust syntax coloring preferences.");
+    /**
+     * TODO: Document method.
+     *
+     * @param parent
+     * @return
+     */
+    public PathEditor createLibraryPathEditor(final Composite parent) {
+        return new PathEditor(
+                RustPreferenceKey.LIBRARY_PATHS.toString(),
+                "Rust &library paths", "Path for Rust libraries",
+                parent);
     }
 
-    @Override
-    protected void createFieldEditors() {
-        // TODO: implement.
+    /**
+     * TODO: Document method.
+     *
+     * @param parent
+     * @return
+     */
+    public FieldEditor createCompilerEditor(final Composite parent) {
+        return new LaxFileFieldEditor(
+                RustPreferenceKey.COMPILER_PATH.toString(),
+                "Rust &compiler path", parent);
     }
 }

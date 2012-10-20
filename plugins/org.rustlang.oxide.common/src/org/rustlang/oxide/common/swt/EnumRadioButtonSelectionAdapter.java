@@ -25,12 +25,7 @@ package org.rustlang.oxide.common.swt;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 
-/**
- * TODO: Document class.
- *
- * @param <T>
- */
-public class EnumRadioButtonSelectionAdapter<T extends Enum<T>>
+class EnumRadioButtonSelectionAdapter<T extends Enum<T>>
         extends SelectionAdapter {
     private final EnumRadioGroup<T> parent;
     private final T value;
